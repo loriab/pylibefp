@@ -40,11 +40,9 @@ std::string wrapped_efp_banner(efp* efp) {
     return str;
 }
 
-void wrapped_efp_print_banner(efp* efp) {
-    printf("%s", efp_banner());
-}
 
-void opts_from_dict(efp* efp, py::dict opts_init) {
+//void opts_from_dict(efp* efp, py::dict opts_init) {
+efp_result opts_from_dict(efp* efp, py::dict opts_init) {
     enum efp_result res;
     struct efp_opts opts;
     memset(&opts, 0, sizeof(struct efp_opts));
@@ -67,16 +65,18 @@ void opts_from_dict(efp* efp, py::dict opts_init) {
             else if (std::string(py::str(item.second)) == "off")
                 opts.elec_damp = EFP_ELEC_DAMP_OFF;
             else
-                printf("bad2\n");
+                throw libefpException("opt_from_dict: invalid value for elec_damp");
         }
+
         if (std::string(py::str(item.first)) == "pol_damp") {
             if (std::string(py::str(item.second)) == "tt")
                 opts.pol_damp = EFP_POL_DAMP_TT;
             else if (std::string(py::str(item.second)) == "off")
                 opts.pol_damp = EFP_POL_DAMP_OFF;
             else
-                printf("bad2\n");
+                throw libefpException("opt_from_dict: invalid value for pol_damp");
         }
+
         if (std::string(py::str(item.first)) == "disp_damp") {
             if (std::string(py::str(item.second)) == "tt")
                 opts.disp_damp = EFP_DISP_DAMP_TT;
@@ -85,7 +85,7 @@ void opts_from_dict(efp* efp, py::dict opts_init) {
             else if (std::string(py::str(item.second)) == "off")
                 opts.disp_damp = EFP_DISP_DAMP_OFF;
             else
-                printf("bad2\n");
+                throw libefpException("opt_from_dict: invalid value for disp_damp");
         }
 
         if (std::string(py::str(item.first)) == "ai_elec")
@@ -111,12 +111,21 @@ void opts_from_dict(efp* efp, py::dict opts_init) {
             if (opts_init["xr"].cast<bool>() == true)
                 opts.terms |= EFP_TERM_XR;
         //opts.terms |= EFP_TERM_CHTR;  // may be enabled in a future libefp release
+
+        if (std::string(py::str(item.first)) == "enable_pbc")
+            opts.enable_pbc = opts_init["enable_pbc"].cast<int>();
+        if (std::string(py::str(item.first)) == "enable_cutoff")
+            opts.enable_cutoff = opts_init["enable_cutoff"].cast<int>();
+        if (std::string(py::str(item.first)) == "swf_cutoff")
+            opts.swf_cutoff = opts_init["swf_cutoff"].cast<double>();
     }
 
-    if ((res = efp_set_opts(efp, &opts))) {
-        std::string sres = "efp_set_opts: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
+    //if ((res = efp_set_opts(efp, &opts))) {
+    //    std::string sres = "efp_set_opts: " + rts(res) + "\n";
+    //    throw libefpException(sres.c_str());
+    //}
+    res = efp_set_opts(efp, &opts);
+    return res;
 }
 
 
@@ -221,26 +230,46 @@ py::dict opts_to_dict(efp* efp) {
         ans = "direct";
     opts_init[py::str("pol_driver")] = ans;
 
+    opts_init[py::str("enable_pbc")] = opts.enable_pbc;
+    opts_init[py::str("enable_cutoff")] = opts.enable_cutoff;
+    opts_init[py::str("swf_cutoff")] = opts.swf_cutoff;
+
     return opts_init;
 }
 
-void wrapped_efp_add_potential(efp* efp, std::string path) {
-    enum efp_result res;
 
-    if ((res = efp_add_potential(efp, path.c_str()))) {
-        std::string sres = "efp_add_potential: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
+//void wrapped_efp_add_fragment(efp* efp, std::string name) {
+//    enum efp_result res;
+//
+//    if ((res = efp_add_fragment(efp, name.c_str()))) {
+//        std::string sres = "wrapped_efp_add_fragment: efp_add_fragment: " + rts(res) + "\n";
+//        throw libefpException(sres.c_str());
+//    }
+//}
+
+efp_result wrapped_efp_set_frag_coordinates1(efp* efp, size_t frag_idx, efp_coord_type ctype, py::list coord) {
+    enum efp_result res;
+//    enum efp_coord_type ctype;
+//
+//    if (coord_type == "xyzabc")
+//        ctype = EFP_COORD_TYPE_XYZABC;
+//    else if (coord_type == "points")
+//        ctype = EFP_COORD_TYPE_POINTS;
+//    else if (coord_type == "rotmat")
+//        ctype = EFP_COORD_TYPE_ROTMAT;
+//    else
+//        throw libefpException("efp_coord_type not found: ");
+
+    double *ccoords = NULL;
+    ccoords = new double[12];  // room for xyzabc (6), points (9), or rotmat (12)
+    double *pcoords = ccoords;
+    for (auto itm : coord)
+        *pcoords++ = itm.cast<double>();
+
+    res = efp_set_frag_coordinates(efp, frag_idx, ctype, ccoords);
+    return res;
 }
 
-void wrapped_efp_add_fragment(efp* efp, std::string name) {
-    enum efp_result res;
-
-    if ((res = efp_add_fragment(efp, name.c_str()))) {
-        std::string sres = "wrapped_efp_add_fragment: efp_add_fragment: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
-}
 
 void wrapped_efp_set_frag_coordinates(efp* efp, size_t frag_idx, std::string coord_type, py::list coord) {
     enum efp_result res;
@@ -267,23 +296,6 @@ void wrapped_efp_set_frag_coordinates(efp* efp, size_t frag_idx, std::string coo
     }
 }
 
-void wrapped_efp_prepare(efp* efp) {
-    enum efp_result res;
-
-    if ((res = efp_prepare(efp))) {
-        std::string sres = "efp_prepare: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
-}
-
-void wrapped_efp_compute(efp* efp, bool do_gradient=false) {
-    enum efp_result res;
-
-    if ((res = efp_compute(efp, do_gradient))) {
-        std::string sres = "efp_compute: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
-}
 
 py::dict wrapped_efp_get_energy(efp* efp) {
     enum efp_result res;
@@ -585,42 +597,6 @@ std::string efp_opts_summary(efp* efp) {
 }
 
 
-
-//    sprintf("\n");
-//    sprintf("    EFP Results\n");
-//    sprintf("  ------------------------------------------------------------\n");
-//    sprintf("    Electrostatics                %20.12f [Eh] %s\n", energy.electrostatic +
-//                                                                   energy.charge_penetration +
-//                                                                   energy.electrostatic_point_charges,
-//                                                                   (elst_enabled_ || qm_elst_enabled_) ? "*" : "");
-//    sprintf("      EFP/EFP                     %20.12f [Eh] %s\n", energy.electrostatic + energy.charge_penetration,
-//                                                                  elst_enabled_ ? "*" : "");
-//    sprintf("      QM-Nuc/EFP                  %20.12f [Eh] %s\n", energy.electrostatic_point_charges,
-//                                                                  qm_elst_enabled_ ? "*" : "");
-//    sprintf("\n");
-//    sprintf("    Exchange                      %20.12f [Eh] %s\n", energy.exchange_repulsion,
-//                                                                  exch_enabled_ ? "*" : "");
-//    sprintf("      EFP/EFP                     %20.12f [Eh] %s\n", energy.exchange_repulsion,
-//                                                                   exch_enabled_ ? "*" : "");
-//    sprintf("      QM/EFP                      %20.12f [Eh] %s\n", 0.0,
-//                                                                   "");
-//    sprintf("\n");
-//    sprintf("    Induction                     %20.12f [Eh] %s\n", energy.polarization,
-//                                                                   (pol_enabled_ || qm_pol_enabled_) ? "*" : "");
-//    sprintf(   "      %-7s                     %20.12f [Eh] %s\n", qm_pol_enabled_ ? "QM/EFP" : "EFP/EFP",
-//                                                                   energy.polarization,
-//                                                                   (pol_enabled_ || qm_pol_enabled_) ? "*" : "");
-//    sprintf("\n");
-//    sprintf("    Dispersion                    %20.12f [Eh] %s\n", energy.dispersion,
-//                                                                   disp_enabled_ ? "*" : "");
-//    sprintf("      EFP/EFP                     %20.12f [Eh] %s\n", energy.dispersion,
-//                                                                   disp_enabled_ ? "*" : "");
-//    sprintf("      QM/EFP                      %20.12f [Eh] %s\n", 0.0,
-//                                                                   "");
-//    sprintf("\n");
-//    sprintf("    Total EFP                     %20.12f [Eh]\n",    energy.total);
-
-
 std::string extended_efp_geometry_str(efp* efp, double units_to_bohr=1.0) {
     char buffer[120];
     std::stringstream ss;
@@ -650,8 +626,8 @@ std::string extended_efp_geometry_str(efp* efp, double units_to_bohr=1.0) {
 }
 
 
-PYBIND11_PLUGIN(pylibefp) {
-    py::module m("pylibefp", "Python wrapping of Parallel implementation of the Effective Fragment Potential (EFP) method");
+PYBIND11_PLUGIN(core) {
+    py::module m("core", "Python wrapping of Parallel implementation of the Effective Fragment Potential (EFP) method");
 
     m.attr("__version__") = py::str("1.1");
     py::exception<libefpException>(m, "libefpException");
@@ -743,16 +719,16 @@ PYBIND11_PLUGIN(pylibefp) {
         .def(py::init())
         //.def("result", &efp_result, "Callback function which is called by libefp to obtain electric field *arg2* in the number *arg0* specified points at positions *arg1* with initialized user data *arg3*")
         .def("banner", wrapped_efp_banner, "Gets a human readable banner string with information about the library")
-        .def("print_banner", wrapped_efp_print_banner, "Prints libefp banner to stdout")
         .def_static("create", &efp_create, "Creates a new efp object")
 //        .def("opts_default", &efp_opts_default, "Gets default values of simulation options returns in *arg0*")
 //        .def("set_error_log", &efp_set_error_log, "Sets the error log callback function")
         .def("set_opts", opts_from_dict, "Set computation options to *arg0*")
         .def("get_opts", opts_to_dict, "Gets currently set computation options")
         .def("summary", efp_opts_summary, "")
-        .def("add_potential", wrapped_efp_add_potential, "Adds EFP potential from full file path *arg0*")
-        .def("add_fragment", wrapped_efp_add_fragment, "Adds a new fragment *arg0* to the EFP subsystem")
-        .def("prepare", wrapped_efp_prepare, "Prepares the calculation")
+        .def("add_potential", &efp_add_potential, "Adds EFP potential from full file path *arg0*")
+        //.def("add_fragment", wrapped_efp_add_fragment, "Adds a new fragment *arg0* to the EFP subsystem")
+        .def("add_fragment", &efp_add_fragment, "Adds a new fragment *arg0* to the EFP subsystem")
+        .def("raw_prepare", &efp_prepare, "Prepares the calculation")
 //        .def("skip_fragments", &efp_skip_fragments, "Skip interactions between the fragments *arg0* and *arg1* inclusive if *arg2*")
 //        .def("set_electron_density_field_fn", &efp_set_electron_density_field_fn, "Sets the callback function which computes electric field from electrons in ab initio subsystem to *arg0*")
 //        .def("set_electron_density_field_user_data", &efp_set_electron_density_field_user_data, "Sets user data *arg0* to be passed to ::efp_electron_density_field_fn")
@@ -765,6 +741,7 @@ PYBIND11_PLUGIN(pylibefp) {
 //        .def("get_point_charge_gradient", &efp_get_point_charge_gradient, "Gets gradient on point charges from EFP subsystem and returns them in *arg1*")
 //        .def("set_coordinates", &efp_set_coordinates, "Update positions and orientations of all fragments with types in array *arg0* and returns them in *arg1*")
         .def("set_frag_coordinates", wrapped_efp_set_frag_coordinates, "Updates position and orientation of the specified effective 0-indexed fragment *arg0* of type *arg1*")
+        .def("set_frag_coordinates1", wrapped_efp_set_frag_coordinates1, "Updates position and orientation of the specified effective 0-indexed fragment *arg0* of type *arg1*")
         .def("get_coordinates", wrapped_efp_get_coordinates, "Gets center of mass positions and Euler angles of the effective fragments and returns it in *arg0*")
         .def("get_frag_xyzabc", wrapped_efp_get_frag_xyzabc, "Gets center of mass position and Euler angles on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("set_periodic_box", &efp_set_periodic_box, "Sets up periodic box size of *arg0* by *arg1* by *arg2*")
@@ -773,7 +750,7 @@ PYBIND11_PLUGIN(pylibefp) {
 //        .def("set_orbital_energies", &efp_set_orbital_energies, "Sets ab initio orbital energies to *efp0* number core orbitals, *efp1* number active orbitals, *efp2* number virtual orbitals, *efp3* array of orbital energies")
 //        .def("set_dipole_integrals", &efp_set_dipole_integrals, "Sets ab initio dipole integrals to  *efp0* number core orbitals, *efp1* number active orbitals, *efp2* number virtual orbitals, *efp3* dipole integral matrices")
 //        .def("get_wavefunction_dependent_energy", &efp_get_wavefunction_dependent_energy, "Updates wavefunction-dependent energy terms returning in *arg0*")
-        .def("compute", wrapped_efp_compute, py::arg("do_gradient") = false, "Perform the EFP computation, doing gradient if *arg0*")
+        .def("raw_compute", &efp_compute, py::arg("do_gradient") = false, "Perform the EFP computation, doing gradient if *arg0*")
         .def("get_frag_charge", wrapped_efp_get_frag_charge, "Gets total charge on 0-indexed fragment *arg0*")
         .def("get_frag_multiplicity", wrapped_efp_get_frag_multiplicity, "Gets spin multiplicity on 0-indexed fragment *arg0*")
 //        .def("get_frag_multipole_count", &efp_get_frag_multipole_count, "Gets number of electrostatic multipole points on 0-indexed fragment *arg0* and returns it in *arg1*")

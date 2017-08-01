@@ -4,7 +4,7 @@ cmake_policy(SET CMP0048 NEW)
 
 project(pylibefp
         VERSION 0.1.0
-        LANGUAGES CXX C)
+        LANGUAGES CXX)
 set(pylibefp_AUTHORS      "Lori A. Burns")
 set(pylibefp_DESCRIPTION  "Python binding to I. Kaliman's libefp for Effective Fragment Potentials")
 set(pylibefp_URL          "https://github.com/loriab/pylibefp")
@@ -18,14 +18,12 @@ option_with_default(CMAKE_BUILD_TYPE "Build type" Release)
 option_with_print(ENABLE_GENERIC "Enable mostly static linking in shared library" OFF)
 option_with_flags(ENABLE_XHOST "Enable processor-specific optimization" ON
                   "-xHost" "-march=native")
-#option_with_print(ENABLE_PYTHON_MODULE "Enable pybind11 bindings of library" OFF)
 
 ######################### Process & Validate Options ###########################
 include(autocmake_safeguards)
 #include(autocmake_omp)
 include(custom_static_library)
 
-#find_package(TargetLAPACK REQUIRED)
 find_package(libefp REQUIRED)
 
 #  <<  Pybind11 & Python  >>
@@ -42,31 +40,14 @@ set(PN ${PROJECT_NAME})
 
 # <<<  Build  >>>
 
-#set(raw_sources_list ai_disp.c balance.c clapack.c disp.c efp.c elec.c
-#                     elec_terms.c int.c log.c parse.c pol.c pol_direct.c
-#                     stream.c swf.c util.c xr.c)
-#set(src_prefix "src/")
-#string(REGEX REPLACE "([^;]+)" "${src_prefix}\\1" sources_list "${raw_sources_list}")
-#
-## STATIC/SHARED on below governed by BUILD_SHARED_LIBS
-#add_library(efp ${sources_list})
-#set_target_properties(efp PROPERTIES POSITION_INDEPENDENT_CODE ${BUILD_FPIC}
-#                                     COMPILE_FLAGS "-std=c99")
-#set_source_files_properties(${src_prefix}int.c PROPERTIES COMPILE_FLAGS -O1)
-#if(${BUILD_SHARED_LIBS})
-#    target_link_libraries(efp PRIVATE ${LIBC_INTERJECT})
-#    if(APPLE)
-#        set_target_properties(efp PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
-#    endif()
-#endif()
-#target_link_libraries(efp PRIVATE tgt::lapack)
+add_subdirectory(pylibefp)
 
 # <<<  Python Module  >>>
 
-pybind11_add_module(pylibefp pylibefp/core.cc) # ${source_list})
-#    target_include_directories(pylibefp PRIVATE ${src_prefix})
-target_include_directories(pylibefp PRIVATE /home/psilocaluser/gits/libefp/src)
-target_link_libraries(pylibefp PRIVATE efp)
+#pybind11_add_module(pylibefp pylibefp/core.cc) # ${source_list})
+##    target_include_directories(pylibefp PRIVATE ${src_prefix})
+#target_include_directories(pylibefp PRIVATE /home/psilocaluser/gits/libefp/src)
+#target_link_libraries(pylibefp PRIVATE efp)
     #add_library(pylibefp SHARED pylibefp/pylibefp.cc ${sources_list})
     #target_link_libraries(pylibefp PUBLIC pybind11::module)
 

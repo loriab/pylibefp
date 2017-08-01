@@ -7,14 +7,17 @@ a2b = 1.0 / b2a
 
 
 def system_1():
-    sys = pylibefp.efp()
+    sys = pylibefp.core.efp()
     sys.create()
     
-    sys.add_potential('../../fraglib/h2o.efp')
-    sys.add_potential('../../fraglib/nh3.efp')
-    sys.add_fragment('h2o_l')
+    frags = ['h2o', 'nh3']
+    sys.add_potentials(frags)
+    sys.add_fragments(frags)
+    #sys.add_potential('../../fraglib/h2o.efp')
+    #sys.add_potential('../../fraglib/nh3.efp')
+    #sys.add_fragment('h2o_l')
     sys.set_frag_coordinates(0, 'xyzabc', [0.0 * a2b, 0.0 * a2b, 0.0 * a2b, 1.0, 2.0, 3.0])
-    sys.add_fragment('nh3_l')
+    #sys.add_fragment('nh3_l')
     sys.set_frag_coordinates(1, 'xyzabc', [5.0 * a2b, 0.0 * a2b, 0.0 * a2b, 5.0, 2.0, 8.0])
 
     sys.prepare()
@@ -22,16 +25,19 @@ def system_1():
 
 
 def system_2():
-    sys = pylibefp.efp()
+    sys = pylibefp.core.efp()
     sys.create()
     
-    sys.add_potential('../../fraglib/h2o.efp')
-    sys.add_potential('../../fraglib/nh3.efp')
-    sys.add_fragment('h2o_l')
-    sys.add_fragment('nh3_l')
-    sys.add_fragment('h2o_l')
-    sys.add_fragment('h2o_l')
-    sys.add_fragment('nh3_l')
+    frags = ['h2o', 'nh3', 'h2o', 'h2o', 'nh3']
+    sys.add_potentials(frags)
+    sys.add_fragments(frags)
+    #sys.add_potential('../../fraglib/h2o.efp')
+    #sys.add_potential('../../fraglib/nh3.efp')
+    #sys.add_fragment('h2o_l')
+    #sys.add_fragment('nh3_l')
+    #sys.add_fragment('h2o_l')
+    #sys.add_fragment('h2o_l')
+    #sys.add_fragment('nh3_l')
     sys.set_frag_coordinates(0, 'xyzabc', [-1.0 * a2b,   3.7 * a2b,   0.4 * a2b,  -1.3,   0.0,   7.0])
     sys.set_frag_coordinates(1, 'xyzabc', [ 0.4 * a2b,  -0.9 * a2b,  -0.7 * a2b,   4.0,   1.6,  -2.3])
     sys.set_frag_coordinates(2, 'xyzabc', [ 1.7 * a2b,   2.0 * a2b,   3.3 * a2b,  -1.2,  -2.0,   6.2])
@@ -43,21 +49,24 @@ def system_2():
 
 
 def system_3():
-    sys = pylibefp.efp()
+    sys = pylibefp.core.efp()
     sys.create()
 
-    sys.add_potential('../../fraglib/nh3.efp')
-    sys.add_potential('../../fraglib/ch3oh.efp')
-    sys.add_potential('../../fraglib/h2o.efp')
-    sys.add_fragment('h2o_l')
-    sys.add_fragment('nh3_l')
-    sys.add_fragment('nh3_l')
-    sys.add_fragment('nh3_l')
-    sys.add_fragment('ch3oh_l')
-    sys.add_fragment('h2o_l')
-    sys.add_fragment('h2o_l')
-    sys.add_fragment('ch3oh_l')
-    sys.add_fragment('h2o_l')
+    frags = ['h2o', 'nh3', 'nh3', 'nh3', 'ch3oh', 'h2o', 'h2o', 'ch3oh', 'h2o']
+    sys.add_potentials(frags)
+    sys.add_fragments(frags)
+    #sys.add_potential('../../fraglib/nh3.efp')
+    #sys.add_potential('../../fraglib/ch3oh.efp')
+    #sys.add_potential('../../fraglib/h2o.efp')
+    #sys.add_fragment('h2o_l')
+    #sys.add_fragment('nh3_l')
+    #sys.add_fragment('nh3_l')
+    #sys.add_fragment('nh3_l')
+    #sys.add_fragment('ch3oh_l')
+    #sys.add_fragment('h2o_l')
+    #sys.add_fragment('h2o_l')
+    #sys.add_fragment('ch3oh_l')
+    #sys.add_fragment('h2o_l')
     sys.set_frag_coordinates(0, 'points', [  -3.394 * a2b,  -1.900 * a2b,  -3.700 * a2b, -3.524 * a2b,  -1.089 * a2b,  -3.147 * a2b, -2.544 * a2b,  -2.340 * a2b,  -3.445 * a2b])
     sys.set_frag_coordinates(1, 'points', [  -5.515 * a2b,   1.083 * a2b,   0.968 * a2b, -5.161 * a2b,   0.130 * a2b,   0.813 * a2b, -4.833 * a2b,   1.766 * a2b,   0.609 * a2b])
     sys.set_frag_coordinates(2, 'points', [   1.848 * a2b,   0.114 * a2b,   0.130 * a2b,  1.966 * a2b,   0.674 * a2b,  -0.726 * a2b,  0.909 * a2b,   0.273 * a2b,   0.517 * a2b])
@@ -73,23 +82,26 @@ def system_3():
 
 
 def system_4():
-    sys = pylibefp.efp()
+    sys = pylibefp.core.efp()
     sys.create()
 
-    for fr in ['acetone', 'c2h5oh', 'c6h6', 'ccl4', 'ch3oh', 'ch4', 'cl2', 'dcm', 'dmso', 'h2', 'h2o', 'nh3']:
-        sys.add_potential('../../fraglib/' + fr + '.efp')
-    sys.add_fragment('acetone_l')
-    sys.add_fragment('c2h5oh_l')
-    sys.add_fragment('c6h6_l')
-    sys.add_fragment('ccl4_l')
-    sys.add_fragment('ch3oh_l')
-    sys.add_fragment('ch4_l')
-    sys.add_fragment('cl2_l')
-    sys.add_fragment('dcm_l')
-    sys.add_fragment('dmso_l')
-    sys.add_fragment('h2_l')
-    sys.add_fragment('h2o_l')
-    sys.add_fragment('nh3_l')
+    frags = ['acetone', 'c2h5oh', 'c6h6', 'ccl4', 'ch3oh', 'ch4', 'cl2', 'dcm', 'dmso', 'h2', 'h2o', 'nh3']
+    sys.add_potentials(frags)
+    sys.add_fragments(frags)
+    #for fr in ['acetone', 'c2h5oh', 'c6h6', 'ccl4', 'ch3oh', 'ch4', 'cl2', 'dcm', 'dmso', 'h2', 'h2o', 'nh3']:
+    #    sys.add_potential('../../fraglib/' + fr + '.efp')
+    #sys.add_fragment('acetone_l')
+    #sys.add_fragment('c2h5oh_l')
+    #sys.add_fragment('c6h6_l')
+    #sys.add_fragment('ccl4_l')
+    #sys.add_fragment('ch3oh_l')
+    #sys.add_fragment('ch4_l')
+    #sys.add_fragment('cl2_l')
+    #sys.add_fragment('dcm_l')
+    #sys.add_fragment('dmso_l')
+    #sys.add_fragment('h2_l')
+    #sys.add_fragment('h2o_l')
+    #sys.add_fragment('nh3_l')
     sys.set_frag_coordinates(0, 'xyzabc', [   0.0 * a2b,   0.0 * a2b,   0.0 * a2b,   0.0,   0.2,   0.3])
     sys.set_frag_coordinates(1, 'xyzabc', [   7.0 * a2b,   0.0 * a2b,   0.0 * a2b,   0.0,   2.0,   3.7])
     sys.set_frag_coordinates(2, 'xyzabc', [  14.0 * a2b,   0.0 * a2b,   0.0 * a2b,   3.1,   0.8,   2.0])
