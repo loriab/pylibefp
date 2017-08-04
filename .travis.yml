@@ -11,24 +11,24 @@ dist: precise
 matrix:
   include:
 
-#  - os: linux
-#    compiler: clang
-#    addons: &1
-#      apt:
-#        sources:
-#        - llvm-toolchain-precise-3.6
-#        - ubuntu-toolchain-r-test
-#        - george-edison55-precise-backports
-#        packages:
-#        - liblapack-dev
-#        - clang-3.6
-#    env:
-#      - CXX_COMPILER='clang++-3.6'
-#      - PYTHON_VER='3.6'
-#      - C_COMPILER='clang-3.6'
-##      - BUILD_TYPE='release'
-##      - NAME='clang'
-##      - VERSION='3.6'
+  - os: linux
+    compiler: clang
+    addons: &1
+      apt:
+        sources:
+        - llvm-toolchain-precise-3.6
+        - ubuntu-toolchain-r-test
+        - george-edison55-precise-backports
+        packages:
+        - liblapack-dev
+        - clang-3.6
+    env:
+      - CXX_COMPILER='clang++-3.6'
+      - PYTHON_VER='3.6'
+      - C_COMPILER='clang-3.6'
+#      - BUILD_TYPE='release'
+#      - NAME='clang'
+#      - VERSION='3.6'
 
   - os: linux
     compiler: gcc
@@ -46,27 +46,27 @@ matrix:
       - PYTHON_VER='2.7'
       - C_COMPILER='gcc-4.9'
 #      - BUILD_TYPE='release'
-#      - NAME='gcc'
-#      - VERSION='4.9'
+ #     - NAME='gcc'
+ #     - VERSION='4.9'
 
-#  - os: linux
-#    compiler: gcc
-#    addons: &4
-#      apt:
-#        sources:
-#        - ubuntu-toolchain-r-test
-#        - george-edison55-precise-backports
-#        packages:
-#        - liblapack-dev
-#        - g++-6
-#        - gcc-6
-#    env:
-#      - CXX_COMPILER='g++-6'
-#      - PYTHON_VER='3.5'
-#      - C_COMPILER='gcc-6'
-##      - BUILD_TYPE='release'
-##      - NAME='gcc'
-##      - VERSION=6
+  - os: linux
+    compiler: gcc
+    addons: &4
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - george-edison55-precise-backports
+        packages:
+        - liblapack-dev
+        - g++-6
+        - gcc-6
+    env:
+      - CXX_COMPILER='g++-6'
+      - PYTHON_VER='3.5'
+      - C_COMPILER='gcc-6'
+#      - BUILD_TYPE='release'
+#      - NAME='gcc'
+#      - VERSION=6
 
 before_install:
   - uname -a
