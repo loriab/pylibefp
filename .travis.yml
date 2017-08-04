@@ -84,12 +84,6 @@ install:
   - conda install pytest pytest-cov codecov -c conda-forge
   - conda list
 
-# Build the C++
-  - python setup.py cmake
-
-# Install the plugin locally
-  - pip install -e .
-
 before_script:
   - uname -a
   - free -m
