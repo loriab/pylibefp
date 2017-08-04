@@ -97,7 +97,7 @@ before_script:
 
 script:
   - make pytest
-  - py.test -v --cov=./
+  #- py.test -v --cov=./
 
 notifications:
     email: false
