@@ -68,6 +68,11 @@ matrix:
 ##      - NAME='gcc'
 ##      - VERSION=6
 
+before_install:
+  - uname -a
+  - free -m
+  - df -h
+  - ulimit -a
 
 install:
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
@@ -85,10 +90,6 @@ install:
   - conda list
 
 before_script:
-  - uname -a
-  - free -m
-  - df -h
-  - ulimit -a
   - python -V
   - cd ${TRAVIS_BUILD_DIR}
   - ${C_COMPILER} --version
