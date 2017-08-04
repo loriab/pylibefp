@@ -8,8 +8,8 @@
 */
 
 
-#include "efp.h"
-#include "private.h"
+#include <efp.h>
+#include <libefp/private.h>
 
 #include <pybind11/pybind11.h>
 
