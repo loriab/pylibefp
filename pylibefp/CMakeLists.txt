@@ -43,7 +43,7 @@ target_link_libraries(core PRIVATE Threads::Threads)
 
 set(PN pylibefp)
 install(TARGETS core
-        EXPORT "{PN}Targets"
+        EXPORT "${PN}Targets"
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
 install(EXPORT "${PN}Targets"
         NAMESPACE "${PN}::"
