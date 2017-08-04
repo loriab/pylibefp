@@ -15,10 +15,10 @@ set(CMAKECONFIG_INSTALL_DIR "share/cmake/${PN}")
 # <<<  Marshal Dependencies & Add-ons  >>>
 
 # TODO put in libefpConfig instead?
-find_package(TargetLAPACK CONFIG REQUIRED)
-get_property(_ill TARGET tgt::lapk PROPERTY INTERFACE_LINK_LIBRARIES)
-list(GET _ill 0 _ill0)
-message(STATUS "${Cyan}Using LAPACK${_isMKL}${ColourReset}: ${_ill0};...")
+#find_package(TargetLAPACK CONFIG REQUIRED)
+#get_property(_ill TARGET tgt::lapk PROPERTY INTERFACE_LINK_LIBRARIES)
+#list(GET _ill 0 _ill0)
+#message(STATUS "${Cyan}Using LAPACK${_isMKL}${ColourReset}: ${_ill0};...")
 
 #  <<  Pybind11 & Python  >>
 set(PYBIND11_CPP_STANDARD "-std=c++${CMAKE_CXX_STANDARD}")
