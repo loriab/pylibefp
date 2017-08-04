@@ -26,9 +26,6 @@ matrix:
       - CXX_COMPILER='clang++-3.6'
       - PYTHON_VER='3.6'
       - C_COMPILER='clang-3.6'
-#      - BUILD_TYPE='release'
-#      - NAME='clang'
-#      - VERSION='3.6'
 
   - os: linux
     compiler: gcc
@@ -45,9 +42,6 @@ matrix:
       - CXX_COMPILER='g++-4.9'
       - PYTHON_VER='2.7'
       - C_COMPILER='gcc-4.9'
-#      - BUILD_TYPE='release'
- #     - NAME='gcc'
- #     - VERSION='4.9'
 
   - os: linux
     compiler: gcc
@@ -64,9 +58,6 @@ matrix:
       - CXX_COMPILER='g++-6'
       - PYTHON_VER='3.5'
       - C_COMPILER='gcc-6'
-#      - BUILD_TYPE='release'
-#      - NAME='gcc'
-#      - VERSION=6
 
 before_install:
   - uname -a

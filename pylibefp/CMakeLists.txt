@@ -35,7 +35,7 @@ message(STATUS "${Cyan}Using libefp${ColourReset}: ${_loc} (version ${libefp_VER
 
 # <<<  Build  >>>
 
-pybind11_add_module(core core.cc)
+pybind11_add_module(core NO_EXTRAS core.cc)
 target_link_libraries(core PRIVATE libefp::efp)
 target_link_libraries(core PRIVATE ${LIBC_INTERJECT})
 target_link_libraries(core PUBLIC pybind11::module)
