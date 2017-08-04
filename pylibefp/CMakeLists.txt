@@ -9,8 +9,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(custom_color_messages)
 # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
-set(PN pylibefp)
-set(CMAKECONFIG_INSTALL_DIR "share/cmake/${PN}")
+set(CMAKECONFIG_INSTALL_DIR "share/cmake/pylibefp")
 
 # <<<  Marshal Dependencies & Add-ons  >>>
 
@@ -42,8 +41,7 @@ target_link_libraries(core PRIVATE ${LIBC_INTERJECT})
 target_link_libraries(core PUBLIC pybind11::module)
 target_link_libraries(core PRIVATE Threads::Threads)
 
-# LAPACK & BLAS linking attached to modules in BIN/LIBLIST to maximally defer
-
+set(PN pylibefp)
 install(TARGETS core
         EXPORT "{PN}Targets"
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
