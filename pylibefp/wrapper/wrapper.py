@@ -13,6 +13,8 @@
 from __future__ import print_function
 
 import os
+import re
+import math
 from pylibefp import core
 from . import psiutil
 from .exceptions import *
@@ -219,6 +221,38 @@ def energy_summary(efpobj):
     return text
 
 
+def nuclear_repulsion_energy(efpobj):
+    """Computes nuclear repulsion energy."""
+
+    pyat = efpobj.get_atoms()
+    nre = 0.0
+    for iat1, at1 in enumerate(pyat['full_atoms']):
+        for iat2, at2 in enumerate(pyat['full_atoms']):
+            if iat2 < iat1:
+                ZZ = at1['Z'] * at2['Z']
+                dx = at1['x'] - at2['x']
+                dy = at1['y'] - at2['y']
+                dz = at1['z'] - at2['z']
+                dist = math.sqrt(dx * dx + dy * dy + dz * dz)
+                nre += ZZ / dist
+
+    return nre
+
+
+def to_dict(efpobj):
+
+    pyat = efpobj.get_atoms()
+    for at in pyat['full_atoms']:
+        at['ghosted'] = False
+        at['at_type'] = 'efpxyz'
+        mobj = re.match(r'\AA\d*(?P<symbol>[A-Z]{1,3})\d*\Z', at['label'])
+        if mobj:
+            at['symbol'] = mobj.group('symbol').capitalize()
+        at['charge'] = at['Z']
+
+    return pyat 
+
+
 # only wrapped to throw Py exceptions
 core.efp.prepare = _pywrapped_efp_prepare
 core.efp.compute = _pywrapped_efp_compute
@@ -226,3 +260,21 @@ core.efp.compute = _pywrapped_efp_compute
 core.efp.add_potentials = _pywrapped_add_potential
 core.efp.add_fragments = _pywrapped_add_fragment
 core.efp.energy_summary = energy_summary
+core.efp.nuclear_repulsion_energy = nuclear_repulsion_energy
+core.efp.to_dict = to_dict
+
+
+def from_dict(efp_init):
+
+    sys = core.efp()
+    sys.create()
+
+    for ifr, fr in enumerate(efp_init['full_fragments']):
+        sys.add_potentials(fr['fragment_file'])
+        sys.add_fragments(fr['fragment_file'])
+        sys.set_frag_coordinates(ifr, fr['efp_type'], fr['coordinates_hint'])
+
+    sys.prepare()
+    return sys
+
+

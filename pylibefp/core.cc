@@ -416,7 +416,7 @@ py::dict extend_efp_get_atoms(efp* efp) {
         f.append(natom);
         fr.append(f);
         frt.append("Real");
-        frcg.append(wrapped_efp_get_frag_charge(efp, ifr));
+        frcg.append(static_cast<int>(wrapped_efp_get_frag_charge(efp, ifr)));
         frmp.append(wrapped_efp_get_frag_multiplicity(efp, ifr));
 
         struct efp_atom atoms[frag_natom];
