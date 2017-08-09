@@ -99,10 +99,7 @@ script:
   - make pytest VERBOSE=1
   #- PYTHONPATH=stage/usr/local/pylibefp/lib/ pytest -v --cov --ignore=external ../tests/
   #- cd ../tests && PYTHONPATH=../build/stage/usr/local/pylibefp/lib/ python -m pytest -v --ignore=../build/external --cov
-  - cd ${TRAVIS_BUILD_DIR}/build/tests && PYTHONPATH=${TRAVIS_BUILD_DIR}/build/stage/${TRAVIS_BUILD_DIR}/Install/lib/ /home/travis/miniconda/envs/tenv/bin/python -m pytest -rws -v --capture=sys ${TRAVIS_BUILD_DIR}/tests --ignore=${TRAVIS_BUILD_DIR}/build/external --cov VERBOSE=1
-
-#cd /home/travis/build/loriab/pylibefp/build/tests && PYTHONPATH=/home/travis/build/loriab/pylibefp/build/stage/home/travis/build/loriab/pylibefp/Install/lib/ /home/travis/miniconda/envs/tenv/bin/python -m pytest -rws -v --capture=sys /home/travis/build/loriab/pylibefp/tests
-
+  - cd ${TRAVIS_BUILD_DIR}/build/tests && PYTHONPATH=${TRAVIS_BUILD_DIR}/build/stage/${TRAVIS_BUILD_DIR}/Install/lib/ /home/travis/miniconda/envs/tenv/bin/python -m pytest -rws -v --capture=sys ${TRAVIS_BUILD_DIR}/tests --ignore=${TRAVIS_BUILD_DIR}/build/external --cov
 
 notifications:
     email: false
