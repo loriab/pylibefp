@@ -96,10 +96,9 @@ before_script:
   - make -j2
 
 script:
-  - make pytest
+  - make pytest VERBOSE=1
   #- PYTHONPATH=stage/usr/local/pylibefp/lib/ pytest -v --cov --ignore=external ../tests/
   - cd ../tests && PYTHONPATH=../build/stage/usr/local/pylibefp/lib/ python -m pytest -v --ignore=../build/external --cov
-
 
 notifications:
     email: false
