@@ -66,6 +66,7 @@ install(FILES __init__.py extras.py
         DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
 
 install(FILES ../tests/utils.py
+              ../tests/conftest.py
               ../tests/test_efpefp.py
         DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp/tests/)
 
