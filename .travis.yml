@@ -97,7 +97,7 @@ before_script:
 
 script:
   - make pytest
-  - PYTHONPATH=stage/usr/local/pylibefp/lib/ pytest -v --cov
+  - PYTHONPATH=stage/usr/local/pylibefp/lib/ pytest -v --cov --ignore=external 
 
 notifications:
     email: false
