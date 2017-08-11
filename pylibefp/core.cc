@@ -297,58 +297,6 @@ void wrapped_efp_set_frag_coordinates(efp* efp, size_t frag_idx, std::string coo
 }
 
 
-py::dict wrapped_efp_get_energy(efp* efp) {
-    enum efp_result res;
-    efp_energy ene;
-
-    if ((res = efp_get_energy(efp, &ene))) {
-        std::string sres = "efp_get_energy: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
-
-//    if (do_grad_) {
-//        SharedMatrix smgrad(new Matrix("EFP Gradient", nfrag_, 6));
-//        double ** psmgrad = smgrad->pointer();
-//        if ((res = efp_get_gradient(efp_, psmgrad[0])))
-//            throw PsiException("EFP::compute():efp_get_gradient(): " +
-//                std::string (efp_result_to_string(res)),__FILE__,__LINE__);
-//        smgrad->print_out();
-//
-//        outfile->Printf("  ==> EFP Gradient <==\n\n");
-//
-//        for (int i=0; i<nfrag_; i++) {
-//            for (int j=0; j<6; j++) {
-//                outfile->Printf("%14.6lf", psmgrad[i][j]);
-//            }
-//            outfile->Printf("\n");
-//        }
-//        outfile->Printf("\n");
-//
-//        torque_ = smgrad;
-//
-//        std::shared_ptr<Wavefunction> wfn = Process::environment.legacy_wavefunction();
-//        wfn->set_efp_torque(smgrad);
-//    }
-
-    py::dict energies;
-    energies[py::str("electrostatic")]               = ene.electrostatic;
-    energies[py::str("charge_penetration")]          = ene.charge_penetration;
-    energies[py::str("electrostatic_point_charges")] = ene.electrostatic_point_charges;
-    energies[py::str("polarization")]                = ene.polarization;
-    energies[py::str("dispersion")]                  = ene.dispersion;
-    energies[py::str("exchange_repulsion")]          = ene.exchange_repulsion;
-    energies[py::str("total")]                       = ene.total;
-
-    energies[py::str("elec")]                        = ene.electrostatic +
-                                                       ene.charge_penetration +
-                                                       ene.electrostatic_point_charges;
-    energies[py::str("xr")]                          = ene.exchange_repulsion;
-    energies[py::str("pol")]                         = ene.polarization;
-    energies[py::str("disp")]                        = ene.dispersion;
-
-    return energies;
-}
-
 int wrapped_efp_get_frag_multiplicity(efp* efp, size_t frag_idx) {
     enum efp_result res;
     int multiplicity=0;
@@ -696,15 +644,23 @@ PYBIND11_PLUGIN(core) {
         // double swf_cutoff;                   /* Cutoff distance for fragment-fragment interactions. */
 
     py::class_<efp_energy>(m, "efp_energy", "EFP energy terms")
-        .def(py::init());
-        // double electrostatic;                /* EFP/EFP electrostatic energy. */
-        // double charge_penetration;           /* Charge penetration energy from overlap-based electrostatic damping. Zero if overlap-based damping is turned off. */
-        // double electrostatic_point_charges;  /* Interaction energy of EFP electrostatics with point charges. */
-        // double polarization;                 /* All polarization energy goes here. Polarization is computed self-consistently so it can't be separated into EFP/EFP and AI/EFP parts. */
-        // double dispersion;                   /* EFP/EFP dispersion energy. */
-        // double ai_dispersion;                /* AI/EFP dispersion energy. */
-        // double exchange_repulsion;           /* EFP/EFP exchange-repulsion energy. */
-        // double total;                        /* Sum of all the above energy terms. */
+        .def(py::init())
+        .def_readwrite("electrostatic", &efp_energy::electrostatic)           /* EFP/EFP electrostatic energy. */
+        .def_readwrite("charge_penetration", &efp_energy::charge_penetration) /* Charge penetration energy from
+                                                                                 overlap-based electrostatic damping.
+                                                                                 Zero if overlap-based damping is turned
+                                                                                 off. */
+        .def_readwrite("electrostatic_point_charges", &efp_energy::electrostatic_point_charges)
+                                                                              /* Interaction energy of EFP electrostatics
+                                                                                 with point charges. */
+        .def_readwrite("polarization", &efp_energy::polarization)             /* All polarization energy goes here.
+                                                                                 Polarization is computed self-consist-
+                                                                                 ently so it can't be separated into
+                                                                                 EFP/EFP and AI/EFP parts. */
+        .def_readwrite("dispersion", &efp_energy::dispersion)                 /* EFP/EFP dispersion energy. */
+        .def_readwrite("ai_dispersion", &efp_energy::ai_dispersion)           /* AI/EFP dispersion energy. */
+        .def_readwrite("exchange_repulsion", &efp_energy::exchange_repulsion) /* EFP/EFP exchange-repulsion energy. */
+        .def_readwrite("total", &efp_energy::total);                          /* Sum of all the above energy terms. */
 
     py::class_<efp_atom>(m, "efp_atom", "EFP atom info")
         .def(py::init());
@@ -764,7 +720,7 @@ PYBIND11_PLUGIN(core) {
 //        .def("get_lmo_count", &efp_get_lmo_count, "Gets the number of LMOs in a fragment and returns it in *arg0*")
 //        .def("get_lmo_coordinates", &efp_get_lmo_coordinates, "Gets coordinates of LMO centroids on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("get_xrfit", &efp_get_xrfit, "Gets parameters of fitted exchange-repulsion on 0-indexed fragment *arg0* and returns it in *arg1*")
-        .def("get_energy", wrapped_efp_get_energy, "Gets computed energy components")
+        .def("raw_get_energy", efp_get_energy, "Gets computed energy components")
 //        .def("get_gradient", &efp_get_gradient, "Gets computed EFP energy gradient and returns it in *arg0*")
 //        .def("get_atomic_gradient", &efp_get_atomic_gradient, "Gets computed EFP energy gradient on individual atoms and returns it in *arg0*")
         .def("get_frag_count", wrapped_efp_get_frag_count, "Gets the number of fragments in this computation")

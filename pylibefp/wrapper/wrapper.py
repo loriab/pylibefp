@@ -159,6 +159,55 @@ def opts_summary(efpobj, labels='libefp'):
     return text
 
 
+def _pywrapped_get_energy(efpobj):
+
+    ene = core.efp_energy()
+    res = efpobj.raw_get_energy(ene)
+    _pywrapped_result_to_error(res)
+
+#    if (do_grad_) {
+#        SharedMatrix smgrad(new Matrix("EFP Gradient", nfrag_, 6));
+#        double ** psmgrad = smgrad->pointer();
+#        if ((res = efp_get_gradient(efp_, psmgrad[0])))
+#            throw PsiException("EFP::compute():efp_get_gradient(): " +
+#                std::string (efp_result_to_string(res)),__FILE__,__LINE__);
+#        smgrad->print_out();
+#
+#        outfile->Printf("  ==> EFP Gradient <==\n\n");
+#
+#        for (int i=0; i<nfrag_; i++) {
+#            for (int j=0; j<6; j++) {
+#                outfile->Printf("%14.6lf", psmgrad[i][j]);
+#            }
+#            outfile->Printf("\n");
+#        }
+#        outfile->Printf("\n");
+#
+#        torque_ = smgrad;
+#
+#        std::shared_ptr<Wavefunction> wfn = Process::environment.legacy_wavefunction();
+#        wfn->set_efp_torque(smgrad);
+#    }
+
+    energies = {
+        'electrostatic':               ene.electrostatic,
+        'charge_penetration':          ene.charge_penetration,
+        'electrostatic_point_charges': ene.electrostatic_point_charges,
+        'polarization':                ene.polarization,
+        'dispersion':                  ene.dispersion,
+        'exchange_repulsion':          ene.exchange_repulsion,
+        'total':                       ene.total,
+        'elec':                        ene.electrostatic +
+                                       ene.charge_penetration +
+                                       ene.electrostatic_point_charges,
+        'xr':                          ene.exchange_repulsion,
+        'pol':                         ene.polarization,
+        'disp':                        ene.dispersion,
+    }
+
+    return energies
+
+
 def energy_summary(efpobj):
 
     opt = efpobj.get_opts()
@@ -259,6 +308,7 @@ core.efp.compute = _pywrapped_efp_compute
 
 core.efp.add_potentials = _pywrapped_add_potential
 core.efp.add_fragments = _pywrapped_add_fragment
+core.efp.get_energy = _pywrapped_get_energy
 core.efp.energy_summary = energy_summary
 core.efp.nuclear_repulsion_energy = nuclear_repulsion_energy
 core.efp.to_dict = to_dict

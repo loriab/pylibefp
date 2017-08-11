@@ -1,8 +1,10 @@
 import sys
 import math
+import pprint
+import deepdiff
 
 
-def success(label):
+def _success(label):
     """Function to print a '*label*...PASSED' line to screen.
     Used by :py:func:`util.compare_values` family when functions pass.
 
@@ -10,21 +12,6 @@ def success(label):
     msg = '\t{0:.<66}PASSED'.format(label)
     print(msg)
     sys.stdout.flush()
-
-
-def failed(label):
-    print('\t{0:.<66}FAILED'.format(label))
-
-
-class ComparisonTestError(Exception):
-    """Error called when a test case fails due to a failed
-    compare_values() call. Prints error message *msg* to standard
-    output stream and output file.
-
-    """
-    def __init__(self, msg):
-        PsiException.__init__(self, msg)
-        self.message = '\nPsiException: %s\n\n' % msg
 
 
 # Test functions
@@ -46,13 +33,39 @@ def compare_values(expected, computed, digits, label, exitonfail=True):
         print(message)
         if exitonfail:
             return False
-            #raise TestComparisonError(message)
     if math.isnan(computed):
         print(message)
         print("\tprobably because the computed value is nan.")
         if exitonfail:
             return False
-            #raise TestComparisonError(message)
-    success(label)
+    _success(label)
     return True
+
+
+def compare_integers(expected, computed, label, exitonfail=True):
+    """Function to compare two integers. Prints :py:func:`util.success`
+    when value *computed* matches value *expected*.
+    Performs a system exit on failure. Used in input files in the test suite.
+
+    """
+    if (expected != computed):
+        print("\t%s: computed value (%d) does not match (%d)." % (label, computed, expected))
+        return False
+    _success(label)
+    return True
+
+
+def compare_dicts(expected, computed, tol, label):
+    """Compares dictionaries *computed* to *expected* using DeepDiff
+
+    Float comparisons made to *tol* significant decimal places.
+
+    Note that a clean DeepDiff returns {}, which evaluates to False, hence the compare_integers.
+
+    """
+    ans = deepdiff.DeepDiff(computed, expected, significant_digits=tol, verbose_level=2)
+    clean = not bool(ans)
+    if not clean:
+        pprint.pprint(ans)
+    return compare_integers(True, clean, label)
 
