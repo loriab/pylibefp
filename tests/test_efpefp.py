@@ -1,5 +1,6 @@
 import sys
 import pytest
+import pprint
 import pylibefp
 from utils import *
 
@@ -10,7 +11,7 @@ a2b = 1.0 / b2a
 def system_1():
     sys = pylibefp.core.efp()
     sys.create()
-    
+
     frags = ['h2o', 'nh3']
     sys.add_potentials(frags)
     sys.add_fragments(frags)
@@ -28,7 +29,7 @@ def system_1():
 def system_2():
     sys = pylibefp.core.efp()
     sys.create()
-    
+
     frags = ['h2o', 'nh3', 'h2o', 'h2o', 'nh3']
     sys.add_potentials(frags)
     sys.add_fragments(frags)
@@ -120,40 +121,73 @@ def system_4():
     return sys
 
 
+def blank_ene():
+    fields = ['charge_penetration', 'disp', 'dispersion', 'elec',
+              'electrostatic', 'electrostatic_point_charges',
+              'exchange_repulsion', 'pol', 'polarization', 'xr']
+    ene = {f: 0.0 for f in fields}
+    return ene
+
+
 def test_elec_1a():
     asdf = system_1()
-    asdf.set_opts({'elec': True, 'elec_damp': 'screen'})
+    opts = {'elec': True, 'elec_damp': 'screen'}
+    asdf.set_opts(opts)
+    #asdf.set_opts({'elec': True, 'elec_damp': 'screen'})
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(0.0002900482, ene['elec'], 6, sys._getframe().f_code.co_name))
+    pprint.pprint(opts)
+
+    expected_ene = blank_ene()
+    expected_ene['elec'] = expected_ene['electrostatic'] = expected_ene['total'] = 0.0002900482
+    assert(compare_dicts(expected_ene, ene, 6,  sys._getframe().f_code.co_name + ': ene'))
 
 
 def test_elec_1b():
-
     asdf = system_1()
     asdf.set_opts({'elec': True, 'elec_damp': 'overlap'})
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(0.0002910961, ene['elec'], 6, sys._getframe().f_code.co_name))
+
+    elst = 0.0002910961
+    cp = -8.066354689359154e-07
+    expected_ene = blank_ene()
+    expected_ene['elec'] = expected_ene['total'] = elst
+    expected_ene['charge_penetration'] = cp
+    expected_ene['electrostatic'] = elst - cp
+    assert(compare_dicts(expected_ene, ene, 6,  sys._getframe().f_code.co_name + ': ene'))
 
 
-@pytest.mark.xfail(True, reason='pol refs suspect', run=True)
 def test_pol_1a():
     asdf = system_1()
-    asdf.set_opts({'pol': True, 'elec_damp': 'screen'})
+    opts = {'elec': True, 'pol': True, 'elec_damp': 'screen'}
+    asdf.set_opts(opts)
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(0.0002777238, ene['pol'], 6, sys._getframe().f_code.co_name))
+
+    elec = 0.0002900482
+    pol = 0.0002777238 - elec
+    expected_ene = blank_ene()
+    expected_ene['elec'] = expected_ene['electrostatic'] = elec
+    expected_ene['pol'] = expected_ene['polarization'] = pol
+    expected_ene['total'] = elec + pol
+    pprint.pprint(opts)
+    assert(compare_dicts(expected_ene, ene, 6,  sys._getframe().f_code.co_name + ': ene'))
 
 
-@pytest.mark.xfail(True, reason='pol refs suspect', run=True)
 def test_pol_1b():
-
     asdf = system_1()
     asdf.set_opts({'pol': True, 'elec_damp': 'screen', 'elec': True, 'pol_driver': 'direct'})
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(0.0002777238, ene['pol'], 6, sys._getframe().f_code.co_name))
+
+    elec = 0.0002900478
+    pol = 0.0002777238 - elec
+    expected_ene = blank_ene()
+    expected_ene['elec'] = expected_ene['electrostatic'] = elec
+    expected_ene['pol'] = expected_ene['polarization'] = pol
+    expected_ene['total'] = elec + pol
+    assert(compare_dicts(expected_ene, ene, 6,  sys._getframe().f_code.co_name + ': ene'))
 
 
 def test_disp_1a():
@@ -161,7 +195,10 @@ def test_disp_1a():
     asdf.set_opts({'disp': True, 'disp_damp': 'tt'})
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(-0.0000989033, ene['disp'], 6, sys._getframe().f_code.co_name))
+
+    expected_ene = blank_ene()
+    expected_ene['disp'] = expected_ene['dispersion'] = expected_ene['total'] = -0.0000989033
+    assert(compare_dicts(expected_ene, ene, 6,  sys._getframe().f_code.co_name + ': ene'))
 
 
 def test_disp_1b():
@@ -170,7 +207,10 @@ def test_disp_1b():
     asdf.set_opts({'disp': True, 'disp_damp': 'overlap'})
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(-0.0001007275, ene['disp'], 6, sys._getframe().f_code.co_name))
+
+    expected_ene = blank_ene()
+    expected_ene['disp'] = expected_ene['dispersion'] = expected_ene['total'] = -0.0001007275
+    assert(compare_dicts(expected_ene, ene, 6,  sys._getframe().f_code.co_name + ': ene'))
 
 
 def test_xr_1():
@@ -178,7 +218,10 @@ def test_xr_1():
     asdf.set_opts({'xr': True})
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(0.0000134716, ene['xr'], 6, sys._getframe().f_code.co_name))
+
+    expected_ene = blank_ene()
+    expected_ene['xr'] = expected_ene['exchange_repulsion'] = expected_ene['total'] = 0.0000134716
+    assert(compare_dicts(expected_ene, ene, 6,  sys._getframe().f_code.co_name + ': ene'))
 
 
 def test_total_1a():
@@ -189,12 +232,22 @@ def test_total_1a():
                    'disp': True, 'disp_damp': 'tt'})
     asdf.compute()
     ene = asdf.get_energy()
+    pprint.pprint(ene)
     print('<<< get_opts():  ', asdf.get_opts(), '>>>')
     print('<<< summary():   ', asdf.summary(), '>>>')
     print('<<< get_energy():', ene, '>>>')
     print('<<< get_atoms(): ', asdf.get_atoms(), '>>>')
+    print(asdf.energy_summary())
     print(asdf.print_geometry(units_to_bohr=b2a))
-    assert(compare_values(0.0001922903, ene['total'], 6, sys._getframe().f_code.co_name))
+    print(asdf.print_geometry(units_to_bohr=1.0))
+
+    expected_ene = blank_ene()
+    expected_ene['elec'] = expected_ene['electrostatic'] = 0.0002900482
+    expected_ene['xr'] = expected_ene['exchange_repulsion'] = 0.0000134716
+    expected_ene['pol'] = expected_ene['polarization'] = 0.0002777238 - expected_ene['electrostatic']
+    expected_ene['disp'] = expected_ene['dispersion'] = -0.0000989033
+    expected_ene['total'] = 0.0001922903
+    assert(compare_dicts(expected_ene, ene, 6,  sys._getframe().f_code.co_name + ': ene'))
 
 
 def test_elec_2a():
@@ -213,22 +266,21 @@ def test_elec_2b():
     assert(compare_values(0.0017049246, ene['elec'], 6, sys._getframe().f_code.co_name))
 
 
-@pytest.mark.xfail(True, reason='pol refs suspect', run=True)
 def test_pol_2a():
     asdf = system_2()
-    asdf.set_opts({'pol': True, 'elec_damp': 'screen'})
+    asdf.set_opts({'elec': True, 'pol': True, 'elec_damp': 'screen'})
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(0.0013685212, ene['pol'], 6, sys._getframe().f_code.co_name))
+    pprint.pprint(ene)
+    assert(compare_values(0.0013685212, ene['total'], 6, sys._getframe().f_code.co_name))
 
 
-@pytest.mark.xfail(True, reason='pol refs suspect', run=True)
 def test_pol_2b():
     asdf = system_2()
-    asdf.set_opts({'pol': True, 'elec_damp': 'screen', 'pol_driver': 'direct'})
+    asdf.set_opts({'elec': True, 'pol': True, 'elec_damp': 'screen', 'pol_driver': 'direct'})
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(0.0013685212, ene['pol'], 6, sys._getframe().f_code.co_name))
+    assert(compare_values(0.0013685212, ene['total'], 6, sys._getframe().f_code.co_name))
 
 
 def test_disp_2a():
@@ -279,22 +331,20 @@ def test_elec_3b():
     assert(compare_values(0.0023592829, ene['elec'], 6, sys._getframe().f_code.co_name))
 
 
-@pytest.mark.xfail(True, reason='pol refs suspect', run=True)
 def test_pol_3a():
     asdf = system_3()
     asdf.set_opts({'elec': True, 'pol': True, 'elec_damp': 'screen', 'pol_damp': 'off'})
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(-0.0066095992, ene['pol'], 6, sys._getframe().f_code.co_name))
+    assert(compare_values(-0.0066095992, ene['total'], 6, sys._getframe().f_code.co_name))
 
 
-@pytest.mark.xfail(True, reason='pol refs suspect', run=True)
 def test_pol_3b():
     asdf = system_3()
-    asdf.set_opts({'pol': True, 'elec_damp': 'screen', 'pol_damp': 'off', 'pol_driver': 'direct'})
+    asdf.set_opts({'elec': True, 'pol': True, 'elec_damp': 'screen', 'pol_damp': 'off', 'pol_driver': 'direct'})
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(-0.0066095992, ene['pol'], 6, sys._getframe().f_code.co_name))
+    assert(compare_values(-0.0066095992, ene['total'], 6, sys._getframe().f_code.co_name))
 
 
 def test_disp_3a():
