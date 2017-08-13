@@ -338,11 +338,11 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
 
     topic = _lbtl[label].get('enable_pbc', 'enable_pbc')
     if topic in dopts:
-        opts.enable_pbc = int(dopts[topic])
+        opts.enable_pbc = dopts[topic]
 
     topic = _lbtl[label].get('enable_cutoff', 'enable_cutoff')
     if topic in dopts:
-        opts.enable_cutoff= int(dopts[topic])
+        opts.enable_cutoff = dopts[topic]
 
     topic = _lbtl[label].get('swf_cutoff', 'swf_cutoff')
     if topic in dopts:
