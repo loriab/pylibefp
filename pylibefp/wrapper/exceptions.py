@@ -45,7 +45,7 @@ class FileNotFound(EFPException):
         self.message = r"""\nEFPException: File not found. {}\n\n""".format(repr(msg))
 
 
-class SyntaxError(EFPException):
+class EFPSyntaxError(EFPException):
     """Syntax error."""
     def __init__(self, msg):
         EFPException.__init__(self, msg)

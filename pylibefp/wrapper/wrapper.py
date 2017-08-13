@@ -36,7 +36,7 @@ def _pywrapped_result_to_error(res, msg=''):
     elif res == core.efp_result.EFP_RESULT_FILE_NOT_FOUND:
         raise FileNotFound(msg)
     elif res == core.efp_result.EFP_RESULT_SYNTAX_ERROR:
-        raise SyntaxError(msg)
+        raise EFPSyntaxError(msg)
     elif res == core.efp_result.EFP_RESULT_UNKNOWN_FRAGMENT:
         raise UnknownFragment(msg)
     elif res == core.efp_result.EFP_RESULT_POL_NOT_CONVERGED:
@@ -119,6 +119,276 @@ def _pywrapped_add_fragment(efpobj, fragments):
     for frag in fragments:
         res = efpobj.add_fragment(frag)
         _pywrapped_result_to_error(res, frag)
+
+
+def _pywrapped_get_opts(efpobj, label='libefp'):
+    """Returns the options state of *efpobj* as a dictionary.
+
+    Parameters
+    ----------
+    label : str, optional
+        Returned dictionary keys are identical to libefp efp_opts struct
+        names unless custom renaming requested via `label`.
+
+    Returns
+    -------
+    dict
+        Current options state of `efpobj` translated into bools, strings,
+        and floats, rather than libefp custom datatypes.
+
+    """
+    opts = core.efp_opts()
+    res = efpobj.raw_get_opts(opts)
+    _pywrapped_result_to_error(res)
+
+    dopts = {}
+
+    dopts['elec'] = bool(opts.terms & core.efp_term.EFP_TERM_ELEC)
+    dopts['pol'] = bool(opts.terms & core.efp_term.EFP_TERM_POL)
+    dopts['disp'] = bool(opts.terms & core.efp_term.EFP_TERM_DISP)
+    dopts['xr'] = bool(opts.terms & core.efp_term.EFP_TERM_XR)
+    dopts['chtr'] = bool(opts.terms & core.efp_term.EFP_TERM_CHTR)
+
+    dopts['elec_damp'] = {
+            core.EFP_ELEC_DAMP_SCREEN: 'screen',
+            core.EFP_ELEC_DAMP_OVERLAP: 'overlap',
+            core.EFP_ELEC_DAMP_OFF: 'off',
+        }[opts.elec_damp]
+
+    dopts['pol_damp'] = {
+               core.EFP_POL_DAMP_TT: 'tt',
+               core.EFP_POL_DAMP_OFF: 'off',
+        }[opts.pol_damp]
+
+    dopts['disp_damp'] = {
+               core.EFP_DISP_DAMP_TT: 'tt',
+               core.EFP_DISP_DAMP_OVERLAP: 'overlap',
+               core.EFP_DISP_DAMP_OFF: 'off',
+        }[opts.disp_damp]
+
+    dopts['enable_pbc'] = opts.enable_pbc
+    dopts['enable_cutoff'] = opts.enable_cutoff
+    dopts['swf_cutoff'] = opts.swf_cutoff
+
+    dopts['pol_driver'] = {
+               core.EFP_POL_DRIVER_ITERATIVE: 'iterative',
+               core.EFP_POL_DRIVER_DIRECT: 'direct',
+        }[opts.pol_driver]
+
+    dopts['ai_elec'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_ELEC)
+    dopts['ai_pol'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_POL)
+    dopts['ai_disp'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_DISP)
+    dopts['ai_xr'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_XR)
+    dopts['ai_chtr'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_CHTR)
+
+    for key in dopts.keys():
+        topic = _lbtl[label].get(key, key)
+        dopts[topic] = dopts.pop(key)
+
+    return dopts
+
+_lbtl = {
+    'libefp': {},
+    'psi': {
+        'elec': 'elst',
+        'pol': 'ind',
+        'xr': 'exch',
+        'elec_damp': 'elst_damp',
+        'pol_damp': 'ind_damp',
+        'pol_driver': 'ind_driver',
+        'ai_elec': 'ai_elst',
+        'ai_pol': 'ai_ind',
+        'ai_xr': 'ai_exch',
+    },
+}
+
+
+def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
+    """Sets the options state of *efpobj* from dictionary `dopts`.
+
+    Parameters
+    ----------
+    dopts : dict
+        Input dict with keys from libefp efp_opts (see `label`) and
+        values bools, strings, floats, and ints, as appropriate, rather
+        than libefp custom datatypes.
+    label : str, optional
+        Input `dopts` keys are read as libefp efp_opts struct names or
+        by the custom translation set defined for `label`.
+    append : str, optional
+        When 'libefp', input `dopts` keys are applied to the default
+        (generally OFF) efp_opts state. When 'psi', input `dopts`
+        keys are applied to the default (generally ON) Psi efp_opts
+        state. When 'append', input `dopts` keys are applied to the
+        current *efpobj* opt_opts state.
+
+    Returns
+    -------
+    dict
+        After setting the options state, `efpobj` is queried as to the
+        current options state, which is then returned.
+
+    """
+    # warn on stray dopts keys
+    allowed = ['elec', 'pol', 'disp', 'xr', 'elec_damp', 'pol_damp', 'disp_damp',
+               'enable_pbc', 'enable_cutoff', 'swf_cutoff', 'pol_driver',
+               'ai_elec', 'ai_pol']
+    label_allowed = [_lbtl[label].get(itm, itm) for itm in allowed]
+    for key in dopts.keys():
+        if key not in label_allowed:
+            print('Warning: unrecognized key {}'.format(key))
+
+    # prepare base options state for dopts
+    opts = core.efp_opts()
+    if append == 'libefp':
+        pass
+    elif append == 'psi':
+        opts.terms |= core.efp_term.EFP_TERM_ELEC
+        opts.terms |= core.efp_term.EFP_TERM_POL
+        opts.terms |= core.efp_term.EFP_TERM_DISP
+        opts.terms |= core.efp_term.EFP_TERM_XR
+        opts.elec_damp = core.EFP_ELEC_DAMP_SCREEN
+        opts.pol_damp = core.EFP_POL_DAMP_TT
+        opts.disp_damp = core.EFP_DISP_DAMP_OVERLAP
+        opts.terms |= core.efp_term.EFP_TERM_AI_ELEC
+        opts.terms |= core.efp_term.EFP_TERM_AI_POL
+    elif append == 'append':
+        res = efpobj.raw_get_opts(opts)
+        _pywrapped_result_to_error(res)
+    else:
+        raise EFPSyntaxError('Unrecognized opts default set: {}'.format(append))
+
+    # apply dopts to options state
+    topic = _lbtl[label].get('elec', 'elec')
+    if topic in dopts:
+        if dopts[topic] is True:
+            opts.terms |= core.efp_term.EFP_TERM_ELEC
+        elif dopts[topic] is False:
+            opts.terms &= ~core.efp_term.EFP_TERM_ELEC
+        else:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+
+    topic = _lbtl[label].get('pol', 'pol')
+    if topic in dopts:
+        if dopts[topic] is True:
+            opts.terms |= core.efp_term.EFP_TERM_POL
+        elif dopts[topic] is False:
+            opts.terms &= ~core.efp_term.EFP_TERM_POL
+        else:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+
+    topic = _lbtl[label].get('disp', 'disp')
+    if topic in dopts:
+        if dopts[topic] is True:
+            opts.terms |= core.efp_term.EFP_TERM_DISP
+        elif dopts[topic] is False:
+            opts.terms &= ~core.efp_term.EFP_TERM_DISP
+        else:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+
+    topic = _lbtl[label].get('xr', 'xr')
+    if topic in dopts:
+        if dopts[topic] is True:
+            opts.terms |= core.efp_term.EFP_TERM_XR
+        elif dopts[topic] is False:
+            opts.terms &= ~core.efp_term.EFP_TERM_XR
+        else:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+
+    topic = _lbtl[label].get('chtr', 'chtr')  # may be enabled in a future libefp release
+
+    topic = _lbtl[label].get('elec_damp', 'elec_damp')
+    if topic in dopts:
+        try:
+            opts.elec_damp = {
+                    'screen': core.EFP_ELEC_DAMP_SCREEN,
+                    'overlap': core.EFP_ELEC_DAMP_OVERLAP,
+                    'off': core.EFP_ELEC_DAMP_OFF,
+                }[dopts[topic].lower()]
+        except KeyError:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [screen/overlap/off] {}: {}'.format(topic, dopts[topic]))
+
+    topic = _lbtl[label].get('pol_damp', 'pol_damp')
+    if topic in dopts:
+        try:
+            opts.pol_damp = {
+                    'tt': core.EFP_POL_DAMP_TT,
+                    'off': core.EFP_POL_DAMP_OFF,
+                }[dopts[topic].lower()]
+        except KeyError:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [tt/off] {}: {}'.format(topic, dopts[topic]))
+
+    topic = _lbtl[label].get('disp_damp', 'disp_damp')
+    if topic in dopts:
+        try:
+            opts.disp_damp = {
+                    'overlap': core.EFP_DISP_DAMP_OVERLAP,
+                    'tt': core.EFP_DISP_DAMP_TT,
+                    'off': core.EFP_DISP_DAMP_OFF,
+                }[dopts[topic].lower()]
+        except KeyError:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [overlap/tt/off] {}: {}'.format(topic, dopts[topic]))
+
+    topic = _lbtl[label].get('enable_pbc', 'enable_pbc')
+    if topic in dopts:
+        opts.enable_pbc = int(dopts[topic])
+
+    topic = _lbtl[label].get('enable_cutoff', 'enable_cutoff')
+    if topic in dopts:
+        opts.enable_cutoff= int(dopts[topic])
+
+    topic = _lbtl[label].get('swf_cutoff', 'swf_cutoff')
+    if topic in dopts:
+        opts.swf_cutoff = float(dopts[topic])
+
+    topic = _lbtl[label].get('pol_driver', 'pol_driver')
+    if topic in dopts:
+        try:
+            opts.pol_driver = {
+                    'iterative': core.EFP_POL_DRIVER_ITERATIVE,
+                    'direct': core.EFP_POL_DRIVER_DIRECT,
+                }[dopts[topic].lower()]
+        except KeyError:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [iterative/direct] {}: {}'.format(topic, dopts[topic]))
+
+    topic = _lbtl[label].get('ai_elec', 'ai_elec')
+    if topic in dopts:
+        if dopts[topic] is True:
+            opts.terms |= core.efp_term.EFP_TERM_AI_ELEC
+        elif dopts[topic] is False:
+            opts.terms &= ~core.efp_term.EFP_TERM_AI_ELEC
+        else:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+
+    topic = _lbtl[label].get('ai_pol', 'ai_pol')
+    if topic in dopts:
+        if dopts[topic] is True:
+            opts.terms |= core.efp_term.EFP_TERM_AI_POL
+        elif dopts[topic] is False:
+            opts.terms &= ~core.efp_term.EFP_TERM_AI_POL
+        else:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+
+    topic = _lbtl[label].get('ai_damp', 'ai_damp')  # may be enabled in a future libefp release
+    topic = _lbtl[label].get('ai_xr', 'ai_xr')      # may be enabled in a future libefp release
+    topic = _lbtl[label].get('ai_chtr', 'ai_chtr')  # may be enabled in a future libefp release
+
+    # set computed options state
+    res = efpobj.raw_set_opts(opts)
+    _pywrapped_result_to_error(res)
+
+    return efpobj.get_opts(label=label)
+
 
 
 def opts_summary(efpobj, labels='libefp'):
@@ -308,6 +578,8 @@ core.efp.compute = _pywrapped_efp_compute
 
 core.efp.add_potentials = _pywrapped_add_potential
 core.efp.add_fragments = _pywrapped_add_fragment
+core.efp.get_opts = _pywrapped_get_opts
+core.efp.set_opts = _pywrapped_set_opts
 core.efp.get_energy = _pywrapped_get_energy
 core.efp.energy_summary = energy_summary
 core.efp.nuclear_repulsion_energy = nuclear_repulsion_energy

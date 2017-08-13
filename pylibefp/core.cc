@@ -41,203 +41,6 @@ std::string wrapped_efp_banner(efp* efp) {
 }
 
 
-//void opts_from_dict(efp* efp, py::dict opts_init) {
-efp_result opts_from_dict(efp* efp, py::dict opts_init) {
-    enum efp_result res;
-    struct efp_opts opts;
-    memset(&opts, 0, sizeof(struct efp_opts));
-
-    for (auto item : opts_init) {
-        if (std::string(py::str(item.first)) == "pol_driver") {
-            if (std::string(py::str(item.second)) == "iterative")
-                opts.pol_driver = EFP_POL_DRIVER_ITERATIVE;
-            else if (std::string(py::str(item.second)) == "direct")
-                opts.pol_driver = EFP_POL_DRIVER_DIRECT;
-            else
-                throw libefpException("opt_from_dict: invalid value for pol_driver");
-        }
-
-        if (std::string(py::str(item.first)) == "elec_damp") {
-            if (std::string(py::str(item.second)) == "screen")
-                opts.elec_damp = EFP_ELEC_DAMP_SCREEN;
-            else if (std::string(py::str(item.second)) == "overlap")
-                opts.elec_damp = EFP_ELEC_DAMP_OVERLAP;
-            else if (std::string(py::str(item.second)) == "off")
-                opts.elec_damp = EFP_ELEC_DAMP_OFF;
-            else
-                throw libefpException("opt_from_dict: invalid value for elec_damp");
-        }
-
-        if (std::string(py::str(item.first)) == "pol_damp") {
-            if (std::string(py::str(item.second)) == "tt")
-                opts.pol_damp = EFP_POL_DAMP_TT;
-            else if (std::string(py::str(item.second)) == "off")
-                opts.pol_damp = EFP_POL_DAMP_OFF;
-            else
-                throw libefpException("opt_from_dict: invalid value for pol_damp");
-        }
-
-        if (std::string(py::str(item.first)) == "disp_damp") {
-            if (std::string(py::str(item.second)) == "tt")
-                opts.disp_damp = EFP_DISP_DAMP_TT;
-            else if (std::string(py::str(item.second)) == "overlap")
-                opts.disp_damp = EFP_DISP_DAMP_OVERLAP;
-            else if (std::string(py::str(item.second)) == "off")
-                opts.disp_damp = EFP_DISP_DAMP_OFF;
-            else
-                throw libefpException("opt_from_dict: invalid value for disp_damp");
-        }
-
-        if (std::string(py::str(item.first)) == "ai_elec")
-            if (opts_init["ai_elec"].cast<bool>() == true)
-                opts.terms |= EFP_TERM_AI_ELEC;
-        if (std::string(py::str(item.first)) == "ai_pol")
-            if (opts_init["ai_pol"].cast<bool>() == true)
-                opts.terms |= EFP_TERM_AI_POL;
-        //opts.terms |= EFP_TERM_AI_DISP;  // may be enabled in future libefp release
-        //opts.terms |= EFP_TERM_AI_XR;    // may be enabled in future libefp release
-        //opts.terms |= EFP_TERM_AI_CHTR;  // may be enabled in future libefp release
-
-        if (std::string(py::str(item.first)) == "elec")
-            if (opts_init["elec"].cast<bool>() == true)
-                opts.terms |= EFP_TERM_ELEC;
-        if (std::string(py::str(item.first)) == "pol")
-            if (opts_init["pol"].cast<bool>() == true)
-                opts.terms |= EFP_TERM_POL;
-        if (std::string(py::str(item.first)) == "disp")
-            if (opts_init["disp"].cast<bool>() == true)
-                opts.terms |= EFP_TERM_DISP;
-        if (std::string(py::str(item.first)) == "xr")
-            if (opts_init["xr"].cast<bool>() == true)
-                opts.terms |= EFP_TERM_XR;
-        //opts.terms |= EFP_TERM_CHTR;  // may be enabled in a future libefp release
-
-        if (std::string(py::str(item.first)) == "enable_pbc")
-            opts.enable_pbc = opts_init["enable_pbc"].cast<int>();
-        if (std::string(py::str(item.first)) == "enable_cutoff")
-            opts.enable_cutoff = opts_init["enable_cutoff"].cast<int>();
-        if (std::string(py::str(item.first)) == "swf_cutoff")
-            opts.swf_cutoff = opts_init["swf_cutoff"].cast<double>();
-    }
-
-    //if ((res = efp_set_opts(efp, &opts))) {
-    //    std::string sres = "efp_set_opts: " + rts(res) + "\n";
-    //    throw libefpException(sres.c_str());
-    //}
-    res = efp_set_opts(efp, &opts);
-    return res;
-}
-
-
-py::dict opts_to_dict_old(efp* efp) {
-    enum efp_result res;
-    struct efp_opts opts;
-    memset(&opts, 0, sizeof(struct efp_opts));
-    std::string ans;
-    py::dict opts_init;
-
-    efp_get_opts(efp, &opts);
-
-    opts_init[py::str("elec")] = (opts.terms & EFP_TERM_ELEC);
-    opts_init[py::str("pol")] = (opts.terms & EFP_TERM_POL);
-    opts_init[py::str("disp")] = (opts.terms & EFP_TERM_DISP);
-    opts_init[py::str("xr")] = (opts.terms & EFP_TERM_XR);
-    //opts_init[py::str("chtr")] = (opts.terms & EFP_TERM_CHTR);
-
-    if (opts.elec_damp == EFP_ELEC_DAMP_SCREEN)
-        ans = "screen";
-    else if (opts.elec_damp == EFP_ELEC_DAMP_OVERLAP)
-        ans = "screen";
-    else if (opts.elec_damp == EFP_ELEC_DAMP_OFF)
-        ans = "off";
-    opts_init[py::str("elec_damp")] = ans;
-
-    if (opts.pol_damp == EFP_POL_DAMP_TT)
-        ans = "tt";
-    else if (opts.pol_damp == EFP_POL_DAMP_OFF)
-        ans = "off";
-    opts_init[py::str("pol_damp")] = ans;
-
-    if (opts.disp_damp == EFP_DISP_DAMP_TT)
-        ans = "tt";
-    else if (opts.disp_damp == EFP_DISP_DAMP_OVERLAP)
-        ans = "overlap";
-    else if (opts.disp_damp == EFP_DISP_DAMP_OFF)
-        ans = "off";
-    opts_init[py::str("disp_damp")] = ans;
-
-    opts_init[py::str("ai_elec")] = (opts.terms & EFP_TERM_AI_ELEC);
-    opts_init[py::str("ai_pol")] = (opts.terms & EFP_TERM_AI_POL);
-    //opts_init[py::str("ai_disp")] = (opts.terms & EFP_TERM_AI_DISP);
-    //opts_init[py::str("ai_xr")] = (opts.terms & EFP_TERM_AI_XR);
-    //opts_init[py::str("ai_chtr")] = (opts.terms & EFP_TERM_AI_CHTR);
-
-    if (opts.pol_driver == EFP_POL_DRIVER_ITERATIVE)
-        ans = "iterative";
-    else if (opts.pol_driver == EFP_POL_DRIVER_DIRECT)
-        ans = "direct";
-    opts_init[py::str("pol_driver")] = ans;
-
-    return opts_init;
-}
-
-py::dict opts_to_dict(efp* efp) {
-    enum efp_result res;
-    struct efp_opts opts;
-    memset(&opts, 0, sizeof(struct efp_opts));
-    std::string ans;
-    py::dict opts_init;
-
-    efp_get_opts(efp, &opts);
-
-    opts_init[py::str("elec")] = (opts.terms & EFP_TERM_ELEC) ? true : false;
-    opts_init[py::str("pol")] = (opts.terms & EFP_TERM_POL) ? true : false;
-    opts_init[py::str("disp")] = (opts.terms & EFP_TERM_DISP) ? true : false;
-    opts_init[py::str("xr")] = (opts.terms & EFP_TERM_XR) ? true : false;
-    //opts_init[py::str("chtr")] = (opts.terms & EFP_TERM_CHTR);
-
-    if (opts.elec_damp == EFP_ELEC_DAMP_SCREEN)
-        ans = "screen";
-    else if (opts.elec_damp == EFP_ELEC_DAMP_OVERLAP)
-        ans = "screen";
-    else if (opts.elec_damp == EFP_ELEC_DAMP_OFF)
-        ans = "off";
-    opts_init[py::str("elec_damp")] = ans;
-
-    if (opts.pol_damp == EFP_POL_DAMP_TT)
-        ans = "tt";
-    else if (opts.pol_damp == EFP_POL_DAMP_OFF)
-        ans = "off";
-    opts_init[py::str("pol_damp")] = ans;
-
-    if (opts.disp_damp == EFP_DISP_DAMP_TT)
-        ans = "tt";
-    else if (opts.disp_damp == EFP_DISP_DAMP_OVERLAP)
-        ans = "overlap";
-    else if (opts.disp_damp == EFP_DISP_DAMP_OFF)
-        ans = "off";
-    opts_init[py::str("disp_damp")] = ans;
-
-    opts_init[py::str("ai_elec")] = (opts.terms & EFP_TERM_AI_ELEC) ? true : false;
-    opts_init[py::str("ai_pol")] = (opts.terms & EFP_TERM_AI_POL) ? true : false;
-    //opts_init[py::str("ai_disp")] = (opts.terms & EFP_TERM_AI_DISP);
-    //opts_init[py::str("ai_xr")] = (opts.terms & EFP_TERM_AI_XR);
-    //opts_init[py::str("ai_chtr")] = (opts.terms & EFP_TERM_AI_CHTR);
-
-    if (opts.pol_driver == EFP_POL_DRIVER_ITERATIVE)
-        ans = "iterative";
-    else if (opts.pol_driver == EFP_POL_DRIVER_DIRECT)
-        ans = "direct";
-    opts_init[py::str("pol_driver")] = ans;
-
-    opts_init[py::str("enable_pbc")] = opts.enable_pbc;
-    opts_init[py::str("enable_cutoff")] = opts.enable_cutoff;
-    opts_init[py::str("swf_cutoff")] = opts.swf_cutoff;
-
-    return opts_init;
-}
-
-
 //void wrapped_efp_add_fragment(efp* efp, std::string name) {
 //    enum efp_result res;
 //
@@ -425,125 +228,6 @@ py::list wrapped_efp_get_frag_xyzabc(efp* efp, size_t frag_idx) {
     return coords;
 }
 
-std::string efp_opts_summary_old(efp* efp) {
-    struct efp_opts opts;
-    memset(&opts, 0, sizeof(struct efp_opts));
-
-    efp_get_opts(efp, &opts);
-    //sprintf(buffer, "    units %-s\n", units_ == Angstrom ? "Angstrom" : "Bohr");
-
-    char buffer[120];
-    std::stringstream ss;
-
-    sprintf(buffer, "  ==> EFP/EFP Setup <==\n\n");
-    ss << buffer;
-    sprintf(buffer, "  Number of EFP fragments: %12d\n", wrapped_efp_get_frag_count(efp));
-    ss << buffer;
-    sprintf(buffer, "  Electrostatics enabled?: %12d\n", (opts.terms & EFP_TERM_ELEC));
-    ss << buffer;
-    sprintf(buffer, "  Polarization enabled?:   %12d\n", (opts.terms & EFP_TERM_POL));
-    ss << buffer;
-    sprintf(buffer, "  Dispersion enabled?:     %12d\n", (opts.terms & EFP_TERM_DISP));
-    ss << buffer;
-    sprintf(buffer, "  Exchange enabled?:       %12d\n", (opts.terms & EFP_TERM_XR));
-    ss << buffer;
-    sprintf(buffer, "  Charge-Transfer enabled?:%12s\n", "undefined");
-    ss << buffer;
-
-    sprintf(buffer, "  Electrostatics damping:  %12d\n", (opts.elec_damp));
-    ss << buffer;
-    sprintf(buffer, "  Polarization damping:    %12d\n", (opts.pol_damp));
-    ss << buffer;
-    sprintf(buffer, "  Dispersion damping:      %12d\n", (opts.disp_damp));
-    ss << buffer;
-
-//    if (do_qm_) {
-    sprintf(buffer, "  ==> QM/EFP Setup <==\n\n");
-    ss << buffer;
-    sprintf(buffer, "  Number of QM fragments:  %12d\n", -1); //, nfrag_);
-    ss << buffer;
-    sprintf(buffer, "  Electrostatics enabled?: %12d\n", (opts.terms & EFP_TERM_AI_ELEC));
-    ss << buffer;
-    sprintf(buffer, "  Polarization enabled?:   %12d\n", (opts.terms & EFP_TERM_AI_POL));
-    ss << buffer;
-    sprintf(buffer, "  Dispersion enabled?:     %12s\n", "undefined");
-    ss << buffer;
-    sprintf(buffer, "  Exchange enabled?:       %12s\n", "undefined");
-    ss << buffer;
-    sprintf(buffer, "  Charge-Transfer enabled?:%12s\n", "undefined");
-    ss << buffer;
-
-//    outfile->Printf("  Gradient enabled?:       %12s\n", do_grad_ ? "true" : "false");
-//
-//    print_efp_geometry();
-//
-//    if (do_qm_) {
-//        outfile->Printf("  ==> QM Geometry <==\n\n");
-//        molecule_->print();
-//    }
-
-    return ss.str();
-}
-
-std::string efp_opts_summary(efp* efp) {
-    char buffer[120];
-    std::stringstream ss;
-
-    py::dict opts = opts_to_dict(efp);
-//    //sprintf(buffer, "    units %-s\n", units_ == Angstrom ? "Angstrom" : "Bohr");
-//
-    sprintf(buffer, "  ==> EFP/EFP Setup <==\n\n");
-    ss << buffer;
-    sprintf(buffer, "  Number of EFP fragments: %12d\n", wrapped_efp_get_frag_count(efp));
-    ss << buffer;
-    sprintf(buffer, "  Electrostatics enabled?: %12s\n", opts["elec"].cast<bool>() ? "true" : "false");
-    ss << buffer;
-    sprintf(buffer, "  Polarization enabled?:   %12s\n", opts["pol"].cast<bool>() ? "true" : "false");
-    ss << buffer;
-    sprintf(buffer, "  Dispersion enabled?:     %12s\n", opts["disp"].cast<bool>() ? "true" : "false");
-    ss << buffer;
-    sprintf(buffer, "  Exchange enabled?:       %12s\n", opts["xr"].cast<bool>() ? "true" : "false");
-    ss << buffer;
-    sprintf(buffer, "  Charge-Transfer enabled?:%12s\n", "undefined");
-    ss << buffer;
-
-    sprintf(buffer, "  Electrostatics damping:  %12s\n", opts["elec_damp"].cast<std::string>().c_str());
-    ss << buffer;
-    sprintf(buffer, "  Polarization damping:    %12s\n", opts["pol_damp"].cast<std::string>().c_str());
-    ss << buffer;
-    sprintf(buffer, "  Dispersion damping:      %12s\n", opts["disp_damp"].cast<std::string>().c_str());
-    ss << buffer;
-    sprintf(buffer, "  Polarization driver:     %12s\n", opts["pol_driver"].cast<std::string>().c_str());
-    ss << buffer;
-
-////    if (do_qm_) {
-//    sprintf(buffer, "  ==> QM/EFP Setup <==\n\n");
-//    ss << buffer;
-//    sprintf(buffer, "  Number of QM fragments:  %12d\n", -1); //, nfrag_);
-//    ss << buffer;
-    sprintf(buffer, "  Electrostatics enabled?: %12s\n", opts["ai_elec"].cast<bool>() ? "true" : "false");
-    ss << buffer;
-    sprintf(buffer, "  Polarization enabled?:   %12s\n", opts["ai_pol"].cast<bool>() ? "true" : "false");
-    ss << buffer;
-    sprintf(buffer, "  Dispersion enabled?:     %12s\n", "undefined");
-    ss << buffer;
-    sprintf(buffer, "  Exchange enabled?:       %12s\n", "undefined");
-    ss << buffer;
-    sprintf(buffer, "  Charge-Transfer enabled?:%12s\n", "undefined");
-    ss << buffer;
-
-////    outfile->Printf("  Gradient enabled?:       %12s\n", do_grad_ ? "true" : "false");
-////
-////    print_efp_geometry();
-////
-////    if (do_qm_) {
-////        outfile->Printf("  ==> QM Geometry <==\n\n");
-////        molecule_->print();
-////    }
-
-    return ss.str();
-}
-
 
 std::string extended_efp_geometry_str(efp* efp, double units_to_bohr=1.0) {
     char buffer[120];
@@ -590,17 +274,17 @@ PYBIND11_PLUGIN(core) {
         .value("EFP_RESULT_POL_NOT_CONVERGED", EFP_RESULT_POL_NOT_CONVERGED)  /* Polarization SCF procedure did not converge. */
         .export_values();
 
-    py::enum_<efp_term>(m, "efp_term", "Flags to specify EFP energy terms")
+    py::enum_<efp_term>(m, "efp_term", py::arithmetic(), "Flags to specify EFP energy terms")
         .value("EFP_TERM_ELEC", EFP_TERM_ELEC)                                /* EFP/EFP electrostatics. */
         .value("EFP_TERM_POL", EFP_TERM_POL)                                  /* EFP/EFP polarization. */
         .value("EFP_TERM_DISP", EFP_TERM_DISP)                                /* EFP/EFP dispersion. */
         .value("EFP_TERM_XR", EFP_TERM_XR)                                    /* EFP/EFP exchange repulsion. */
-        .value("EFP_TERM_CHTR", EFP_TERM_CHTR)                                /* EFP/EFP charge transfer, reserved for future use. */
+        .value("EFP_TERM_CHTR", EFP_TERM_CHTR)                                /* EFP/EFP charge transfer, reserved for future. */
         .value("EFP_TERM_AI_ELEC", EFP_TERM_AI_ELEC)                          /* Ab initio/EFP electrostatics. */
         .value("EFP_TERM_AI_POL", EFP_TERM_AI_POL)                            /* Ab initio/EFP polarization. */
-        .value("EFP_TERM_AI_DISP", EFP_TERM_AI_DISP)                          /* Ab initio/EFP dispersion, reserved for future use. */
-        .value("EFP_TERM_AI_XR", EFP_TERM_AI_XR)                              /* Ab initio/EFP exchange repulsion, reserved for future use. */
-        .value("EFP_TERM_AI_CHTR", EFP_TERM_AI_CHTR)                          /* Ab initio/EFP charge transfer, reserved for future use. */
+        .value("EFP_TERM_AI_DISP", EFP_TERM_AI_DISP)                          /* Ab initio/EFP dispersion, reserved for future. */
+        .value("EFP_TERM_AI_XR", EFP_TERM_AI_XR)                              /* Ab initio/EFP exchange repulsion, reserved for future. */
+        .value("EFP_TERM_AI_CHTR", EFP_TERM_AI_CHTR)                          /* Ab initio/EFP charge transfer, reserved for future. */
         .export_values();
 
     py::enum_<efp_disp_damp>(m, "efp_disp_damp", "Fragment-fragment dispersion damping type")
@@ -633,15 +317,15 @@ PYBIND11_PLUGIN(core) {
         .export_values();
 
     py::class_<efp_opts>(m, "efp_opts", "Options controlling EFP computation")
-        .def(py::init());
-        // unsigned terms;                      /* Specifies which energy terms to compute. */
-        // enum efp_disp_damp disp_damp;        /* Dispersion damping type (see #efp_disp_damp). */
-        // enum efp_elec_damp elec_damp;        /* Electrostatic damping type (see #efp_elec_damp). */
-        // enum efp_pol_damp pol_damp;          /* Polarization damping type (see #efp_pol_damp). */
-        // enum efp_pol_driver pol_driver;      /* Driver used to find polarization induced dipoles. */
-        // int enable_pbc;                      /* Enable periodic boundary conditions if nonzero. */
-        // int enable_cutoff;                   /* Enable fragment-fragment interaction cutoff if nonzero. */
-        // double swf_cutoff;                   /* Cutoff distance for fragment-fragment interactions. */
+        .def(py::init())
+        .def_readwrite("terms", &efp_opts::terms)                             /* Specifies which energy terms to compute. */
+        .def_readwrite("disp_damp", &efp_opts::disp_damp)                     /* Dispersion damping type (see #efp_disp_damp). */
+        .def_readwrite("elec_damp", &efp_opts::elec_damp)                     /* Electrostatic damping type (see #efp_elec_damp). */
+        .def_readwrite("pol_damp", &efp_opts::pol_damp)                       /* Polarization damping type (see #efp_pol_damp). */
+        .def_readwrite("pol_driver", &efp_opts::pol_driver)                   /* Driver used to find polarization induced dipoles. */
+        .def_readwrite("enable_pbc", &efp_opts::enable_pbc)                   /* Enable periodic boundary conditions if nonzero. */
+        .def_readwrite("enable_cutoff", &efp_opts::enable_cutoff)             /* Enable frag-fraginteraction cutoff if nonzero. */
+        .def_readwrite("swf_cutoff", &efp_opts::swf_cutoff);                  /* Cutoff distance for frag-frag interactions. */
 
     py::class_<efp_energy>(m, "efp_energy", "EFP energy terms")
         .def(py::init())
@@ -676,11 +360,10 @@ PYBIND11_PLUGIN(core) {
         //.def("result", &efp_result, "Callback function which is called by libefp to obtain electric field *arg2* in the number *arg0* specified points at positions *arg1* with initialized user data *arg3*")
         .def("banner", wrapped_efp_banner, "Gets a human readable banner string with information about the library")
         .def_static("create", &efp_create, "Creates a new efp object")
-//        .def("opts_default", &efp_opts_default, "Gets default values of simulation options returns in *arg0*")
 //        .def("set_error_log", &efp_set_error_log, "Sets the error log callback function")
-        .def("set_opts", opts_from_dict, "Set computation options to *arg0*")
-        .def("get_opts", opts_to_dict, "Gets currently set computation options")
-        .def("summary", efp_opts_summary, "")
+        .def("raw_set_opts", &efp_set_opts, "Set computation options to *arg0*")
+        .def("raw_get_opts", &efp_get_opts, "Gets currently set computation options")
+//        .def("summary", efp_opts_summary, "")
         .def("add_potential", &efp_add_potential, "Adds EFP potential from full file path *arg0*")
         //.def("add_fragment", wrapped_efp_add_fragment, "Adds a new fragment *arg0* to the EFP subsystem")
         .def("add_fragment", &efp_add_fragment, "Adds a new fragment *arg0* to the EFP subsystem")
@@ -753,8 +436,6 @@ PYBIND11_PLUGIN(core) {
 //        .def("get_frag_charge", &efp_get_frag_charge, "Gets total charge on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("get_frag_multiplicity", &efp_get_frag_multiplicity, "Gets spin multiplicity on 0-indexed fragment *arg0* and returns it in *arg1*")
 
-        //.def("set_opts", &efp_set_opts, "Set computation options to *arg0*")
-        //.def("get_opts", &efp_get_opts, "Gets currently set computation options returns in *arg0*")
 //        .def("get_frag_atom_count", wrapped_get_frag_atom_count, "Gets the number of atoms on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("get_frag_count", &efp_get_frag_count, "Gets the number of fragments in this computation and returns it in *arg0*")
 //        .def("get_frag_atoms", &efp_get_frag_atoms, "Gets atoms comprising the specified 0-indexed fragment *arg0* and returns it in *arg1*")
