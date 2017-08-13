@@ -394,7 +394,6 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
 def opts_summary(efpobj, labels='libefp'):
 
     opts = efpobj.get_opts()
-    print(opts)
 #    py::dict opts = opts_to_dict(efp);
 
     elec = 'Electrostatics'
