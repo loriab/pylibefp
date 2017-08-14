@@ -198,9 +198,14 @@ def _pywrapped_get_opts(efpobj, label='libefp'):
     dopts['ai_chtr'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_CHTR)
 
     print('GET BEFORE: ', dopts)
-    for key in dopts.keys():
-        topic = _lbtl[label].get(key, key)
-        dopts[topic] = dopts.pop(key)
+    def rekey(rawdict):
+        newdict = rawdict.copy()
+        for key in rawdict.keys():
+            topic = _lbtl[label].get(key, key)
+            newdict[topic] = newdict.pop(key)
+        return newdict
+
+    dopts = rekey(dopts)
     print('GET AFTER: ', dopts)
 
     return dopts
