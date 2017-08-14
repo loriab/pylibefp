@@ -63,7 +63,7 @@ def compare_dicts(expected, computed, tol, label):
     Note that a clean DeepDiff returns {}, which evaluates to False, hence the compare_integers.
 
     """
-    ans = deepdiff.DeepDiff(computed, expected, significant_digits=tol, verbose_level=2)
+    ans = deepdiff.DeepDiff(expected, computed, significant_digits=tol, verbose_level=2)
     clean = not bool(ans)
     if not clean:
         pprint.pprint(ans)

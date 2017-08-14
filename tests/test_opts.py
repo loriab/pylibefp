@@ -63,15 +63,15 @@ from systems import *
 def test_opts_psi_dflt():
     pdasdf = system_1()
 
-    pdref1 = {'ai_elst': True, 'elst_damp': 'screen', 'ai_disp': False, 'chtr': False, 'swf_cutoff': 0.0, 'enable_cutoff': 0, 'disp': True, 'ai_ind': True, 'ind': True, 'exch': True, 'ind_driver': 'iterative', 'ai_exch': False, 'elst': True, 'ind_damp': 'tt', 'disp_damp': 'overlap', 'enable_pbc': 0, 'ai_chtr': False}
+    pdref1 = {'ai_elst': True, 'elst_damp': 'screen', 'ai_disp': False, 'chtr': False, 'swf_cutoff': 0.0, 'enable_cutoff': 0L, 'disp': True, 'ai_ind': True, 'ind': True, 'exch': True, 'ind_driver': 'iterative', 'ai_exch': False, 'elst': True, 'ind_damp': 'tt', 'disp_damp': 'overlap', 'enable_pbc': 0L, 'ai_chtr': False}
     pdans1 = pdasdf.set_opts({}, label='psi', append='psi')
     assert(compare_dicts(pdref1, pdans1, 6, sys._getframe().f_code.co_name + ': psi default blank'))
 
-    pdref2 = {'ai_elst': False, 'elst_damp': 'off', 'ai_disp': False, 'chtr': False, 'swf_cutoff': 1.0, 'enable_cutoff': 0, 'disp': True, 'ai_ind': True, 'ind': True, 'exch': True, 'ind_driver': 'iterative', 'ai_exch': False, 'elst': True, 'ind_damp': 'tt', 'disp_damp': 'overlap', 'enable_pbc': 0, 'ai_chtr': False}
+    pdref2 = {'ai_elst': False, 'elst_damp': 'off', 'ai_disp': False, 'chtr': False, 'swf_cutoff': 1.0, 'enable_cutoff': 0L, 'disp': True, 'ai_ind': True, 'ind': True, 'exch': True, 'ind_driver': 'iterative', 'ai_exch': False, 'elst': True, 'ind_damp': 'tt', 'disp_damp': 'overlap', 'enable_pbc': 0L, 'ai_chtr': False}
     pdans2 = pdasdf.set_opts({'elst_damp': 'OFF', 'swf_cutoff': 1.0, 'elst': True, 'ai_elst': False, 'enable_cutoff': 0}, label='psi', append='append')
     assert(compare_dicts(pdref2, pdans2, 6, sys._getframe().f_code.co_name + ': psi default append setting'))
 
-    pdref3 = {'ai_elst': True, 'elst_damp': 'overlap', 'ai_disp': False, 'chtr': False, 'swf_cutoff': 2.0, 'enable_cutoff': 0, 'disp': True, 'ai_ind': True, 'ind': True, 'exch': True, 'ind_driver': 'iterative', 'ai_exch': False, 'elst': False, 'ind_damp': 'tt', 'disp_damp': 'overlap', 'enable_pbc': 0, 'ai_chtr': False}
+    pdref3 = {'ai_elst': True, 'elst_damp': 'overlap', 'ai_disp': False, 'chtr': False, 'swf_cutoff': 2.0, 'enable_cutoff': 0L, 'disp': True, 'ai_ind': True, 'ind': True, 'exch': True, 'ind_driver': 'iterative', 'ai_exch': False, 'elst': False, 'ind_damp': 'tt', 'disp_damp': 'overlap', 'enable_pbc': 0L, 'ai_chtr': False}
     pdans3 = pdasdf.set_opts({'elst_damp': 'OVERlap', 'swf_cutoff': 2.0, 'elst': False, 'enable_cutoff': 0}, append='psi', label='psi')
     assert(compare_dicts(pdref3, pdans3, 6, sys._getframe().f_code.co_name + ': psi default reset setting'))
 
