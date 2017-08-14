@@ -197,9 +197,11 @@ def _pywrapped_get_opts(efpobj, label='libefp'):
     dopts['ai_xr'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_XR)
     dopts['ai_chtr'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_CHTR)
 
+    print('GET BEFORE: ', dopts)
     for key in dopts.keys():
         topic = _lbtl[label].get(key, key)
         dopts[topic] = dopts.pop(key)
+    print('GET AFTER: ', dopts)
 
     return dopts
 
@@ -259,6 +261,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
     else:
         raise EFPSyntaxError('Unrecognized opts default set: {}'.format(append))
 
+    print('SET BEFORE:', dopts)
     # apply dopts to options state
     topic = _lbtl[label].get('elec', 'elec')
     if topic in dopts:
@@ -400,7 +403,9 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
     res = efpobj.raw_set_opts(opts)
     _pywrapped_result_to_error(res)
 
-    return efpobj.get_opts(label=label)
+    ropts = efpobj.get_opts(label=label)
+    print('SET AFTER:', ropts)
+    return ropts
 
 
 
