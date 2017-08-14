@@ -41,6 +41,14 @@ _lbtl = {
 }
 
 
+def _rekey(rawdict, label):
+    newdict = rawdict.copy()
+    for key in rawdict.keys():
+        topic = _lbtl[label].get(key, key)
+        newdict[topic] = newdict.pop(key)
+    return newdict
+
+
 def _pywrapped_result_to_error(res, msg=''):
 
     if res == core.efp_result.EFP_RESULT_SUCCESS:
@@ -197,14 +205,7 @@ def _pywrapped_get_opts(efpobj, label='libefp'):
     dopts['ai_xr'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_XR)
     dopts['ai_chtr'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_CHTR)
 
-    def rekey(rawdict):
-        newdict = rawdict.copy()
-        for key in rawdict.keys():
-            topic = _lbtl[label].get(key, key)
-            newdict[topic] = newdict.pop(key)
-        return newdict
-
-    return rekey(dopts)
+    return _rekey(dopts, label=label)
 
 
 def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
@@ -256,6 +257,9 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
         opts.disp_damp = core.EFP_DISP_DAMP_OVERLAP
         opts.terms |= core.efp_term.EFP_TERM_AI_ELEC
         opts.terms |= core.efp_term.EFP_TERM_AI_POL
+    #elif append == 'qchem':
+    #    # q-chem and psi4 have different defaults for at least this option
+    #    opts.disp_damp = core.EFP_DISP_DAMP_TT
     elif append == 'append':
         res = efpobj.raw_get_opts(opts)
         _pywrapped_result_to_error(res)
@@ -444,8 +448,22 @@ def opts_summary(efpobj, labels='libefp'):
     return text
 
 
-def _pywrapped_get_energy(efpobj):
+def _pywrapped_get_energy(efpobj, label='libefp'):
+    """Gets the energy components from *efpobj* computation as a dictionary.
 
+    Parameters
+    ----------
+    label : str, optional
+        Returned dictionary keys are identical to libefp efp_energy struct
+        names plus elec, pol, disp, xr, & total components unless custom renaming
+        requested via `label`.
+
+    Returns
+    -------
+    dict
+        Individual terms, summed components, and total energies.
+
+    """
     ene = core.efp_energy()
     res = efpobj.raw_get_energy(ene)
     _pywrapped_result_to_error(res)
@@ -466,7 +484,7 @@ def _pywrapped_get_energy(efpobj):
         'disp':                        ene.dispersion,
     }
 
-    return energies
+    return _rekey(energies, label=label)
 
 
 def _pywrapped_get_frag_count(efpobj):
@@ -539,7 +557,7 @@ def energy_summary(efpobj):
                                       ene['electrostatic_point_charges'],
                                       _enabled(opt['elec'] or opt['ai_elec']))
     text +=   '      EFP/EFP                     {:20.12f} [Eh] {}\n'.format(
-                                      ene['electrostatic'] + 
+                                      ene['electrostatic'] +
                                       ene['charge_penetration'],
                                       _enabled(opt['elec']))
     text +=   '      QM-Nuc/EFP                  {:20.12f} [Eh] {}\n'.format(
@@ -605,7 +623,7 @@ def to_dict(efpobj):
             at['symbol'] = mobj.group('symbol').capitalize()
         at['charge'] = at['Z']
 
-    return pyat 
+    return pyat
 
 
 # only wrapped to throw Py exceptions

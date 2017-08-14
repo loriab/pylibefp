@@ -319,3 +319,30 @@ def test_efpefptorque():
     assert(compare_values(-0.0066095987170644, ene['total'], 5, sys._getframe().f_code.co_name + ': ene'))
     assert(compare_dicts(ref, {'torque': torq}, 6, sys._getframe().f_code.co_name + ': torq'))
 
+
+def test_efpefp_bz2():
+    """psi4/test/libefp/qchem-efp-sp"""
+    b2a = 0.529177
+    a2b = 1.0 / b2a
+
+    asdf = pylibefp.core.efp()
+    asdf.create()
+
+    frags = ['c6h6', 'c6h6']
+    asdf.add_potentials(frags)
+    asdf.add_fragments(frags)
+    asdf.set_frag_coordinates(0, 'xyzabc', [-0.30448173 * a2b, -2.24210052 * a2b, -0.29383131 * a2b, -0.642499, 1.534222, -0.568147])
+    asdf.set_frag_coordinates(1, 'xyzabc', [-0.60075437 * a2b,  1.36443336 * a2b,  0.78647823 * a2b,  3.137879, 1.557344, -2.568550])
+    asdf.prepare()
+
+    asdf.set_opts({'disp_damp': 'tt'}, append='psi')
+    asdf.compute()
+    ene = asdf.get_energy(label='psi')
+
+    # values copied from q-chem output file
+    assert(compare_values(-0.006945881265, ene['elst'], 6, sys._getframe().f_code.co_name + ': ene elst'))
+    assert(compare_values( 0.046915489574, ene['exch'], 6, sys._getframe().f_code.co_name + ': ene exch'))
+    assert(compare_values(-0.000675030191, ene['ind'], 6, sys._getframe().f_code.co_name + ': ene ind'))
+    assert(compare_values(-0.021092526180, ene['disp'], 6, sys._getframe().f_code.co_name + ': ene disp'))
+    assert(compare_values( 0.018202051938, ene['total'], 6, sys._getframe().f_code.co_name + ': ene'))
+
