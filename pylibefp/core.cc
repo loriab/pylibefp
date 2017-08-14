@@ -122,7 +122,33 @@ double wrapped_efp_get_frag_charge(efp* efp, size_t frag_idx) {
     return charge;
 }
 
-size_t wrapped_efp_get_frag_count(efp* efp) {
+py::tuple cwrapped_efp_get_gradient(efp* efp, size_t n_frag) {
+    enum efp_result res;
+    py::list grad;
+
+    double *ccoords = NULL;
+    ccoords = new double[6 * n_frag];
+    double *pcoords = ccoords;
+
+    res = efp_get_gradient(efp, ccoords);
+    for (size_t ic = 0; ic < 6*n_frag; ++ic)
+        grad.append(ccoords[ic]);
+
+    py::tuple rets = py::make_tuple(res, grad);
+    return rets;
+}
+
+py::tuple cwrapped_efp_get_frag_count(efp* efp) {
+    enum efp_result res;
+    size_t n=0;
+
+    res = efp_get_frag_count(efp, &n);
+
+    py::tuple rets = py::make_tuple(res, n);
+    return rets;
+}
+
+size_t twrapped_efp_get_frag_count(efp* efp) {
     enum efp_result res;
     size_t n=0;
 
@@ -158,7 +184,7 @@ py::dict extend_efp_get_atoms(efp* efp) {
     mol_info[py::str("fix_orientation")] = true;
     mol_info[py::str("fix_symmetry")] = "c1";
 
-    size_t frag_count = wrapped_efp_get_frag_count(efp);
+    size_t frag_count = twrapped_efp_get_frag_count(efp);
     for (int ifr = 0; ifr < frag_count; ++ifr) {
         frag_natom = wrapped_efp_get_frag_atom_count(efp, ifr);
         py::list f;
@@ -201,7 +227,7 @@ py::dict extend_efp_get_atoms(efp* efp) {
 py::list wrapped_efp_get_coordinates(efp* efp) {
     enum efp_result res;
 
-    size_t nfr = wrapped_efp_get_frag_count(efp);
+    size_t nfr = twrapped_efp_get_frag_count(efp);
 
     double *ccoords = NULL;
     ccoords = new double[6 * nfr];
@@ -364,9 +390,9 @@ PYBIND11_PLUGIN(core) {
         .def("raw_set_opts", &efp_set_opts, "Set computation options to *arg0*")
         .def("raw_get_opts", &efp_get_opts, "Gets currently set computation options")
 //        .def("summary", efp_opts_summary, "")
-        .def("add_potential", &efp_add_potential, "Adds EFP potential from full file path *arg0*")
+        .def("raw_add_potential", &efp_add_potential, "Adds EFP potential from full file path *arg0*")
         //.def("add_fragment", wrapped_efp_add_fragment, "Adds a new fragment *arg0* to the EFP subsystem")
-        .def("add_fragment", &efp_add_fragment, "Adds a new fragment *arg0* to the EFP subsystem")
+        .def("raw_add_fragment", &efp_add_fragment, "Adds a new fragment *arg0* to the EFP subsystem")
         .def("raw_prepare", &efp_prepare, "Prepares the calculation")
 //        .def("skip_fragments", &efp_skip_fragments, "Skip interactions between the fragments *arg0* and *arg1* inclusive if *arg2*")
 //        .def("set_electron_density_field_fn", &efp_set_electron_density_field_fn, "Sets the callback function which computes electric field from electrons in ab initio subsystem to *arg0*")
@@ -403,10 +429,12 @@ PYBIND11_PLUGIN(core) {
 //        .def("get_lmo_count", &efp_get_lmo_count, "Gets the number of LMOs in a fragment and returns it in *arg0*")
 //        .def("get_lmo_coordinates", &efp_get_lmo_coordinates, "Gets coordinates of LMO centroids on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("get_xrfit", &efp_get_xrfit, "Gets parameters of fitted exchange-repulsion on 0-indexed fragment *arg0* and returns it in *arg1*")
-        .def("raw_get_energy", efp_get_energy, "Gets computed energy components")
-//        .def("get_gradient", &efp_get_gradient, "Gets computed EFP energy gradient and returns it in *arg0*")
+        .def("raw_get_energy", &efp_get_energy, "Gets computed energy components")
+        .def("cwrapped_get_gradient", cwrapped_efp_get_gradient, "Gets computed EFP energy gradient")
 //        .def("get_atomic_gradient", &efp_get_atomic_gradient, "Gets computed EFP energy gradient on individual atoms and returns it in *arg0*")
-        .def("get_frag_count", wrapped_efp_get_frag_count, "Gets the number of fragments in this computation")
+//        .def("get_frag_count", twrapped_efp_get_frag_count, "Gets the number of fragments in this computation")
+//        .def("raw_get_frag_count", &efp_get_frag_count, "Gets the number of fragments in this computation")
+        .def("cwrapped_get_frag_count", cwrapped_efp_get_frag_count, "Gets the number of fragments in this computation")
 //        .def("get_frag_name", &efp_get_frag_name, "Gets the name of the specified 0-indexed effective fragment *arg0* and returns it in *arg2* of length *arg1*")
 //        .def("get_frag_mass", &efp_get_frag_mass, "Gets total mass on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("get_frag_inertia", &efp_get_frag_inertia, "Gets fragment principal moments of inertia on 0-indexed fragment *arg0* and returns it in *arg1*")

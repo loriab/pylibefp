@@ -64,8 +64,8 @@ def _pywrapped_efp_prepare(efpobj):
     _pywrapped_result_to_error(res)
 
 
-def _pywrapped_efp_compute(efpobj):
-    res = efpobj.raw_compute()
+def _pywrapped_efp_compute(efpobj, do_gradient=False):
+    res = efpobj.raw_compute(do_gradient=int(do_gradient))
     _pywrapped_result_to_error(res)
 
 
@@ -114,7 +114,7 @@ def _pywrapped_add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_o
 
     # load the potentials
     for ipot, pot in enumerate(abspath_pots):
-        res = efpobj.add_potential(pot)
+        res = efpobj.raw_add_potential(pot)
         try:
             _pywrapped_result_to_error(res, uniq_pots[ipot])
         except Fatal as e:
@@ -133,7 +133,7 @@ def _pywrapped_add_fragment(efpobj, fragments):
     if isinstance(fragments, basestring):
         fragments = [fragments]
     for frag in fragments:
-        res = efpobj.add_fragment(frag)
+        res = efpobj.raw_add_fragment(frag)
         _pywrapped_result_to_error(res, frag)
 
 
@@ -450,30 +450,6 @@ def _pywrapped_get_energy(efpobj):
     res = efpobj.raw_get_energy(ene)
     _pywrapped_result_to_error(res)
 
-#    if (do_grad_) {
-#        SharedMatrix smgrad(new Matrix("EFP Gradient", nfrag_, 6));
-#        double ** psmgrad = smgrad->pointer();
-#        if ((res = efp_get_gradient(efp_, psmgrad[0])))
-#            throw PsiException("EFP::compute():efp_get_gradient(): " +
-#                std::string (efp_result_to_string(res)),__FILE__,__LINE__);
-#        smgrad->print_out();
-#
-#        outfile->Printf("  ==> EFP Gradient <==\n\n");
-#
-#        for (int i=0; i<nfrag_; i++) {
-#            for (int j=0; j<6; j++) {
-#                outfile->Printf("%14.6lf", psmgrad[i][j]);
-#            }
-#            outfile->Printf("\n");
-#        }
-#        outfile->Printf("\n");
-#
-#        torque_ = smgrad;
-#
-#        std::shared_ptr<Wavefunction> wfn = Process::environment.legacy_wavefunction();
-#        wfn->set_efp_torque(smgrad);
-#    }
-
     energies = {
         'electrostatic':               ene.electrostatic,
         'charge_penetration':          ene.charge_penetration,
@@ -491,6 +467,51 @@ def _pywrapped_get_energy(efpobj):
     }
 
     return energies
+
+
+def _pywrapped_get_frag_count(efpobj):
+    """Gets the number of fragments in *efpobj* computation.
+
+    Returns
+    -------
+    int
+        Number of fragments in calculation.
+
+    """
+    (res, nfrag) = efpobj.cwrapped_get_frag_count()
+    _pywrapped_result_to_error(res)
+
+    return nfrag
+
+
+def _pywrapped_get_gradient(efpobj, quiet=False):
+    """Gets the computed per-fragment EFP energy gradient of *efpobj*.
+
+    Parameters
+    ----------
+    quiet : bool, optional
+        Print out the gradient array.
+
+    Returns
+    -------
+    list
+        6 x n_frag array of per-fragment negative force and torque.
+
+    """
+    nfrag = efpobj.get_frag_count()
+    (res, grad) = efpobj.cwrapped_get_gradient(nfrag)
+    _pywrapped_result_to_error(res)
+
+    if not quiet:
+        grad6 = list(map(list, zip(*[iter(grad)] * 6)))
+
+        text = '\n  ==> EFP Gradient <==\n\n'
+        for fr in range(nfrag):
+            text += '{:14.8f} {:14.8f} {:14.8f}   {:14.8f} {:14.8f} {:14.8f}\n'.format(
+                *grad6[fr])
+        print(text)
+
+    return grad
 
 
 def energy_summary(efpobj):
@@ -595,7 +616,9 @@ core.efp.add_potentials = _pywrapped_add_potential
 core.efp.add_fragments = _pywrapped_add_fragment
 core.efp.get_opts = _pywrapped_get_opts
 core.efp.set_opts = _pywrapped_set_opts
+core.efp.get_frag_count = _pywrapped_get_frag_count
 core.efp.get_energy = _pywrapped_get_energy
+core.efp.get_gradient = _pywrapped_get_gradient
 core.efp.energy_summary = energy_summary
 core.efp.nuclear_repulsion_energy = nuclear_repulsion_energy
 core.efp.to_dict = to_dict
