@@ -329,8 +329,8 @@ def test_efpefp_bz2():
     asdf.create()
 
     frags = ['c6h6', 'c6h6']
-    asdf.add_potentials(frags)
-    asdf.add_fragments(frags)
+    asdf.add_potential(frags)
+    asdf.add_fragment(frags)
     asdf.set_frag_coordinates(0, 'xyzabc', [-0.30448173 * a2b, -2.24210052 * a2b, -0.29383131 * a2b, -0.642499, 1.534222, -0.568147])
     asdf.set_frag_coordinates(1, 'xyzabc', [-0.60075437 * a2b,  1.36443336 * a2b,  0.78647823 * a2b,  3.137879, 1.557344, -2.568550])
     asdf.prepare()

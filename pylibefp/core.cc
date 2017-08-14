@@ -41,15 +41,6 @@ std::string wrapped_efp_banner(efp* efp) {
 }
 
 
-//void wrapped_efp_add_fragment(efp* efp, std::string name) {
-//    enum efp_result res;
-//
-//    if ((res = efp_add_fragment(efp, name.c_str()))) {
-//        std::string sres = "wrapped_efp_add_fragment: efp_add_fragment: " + rts(res) + "\n";
-//        throw libefpException(sres.c_str());
-//    }
-//}
-
 efp_result wrapped_efp_set_frag_coordinates1(efp* efp, size_t frag_idx, efp_coord_type ctype, py::list coord) {
     enum efp_result res;
 //    enum efp_coord_type ctype;
@@ -391,8 +382,7 @@ PYBIND11_PLUGIN(core) {
         .def("raw_get_opts", &efp_get_opts, "Gets currently set computation options")
 //        .def("summary", efp_opts_summary, "")
         .def("raw_add_potential", &efp_add_potential, "Adds EFP potential from full file path *arg0*")
-        //.def("add_fragment", wrapped_efp_add_fragment, "Adds a new fragment *arg0* to the EFP subsystem")
-        .def("raw_add_fragment", &efp_add_fragment, "Adds a new fragment *arg0* to the EFP subsystem")
+        .def("raw_add_fragment", &efp_add_fragment, "Adds a new fragment to the EFP subsystem")
         .def("raw_prepare", &efp_prepare, "Prepares the calculation")
 //        .def("skip_fragments", &efp_skip_fragments, "Skip interactions between the fragments *arg0* and *arg1* inclusive if *arg2*")
 //        .def("set_electron_density_field_fn", &efp_set_electron_density_field_fn, "Sets the callback function which computes electric field from electrons in ab initio subsystem to *arg0*")
@@ -455,8 +445,6 @@ PYBIND11_PLUGIN(core) {
 //        .def("get_frag_xyzabc", &efp_get_frag_xyzabc, "Gets center of mass position and Euler angles on 0-indexed fragment *arg0* and returns it in *arg1*")
         //.def("banner", &efp_banner, "Gets a human readable banner string with information about the library")
         //.def("print_banner", &efp_print_banner, "Prints libefp banner to stdout")
-        //.def("add_potential", &efp_add_potential, "Adds EFP potential from a file *arg0*")
-        //.def("add_fragment", &efp_add_fragment, "Adds a new fragment *arg0* to the EFP subsystem")
         //.def("set_frag_coordinates", &efp_set_frag_coordinates, "Updates position and orientation of the specified effective 0-indexed fragment *arg0* of type *arg1* and returns it in *arg2*")
         //.def("prepare", &efp_prepare, "Prepares the calculation")
 //        .def("compute", &efp_compute, "Perform the EFP computation, doing gradient if *arg0*")

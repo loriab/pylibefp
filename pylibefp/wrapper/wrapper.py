@@ -80,18 +80,27 @@ def _pywrapped_efp_compute(efpobj, do_gradient=False):
 def _pywrapped_add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
     """Searches for EFP fragments and adds to *efpobj*.
 
-    *potential* is a single fragment name or a list of fragments,
-    with or without `.efp` extension.
+    Parameters
+    ----------
+    potential : str or list
+        Single fragment name or a list of fragments, with or without
+        ".efp" extension.
+    fragpath : string, optional
+        String with :-separated paths that may include absolute paths,
+        relative paths, $-marked environment variables, and the word
+        LIBRARY, all of which will be expanded with LIBRARY expanded
+        to the native libefp fragment library.
 
-    *fragpath* should be a string with :-separated paths that may include
-    absolute paths, relative paths, $-marked environment variables,
-    and the word LIBRARY, all of which will be expanded with LIBRARY
-    expanded to the native libefp fragment library.
+    duplicates_ok : bool, optional
+        Whether to continue or to return pylibefp.Fatal if asked
+        to load a duplicate potential according to libefp default
+        behavior. The `potential` list is always filtered to avoid
+        duplicates. Activating `duplicates_ok` additionally allows
+        repeated calls to this function to add duplicate potentials.
 
-    *duplicates_ok* is a boolean indicating whether to return
-    pylibefp.wrapper.exceptions.Fatal if asked to load a duplicate
-    potential according to libefp default behavior (filtered where
-    possible) or to continue.
+    label : str, optional
+        Returned dictionary keys are identical to libefp efp_opts struct
+        names unless custom renaming requested via `label`.
 
     """
     # form unified path list for efpfrags
@@ -630,8 +639,8 @@ def to_dict(efpobj):
 core.efp.prepare = _pywrapped_efp_prepare
 core.efp.compute = _pywrapped_efp_compute
 
-core.efp.add_potentials = _pywrapped_add_potential
-core.efp.add_fragments = _pywrapped_add_fragment
+core.efp.add_potential = _pywrapped_add_potential
+core.efp.add_fragment = _pywrapped_add_fragment
 core.efp.get_opts = _pywrapped_get_opts
 core.efp.set_opts = _pywrapped_set_opts
 core.efp.get_frag_count = _pywrapped_get_frag_count
@@ -648,8 +657,8 @@ def from_dict(efp_init):
     sys.create()
 
     for ifr, fr in enumerate(efp_init['full_fragments']):
-        sys.add_potentials(fr['fragment_file'])
-        sys.add_fragments(fr['fragment_file'])
+        sys.add_potential(fr['fragment_file'])
+        sys.add_fragment(fr['fragment_file'])
         sys.set_frag_coordinates(ifr, fr['efp_type'], fr['coordinates_hint'])
 
     sys.prepare()

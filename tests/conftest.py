@@ -17,7 +17,6 @@ def set_up():
 
 def tear_down():
     pass
-    del asdf
 #    import os
 #    import glob
 #    patterns = ['cavity.*', 'grid*', 'pytest_output.*h5',

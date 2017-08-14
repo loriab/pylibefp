@@ -10,8 +10,8 @@ def system_1():
     sys.create()
 
     frags = ['h2o', 'nh3']
-    sys.add_potentials(frags)
-    sys.add_fragments(frags)
+    sys.add_potential(frags)
+    sys.add_fragment(frags)
     #sys.add_potential('../../fraglib/h2o.efp')
     #sys.add_potential('../../fraglib/nh3.efp')
     #sys.add_fragment('h2o_l')
@@ -28,8 +28,8 @@ def system_2():
     sys.create()
 
     frags = ['h2o', 'nh3', 'h2o', 'h2o', 'nh3']
-    sys.add_potentials(frags)
-    sys.add_fragments(frags)
+    sys.add_potential(frags)
+    sys.add_fragment(frags)
     #sys.add_potential('../../fraglib/h2o.efp')
     #sys.add_potential('../../fraglib/nh3.efp')
     #sys.add_fragment('h2o_l')
@@ -52,8 +52,8 @@ def system_3():
     sys.create()
 
     frags = ['h2o', 'nh3', 'nh3', 'nh3', 'ch3oh', 'h2o', 'h2o', 'ch3oh', 'h2o']
-    sys.add_potentials(frags)
-    sys.add_fragments(frags)
+    sys.add_potential(frags)
+    sys.add_fragment(frags)
     #sys.add_potential('../../fraglib/nh3.efp')
     #sys.add_potential('../../fraglib/ch3oh.efp')
     #sys.add_potential('../../fraglib/h2o.efp')
@@ -85,8 +85,8 @@ def system_4():
     sys.create()
 
     frags = ['acetone', 'c2h5oh', 'c6h6', 'ccl4', 'ch3oh', 'ch4', 'cl2', 'dcm', 'dmso', 'h2', 'h2o', 'nh3']
-    sys.add_potentials(frags)
-    sys.add_fragments(frags)
+    sys.add_potential(frags)
+    sys.add_fragment(frags)
     #for fr in ['acetone', 'c2h5oh', 'c6h6', 'ccl4', 'ch3oh', 'ch4', 'cl2', 'dcm', 'dmso', 'h2', 'h2o', 'nh3']:
     #    sys.add_potential('../../fraglib/' + fr + '.efp')
     #sys.add_fragment('acetone_l')
