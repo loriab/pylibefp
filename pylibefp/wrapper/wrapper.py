@@ -25,6 +25,22 @@ except NameError:
     basestring = str
 
 
+_lbtl = {
+    'libefp': {},
+    'psi': {
+        'elec': 'elst',
+        'pol': 'ind',
+        'xr': 'exch',
+        'elec_damp': 'elst_damp',
+        'pol_damp': 'ind_damp',
+        'pol_driver': 'ind_driver',
+        'ai_elec': 'ai_elst',
+        'ai_pol': 'ai_ind',
+        'ai_xr': 'ai_exch',
+    },
+}
+
+
 def _pywrapped_result_to_error(res, msg=''):
 
     if res == core.efp_result.EFP_RESULT_SUCCESS:
@@ -166,8 +182,8 @@ def _pywrapped_get_opts(efpobj, label='libefp'):
                core.EFP_DISP_DAMP_OFF: 'off',
         }[opts.disp_damp]
 
-    dopts['enable_pbc'] = opts.enable_pbc
-    dopts['enable_cutoff'] = opts.enable_cutoff
+    dopts['enable_pbc'] = bool(opts.enable_pbc)
+    dopts['enable_cutoff'] = bool(opts.enable_cutoff)
     dopts['swf_cutoff'] = opts.swf_cutoff
 
     dopts['pol_driver'] = {
@@ -186,21 +202,6 @@ def _pywrapped_get_opts(efpobj, label='libefp'):
         dopts[topic] = dopts.pop(key)
 
     return dopts
-
-_lbtl = {
-    'libefp': {},
-    'psi': {
-        'elec': 'elst',
-        'pol': 'ind',
-        'xr': 'exch',
-        'elec_damp': 'elst_damp',
-        'pol_damp': 'ind_damp',
-        'pol_driver': 'ind_driver',
-        'ai_elec': 'ai_elst',
-        'ai_pol': 'ai_ind',
-        'ai_xr': 'ai_exch',
-    },
-}
 
 
 def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
@@ -338,11 +339,23 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
 
     topic = _lbtl[label].get('enable_pbc', 'enable_pbc')
     if topic in dopts:
-        opts.enable_pbc = dopts[topic]
+        if dopts[topic] is True:
+            opts.enable_pbc = 1
+        elif dopts[topic] is False:
+            opts.enable_pbc = 0
+        else:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('enable_cutoff', 'enable_cutoff')
     if topic in dopts:
-        opts.enable_cutoff = dopts[topic]
+        if dopts[topic] is True:
+            opts.enable_cutoff = 1
+        elif dopts[topic] is False:
+            opts.enable_cutoff = 0
+        else:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('swf_cutoff', 'swf_cutoff')
     if topic in dopts:
