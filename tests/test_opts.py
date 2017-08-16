@@ -29,6 +29,7 @@ def test_opts_libefp():
 def test_opts_fail_1():
     asdf = system_1()
 
+    ans = asdf.set_opts({'nonsense_key': 'harmless'})
     with pytest.raises(pylibefp.EFPSyntaxError) as e_info:
         ans = asdf.set_opts({'elec_damp': 'nonsense'})
 

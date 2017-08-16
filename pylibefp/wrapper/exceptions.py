@@ -49,7 +49,7 @@ class EFPSyntaxError(EFPException):
     """Syntax error."""
     def __init__(self, msg):
         EFPException.__init__(self, msg)
-        self.message = r"""\nEFPException: Syntax error. {}\n\n""".format(repr(msg))
+        self.message = r"""\nEFPException: Libefp syntax error. {}\n\n""".format(repr(msg))
 
 
 class UnknownFragment(EFPException):
@@ -64,3 +64,10 @@ class PolNotConverged(EFPException):
     def __init__(self, msg):
         EFPException.__init__(self, msg)
         self.message = r"""\nEFPException: Polarization SCF procedure did not converge. {}\n\n""".format(repr(msg))
+
+
+class PyEFPSyntaxError(EFPException):
+    """Syntax error."""
+    def __init__(self, msg):
+        EFPException.__init__(self, msg)
+        self.message = r"""\nEFPException: Pylibefp syntax error. {}\n\n""".format(repr(msg))

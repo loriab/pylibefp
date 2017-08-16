@@ -102,6 +102,10 @@ def _pywrapped_add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_o
         Returned dictionary keys are identical to libefp efp_opts struct
         names unless custom renaming requested via `label`.
 
+    Returns
+    -------
+    None
+
     """
     # form unified path list for efpfrags
     paths = []
@@ -273,7 +277,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
         res = efpobj.raw_get_opts(opts)
         _pywrapped_result_to_error(res)
     else:
-        raise EFPSyntaxError('Unrecognized opts default set: {}'.format(append))
+        raise PyEFPSyntaxError('Unrecognized opts default set: {}'.format(append))
 
     # apply dopts to options state
     topic = _lbtl[label].get('elec', 'elec')
@@ -708,9 +712,71 @@ def to_viz_dict(efpobj):
         if mobj:
             at['symbol'] = mobj.group('symbol').capitalize()
         at['charge'] = at['Z']
+        #pyat['molecule']['fragment_charges'].append(efpobj.get_frag_charges(fr)
+        #pyat['molecule']['fragment_multiplicities'].append(efpobj.get_frag_multiplicity(fr)
 
     return pyat
 
+
+def to_dict(efpobj):
+    pysys = {}
+    pysys['full_fragments'] = []
+
+    for fr in range(efpobj.get_frag_count()):
+        (res, xyzabc) = efpobj.cwrapped_get_frag_xyzabc(fr)
+        _pywrapped_result_to_error(res)
+
+        pysys['full_fragments'].append({
+            'coordinates_hint': xyzabc,
+            'efp_type': 'xyzabc',
+            'fragment_file': efpobj.get_frag_name(fr).lower(),
+                   })
+
+    pysys['molecule'] = {
+        'fix_com': True,
+        'fix_orientation': True,
+        'fix_symmetry': 'c1',
+        'fragment_charges': [],
+        'fragment_multiplicities': [],
+        'fragment_types': [],
+        'fragments': [],
+        'full_atoms': [],
+        'input_units_to_au': 1.8897261328856432,
+        'name': 'default',
+        'units': 'Bohr'}
+
+    return pysys
+
+
+yuio = {'libefp': {'full_fragments':
+ [{'coordinates_hint': [-0.5753870821672306,
+                       -4.23695594520049,
+                       -0.5552607051670226,
+                       -0.642499,
+                       1.534222,
+                       -0.568147],
+  'efp_type': 'xyzabc',
+  'fragment_file': 'C6H6'},
+ {'coordinates_hint': [-1.1352612324342508,
+                       2.578405376972965,
+                       1.4862284641766452,
+                       3.137879,
+                       1.557344,
+                       -2.56855],
+  'efp_type': 'xyzabc',
+  'fragment_file': 'C6H6'}]},
+ 'molecule': {
+ 'fix_com': True,
+ 'fix_orientation': True,
+ 'fix_symmetry': 'c1',
+ 'fragment_charges': [],
+ 'fragment_multiplicities': [],
+ 'fragment_types': [],
+ 'fragments': [],
+ 'full_atoms': [],
+ 'input_units_to_au': 1.8897261328856432,
+ 'name': 'default',
+ 'units': 'Angstrom'}}
 
 # only wrapped to throw Py exceptions
 core.efp.prepare = _pywrapped_efp_prepare
@@ -725,6 +791,7 @@ core.efp.get_energy = _pywrapped_get_energy
 core.efp.get_gradient = _pywrapped_get_gradient
 core.efp.energy_summary = energy_summary
 core.efp.nuclear_repulsion_energy = nuclear_repulsion_energy
+core.efp.to_viz_dict = to_viz_dict
 core.efp.to_dict = to_dict
 core.efp.get_frag_name = _pywrapped_get_frag_name
 core.efp.get_frag_charge = _pywrapped_get_frag_charge

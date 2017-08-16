@@ -71,6 +71,7 @@ install(FILES ../tests/utils.py
               ../tests/test_efpefp.py
               ../tests/test_opts.py
               ../tests/test_coverage.py
+              ../tests/test_dict.py
         DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp/tests/)
 
 install(DIRECTORY wrapper

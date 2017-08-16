@@ -32,5 +32,5 @@ from pylibefp.wrapper.wrapper import *
 ## Single functions
 #from psi4.driver.driver_cbs import cbs
 #from psi4.driver.p4util.python_helpers import set_options, set_module_options, pcm_helper, basis_helper
-from pylibefp.wrapper.psiutil import compare_values
+#from pylibefp.wrapper.psiutil import compare_values
 
