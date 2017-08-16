@@ -621,7 +621,84 @@ def nuclear_repulsion_energy(efpobj):
     return nre
 
 
-def to_dict(efpobj):
+def _frag_idx_validation(efpobj, ifr):
+    nfr = efpobj.get_frag_count()
+    if (ifr < 0) or (ifr >= nfr):
+        raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
+
+
+def _pywrapped_get_frag_name(efpobj, ifr):
+    """Gets system name on fragment `ifr` of `efpobj`.
+
+    Parameters
+    ----------
+    ifr : int
+        Index of fragment (0-indexed).
+
+    Returns
+    -------
+    str
+        Name of fragment.
+
+    """
+    _frag_idx_validation(efpobj, ifr)
+
+    (res, fname) = efpobj.cwrapped_get_frag_name(ifr)
+    _pywrapped_result_to_error(res)
+
+    return fname
+
+
+def _pywrapped_get_frag_charge(efpobj, ifr, zero=1e-8):
+    """Gets total charge on fragment `ifr` of `efpobj`.
+
+    Parameters
+    ----------
+    ifr : int
+        Index of fragment (0-indexed).
+    zero : float, optional
+        Absolute value under which to zero charge.
+
+    Returns
+    -------
+    int
+        Charge on fragment.
+
+    """
+    _frag_idx_validation(efpobj, ifr)
+    
+    (res, chg) = efpobj.cwrapped_get_frag_charge(ifr)
+    _pywrapped_result_to_error(res)
+
+    if math.fabs(chg) < zero:
+        return 0.0
+    else:
+        return chg
+
+
+def _pywrapped_get_frag_multiplicity(efpobj, ifr):
+    """Gets spin multiplicity on fragment `ifr` of `efpobj`.
+
+    Parameters
+    ----------
+    ifr : int
+        Index of fragment (0-indexed).
+
+    Returns
+    -------
+    int
+        Multiplicity of fragment.
+
+    """
+    _frag_idx_validation(efpobj, ifr)
+
+    (res, mult) = efpobj.cwrapped_get_frag_multiplicity(ifr)
+    _pywrapped_result_to_error(res)
+
+    return mult
+
+
+def to_viz_dict(efpobj):
 
     pyat = efpobj.get_atoms()
     for at in pyat['full_atoms']:
@@ -649,6 +726,9 @@ core.efp.get_gradient = _pywrapped_get_gradient
 core.efp.energy_summary = energy_summary
 core.efp.nuclear_repulsion_energy = nuclear_repulsion_energy
 core.efp.to_dict = to_dict
+core.efp.get_frag_name = _pywrapped_get_frag_name
+core.efp.get_frag_charge = _pywrapped_get_frag_charge
+core.efp.get_frag_multiplicity = _pywrapped_get_frag_multiplicity
 
 
 def from_dict(efp_init):

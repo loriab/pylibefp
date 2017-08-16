@@ -40,6 +40,16 @@ std::string wrapped_efp_banner(efp* efp) {
     return str;
 }
 
+py::tuple cwrapped_efp_get_frag_name(efp* efp, size_t frag_idx) {
+    enum efp_result res;
+    char buffer[300];
+
+    res = efp_get_frag_name(efp, frag_idx, 300, buffer);
+    std::string fname = std::string(buffer);
+
+    py::tuple rets = py::make_tuple(res, fname);
+    return rets;
+}
 
 efp_result wrapped_efp_set_frag_coordinates1(efp* efp, size_t frag_idx, efp_coord_type ctype, py::list coord) {
     enum efp_result res;
@@ -113,6 +123,26 @@ double wrapped_efp_get_frag_charge(efp* efp, size_t frag_idx) {
     return charge;
 }
 
+py::tuple cwrapped_efp_get_frag_charge(efp* efp, size_t frag_idx) {
+    enum efp_result res;
+    double charge = 0.0;
+
+    res = efp_get_frag_charge(efp, frag_idx, &charge);
+
+    py::tuple rets = py::make_tuple(res, charge);
+    return rets;
+}
+
+py::tuple cwrapped_efp_get_frag_multiplicity(efp* efp, size_t frag_idx) {
+    enum efp_result res;
+    int multiplicity = 0;
+
+    res = efp_get_frag_multiplicity(efp, frag_idx, &multiplicity);
+
+    py::tuple rets = py::make_tuple(res, multiplicity);
+    return rets;
+}
+
 py::tuple cwrapped_efp_get_gradient(efp* efp, size_t n_frag) {
     enum efp_result res;
     py::list grad;
@@ -131,11 +161,11 @@ py::tuple cwrapped_efp_get_gradient(efp* efp, size_t n_frag) {
 
 py::tuple cwrapped_efp_get_frag_count(efp* efp) {
     enum efp_result res;
-    size_t n=0;
+    size_t n_frag = 0;
 
-    res = efp_get_frag_count(efp, &n);
+    res = efp_get_frag_count(efp, &n_frag);
 
-    py::tuple rets = py::make_tuple(res, n);
+    py::tuple rets = py::make_tuple(res, n_frag);
     return rets;
 }
 
@@ -215,34 +245,38 @@ py::dict extend_efp_get_atoms(efp* efp) {
 }
 
 
-py::list wrapped_efp_get_coordinates(efp* efp) {
+py::tuple cwrapped_efp_get_coordinates(efp* efp, size_t n_frag) {
     enum efp_result res;
-
-    size_t nfr = twrapped_efp_get_frag_count(efp);
+    py::list xyzabc;
+//    size_t nfr = twrapped_efp_get_frag_count(efp);
 
     double *ccoords = NULL;
-    ccoords = new double[6 * nfr];
+    ccoords = new double[6 * n_frag];
     double *pcoords = ccoords;
-//    for (auto itm : coord)
-//        *pcoords++ = itm.cast<double>();
 
-    if ((res = efp_get_coordinates(efp, pcoords))) {
-        std::string sres = "efp_get_coordinates: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
+    res = efp_get_coordinates(efp, pcoords);
+    for (size_t ic = 0; ic < 6*n_frag; ++ic)
+        xyzabc.append(ccoords[ic]);
+
+    py::tuple rets = py::make_tuple(res, xyzabc);
+    return rets;
 }
 
-py::list wrapped_efp_get_frag_xyzabc(efp* efp, size_t frag_idx) {
+
+py::tuple cwrapped_efp_get_frag_xyzabc(efp* efp, size_t frag_idx) {
     enum efp_result res;
-//    //std::vector<double> coords;
-    py::list coords;
+    py::list xyzabc;
 
-//    if ((res = efp_get_frag_xyzabc(efp, frag_idx, &coords[0]))) {
-//        std::string sres = "efp_get_frag_xyzabc: " + rts(res) + "\n";
-//        throw libefpException(sres.c_str());
-//    }
+    double *ccoords = NULL;
+    ccoords = new double[6];
+    double *pcoords = ccoords;
 
-    return coords;
+    res = efp_get_frag_xyzabc(efp, frag_idx, pcoords);
+    for (size_t ic = 0; ic < 6; ++ic)
+        xyzabc.append(ccoords[ic]);
+
+    py::tuple rets = py::make_tuple(res, xyzabc);
+    return rets;
 }
 
 
@@ -397,8 +431,8 @@ PYBIND11_PLUGIN(core) {
 //        .def("set_coordinates", &efp_set_coordinates, "Update positions and orientations of all fragments with types in array *arg0* and returns them in *arg1*")
         .def("set_frag_coordinates", wrapped_efp_set_frag_coordinates, "Updates position and orientation of the specified effective 0-indexed fragment *arg0* of type *arg1*")
         .def("set_frag_coordinates1", wrapped_efp_set_frag_coordinates1, "Updates position and orientation of the specified effective 0-indexed fragment *arg0* of type *arg1*")
-        .def("get_coordinates", wrapped_efp_get_coordinates, "Gets center of mass positions and Euler angles of the effective fragments and returns it in *arg0*")
-        .def("get_frag_xyzabc", wrapped_efp_get_frag_xyzabc, "Gets center of mass position and Euler angles on 0-indexed fragment *arg0* and returns it in *arg1*")
+        .def("cwrapped_get_coordinates", cwrapped_efp_get_coordinates, "Gets center of mass positions and Euler angles of the effective fragments and returns it in *arg0*")
+        .def("cwrapped_get_frag_xyzabc", cwrapped_efp_get_frag_xyzabc, "Gets center of mass position and Euler angles on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("set_periodic_box", &efp_set_periodic_box, "Sets up periodic box size of *arg0* by *arg1* by *arg2*")
 //        .def("get_stress_tensor", &efp_get_stress_tensor, "Gets the stress tensor and returns it in *arg0*")
 //        .def("get_ai_screen", &efp_get_ai_screen, "Gets the ab initio screening parameters on 0-indexed fragment *arg0* and returns it in *arg1*")
@@ -408,6 +442,8 @@ PYBIND11_PLUGIN(core) {
         .def("raw_compute", &efp_compute, py::arg("do_gradient") = false, "Perform the EFP computation, doing gradient if *arg0*")
         .def("get_frag_charge", wrapped_efp_get_frag_charge, "Gets total charge on 0-indexed fragment *arg0*")
         .def("get_frag_multiplicity", wrapped_efp_get_frag_multiplicity, "Gets spin multiplicity on 0-indexed fragment *arg0*")
+        .def("cwrapped_get_frag_charge", cwrapped_efp_get_frag_charge, "Gets total charge on 0-indexed fragment *arg0*")
+        .def("cwrapped_get_frag_multiplicity", cwrapped_efp_get_frag_multiplicity, "Gets spin multiplicity on 0-indexed fragment *arg0*")
 //        .def("get_frag_multipole_count", &efp_get_frag_multipole_count, "Gets number of electrostatic multipole points on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("get_multipole_count", &efp_get_multipole_count, "Gets total number of multipoles from EFP electrostatics and returns it in *arg0*")
 //        .def("get_multipole_coordinates", &efp_get_multipole_coordinates, "Gets coordinates of electrostatics multipoles and returns it in *arg0*")
@@ -425,7 +461,7 @@ PYBIND11_PLUGIN(core) {
 //        .def("get_frag_count", twrapped_efp_get_frag_count, "Gets the number of fragments in this computation")
 //        .def("raw_get_frag_count", &efp_get_frag_count, "Gets the number of fragments in this computation")
         .def("cwrapped_get_frag_count", cwrapped_efp_get_frag_count, "Gets the number of fragments in this computation")
-//        .def("get_frag_name", &efp_get_frag_name, "Gets the name of the specified 0-indexed effective fragment *arg0* and returns it in *arg2* of length *arg1*")
+        .def("cwrapped_get_frag_name", cwrapped_efp_get_frag_name, "Gets the name of the specified 0-indexed effective fragment *arg0* and returns it in *arg2* of length *arg1*")
 //        .def("get_frag_mass", &efp_get_frag_mass, "Gets total mass on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("get_frag_inertia", &efp_get_frag_inertia, "Gets fragment principal moments of inertia on 0-indexed fragment *arg0* and returns it in *arg1*")
         .def("get_frag_atom_count", wrapped_efp_get_frag_atom_count, "Gets the number of atoms on 0-indexed fragment *arg0*")
