@@ -42,9 +42,9 @@ std::string wrapped_efp_banner(efp* efp) {
 
 py::tuple cwrapped_efp_get_frag_name(efp* efp, size_t frag_idx) {
     enum efp_result res;
-    char buffer[300];
+    char buffer[80];
 
-    res = efp_get_frag_name(efp, frag_idx, 300, buffer);
+    res = efp_get_frag_name(efp, frag_idx, 80, buffer);
     std::string fname = std::string(buffer);
 
     py::tuple rets = py::make_tuple(res, fname);
