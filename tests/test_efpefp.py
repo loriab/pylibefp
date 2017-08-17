@@ -5,6 +5,10 @@ import pylibefp
 from utils import *
 from systems import *
 
+try:
+    long(1)
+except NameError:
+    long = int
 
 def blank_ene():
     fields = ['charge_penetration', 'disp', 'dispersion', 'elec',
@@ -272,9 +276,25 @@ def test_total_4a():
     asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True, 'elec_damp': 'screen', 'disp_damp': 'tt', 'pol_damp': 'tt'})
     asdf.compute()
     ene = asdf.get_energy()
-    nfrags = ['ACETONE', 'C2H5OH', 'C6H6', 'CCL4', 'CH3OH', 'CH4', 'CL2', 'DCM', 'DMSO', 'H2', 'H2O', 'NH3']
+    print(sys.version_info)
+    try:
+        print(2.7)
+        nfrags = [u'ACETONE', u'C2H5OH', u'C6H6', u'CCL4', u'CH3OH', u'CH4', u'CL2', u'DCM', u'DMSO', u'H2', u'H2O', u'NH3']
+        mfrags = [long(1) for fr in range(12)]
+    except SyntaxError:
+        print(3)
+        nfrags = ['ACETONE', 'C2H5OH', 'C6H6', 'CCL4', 'CH3OH', 'CH4', 'CL2', 'DCM', 'DMSO', 'H2', 'H2O', 'NH3']
+        mfrags = [1 for fr in range(12)]
+
+#    if sys.version_info >= (3, 4):
+#        print(3)
+#        nfrags = ['ACETONE', 'C2H5OH', 'C6H6', 'CCL4', 'CH3OH', 'CH4', 'CL2', 'DCM', 'DMSO', 'H2', 'H2O', 'NH3']
+#        mfrags = [1 for fr in range(12)]
+#    else:
+#        print(2.7)
+#        nfrags = [u'ACETONE', u'C2H5OH', u'C6H6', u'CCL4', u'CH3OH', u'CH4', u'CL2', u'DCM', u'DMSO', u'H2', u'H2O', u'NH3']
+#        mfrags = [1L for fr in range(12)]
     cfrags = [0.0 for fr in range(12)]
-    mfrags = [1 for fr in range(12)]
     assert(compare_integers(12, asdf.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag'))
     assert(compare_dicts({'dummy': cfrags}, {'dummy': asdf.get_frag_charge()}, 2, sys._getframe().f_code.co_name + ': f_chg'))
     assert(compare_dicts({'dummy': mfrags}, {'dummy': asdf.get_frag_multiplicity()}, 2, sys._getframe().f_code.co_name + ': f_mult'))

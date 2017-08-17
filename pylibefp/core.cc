@@ -51,18 +51,9 @@ py::tuple cwrapped_efp_get_frag_name(efp* efp, size_t frag_idx) {
     return rets;
 }
 
-efp_result wrapped_efp_set_frag_coordinates1(efp* efp, size_t frag_idx, efp_coord_type ctype, py::list coord) {
+
+efp_result cwrapped_efp_set_frag_coordinates(efp* efp, size_t frag_idx, efp_coord_type ctype, py::list coord) {
     enum efp_result res;
-//    enum efp_coord_type ctype;
-//
-//    if (coord_type == "xyzabc")
-//        ctype = EFP_COORD_TYPE_XYZABC;
-//    else if (coord_type == "points")
-//        ctype = EFP_COORD_TYPE_POINTS;
-//    else if (coord_type == "rotmat")
-//        ctype = EFP_COORD_TYPE_ROTMAT;
-//    else
-//        throw libefpException("efp_coord_type not found: ");
 
     double *ccoords = NULL;
     ccoords = new double[12];  // room for xyzabc (6), points (9), or rotmat (12)
@@ -73,33 +64,6 @@ efp_result wrapped_efp_set_frag_coordinates1(efp* efp, size_t frag_idx, efp_coor
     res = efp_set_frag_coordinates(efp, frag_idx, ctype, ccoords);
     return res;
 }
-
-
-void wrapped_efp_set_frag_coordinates(efp* efp, size_t frag_idx, std::string coord_type, py::list coord) {
-    enum efp_result res;
-    enum efp_coord_type ctype;
-
-    if (coord_type == "xyzabc")
-        ctype = EFP_COORD_TYPE_XYZABC;
-    else if (coord_type == "points")
-        ctype = EFP_COORD_TYPE_POINTS;
-    else if (coord_type == "rotmat")
-        ctype = EFP_COORD_TYPE_ROTMAT;
-    else
-        throw libefpException("efp_coord_type not found: ");
-
-    double *ccoords = NULL;
-    ccoords = new double[12];  // room for xyzabc (6), points (9), or rotmat (12)
-    double *pcoords = ccoords;
-    for (auto itm : coord)
-        *pcoords++ = itm.cast<double>();
-
-    if ((res = efp_set_frag_coordinates(efp, frag_idx, ctype, ccoords))) {
-        std::string sres = "efp_set_frag_coordinates: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
-}
-
 
 int wrapped_efp_get_frag_multiplicity(efp* efp, size_t frag_idx) {
     enum efp_result res;
@@ -429,8 +393,7 @@ PYBIND11_PLUGIN(core) {
 //        .def("set_point_charge_coordinates", &efp_set_point_charge_coordinates, "Sets coordinates *arg0* of point charges")
 //        .def("get_point_charge_gradient", &efp_get_point_charge_gradient, "Gets gradient on point charges from EFP subsystem and returns them in *arg1*")
 //        .def("set_coordinates", &efp_set_coordinates, "Update positions and orientations of all fragments with types in array *arg0* and returns them in *arg1*")
-        .def("set_frag_coordinates", wrapped_efp_set_frag_coordinates, "Updates position and orientation of the specified effective 0-indexed fragment *arg0* of type *arg1*")
-        .def("set_frag_coordinates1", wrapped_efp_set_frag_coordinates1, "Updates position and orientation of the specified effective 0-indexed fragment *arg0* of type *arg1*")
+        .def("cwrapped_set_frag_coordinates", cwrapped_efp_set_frag_coordinates, "Updates position and orientation of the specified effective 0-indexed fragment *arg0* of type *arg1*")
         .def("cwrapped_get_coordinates", cwrapped_efp_get_coordinates, "Gets center of mass positions and Euler angles of the effective fragments and returns it in *arg0*")
         .def("cwrapped_get_frag_xyzabc", cwrapped_efp_get_frag_xyzabc, "Gets center of mass position and Euler angles on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("set_periodic_box", &efp_set_periodic_box, "Sets up periodic box size of *arg0* by *arg1* by *arg2*")
@@ -481,7 +444,6 @@ PYBIND11_PLUGIN(core) {
 //        .def("get_frag_xyzabc", &efp_get_frag_xyzabc, "Gets center of mass position and Euler angles on 0-indexed fragment *arg0* and returns it in *arg1*")
         //.def("banner", &efp_banner, "Gets a human readable banner string with information about the library")
         //.def("print_banner", &efp_print_banner, "Prints libefp banner to stdout")
-        //.def("set_frag_coordinates", &efp_set_frag_coordinates, "Updates position and orientation of the specified effective 0-indexed fragment *arg0* of type *arg1* and returns it in *arg2*")
         //.def("prepare", &efp_prepare, "Prepares the calculation")
 //        .def("compute", &efp_compute, "Perform the EFP computation, doing gradient if *arg0*")
 //        .def("get_energy", &efp_get_energy, "Gets computed energy components and returns it in *arg0*")

@@ -630,6 +630,36 @@ def nuclear_repulsion_energy(efpobj):
 #    if (ifr < 0) or (ifr >= nfr):
 #        raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
+def _pywrapped_set_frag_coordinates(efpobj, ifr, ctype, coord):
+    """Set fragment orientation on `efpobj` from hint.
+
+    Parameters
+    ----------
+    ifr : int
+        Index of fragment (0-indexed).
+    ctype : core.efp_coord_type or str
+        Type of coodinates hint among `xyzabc`, `points`, & `rotmat`.
+    coord : list of floats
+        6-, 9-, or 12-element hint of coordinates.
+
+    Returns
+    -------
+    None
+    
+    """
+    if isinstance(ctype, basestring):
+        try:
+            ctype = {'xyzabc': core.EFP_COORD_TYPE_XYZABC,
+                     'points': core.EFP_COORD_TYPE_POINTS,
+                     'rotmat': core.EFP_COORD_TYPE_ROTMAT,
+                    }[ctype.lower()]
+        except KeyError:
+            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                                       'invalid value for [xyzabc/points/rotmat] {}: {}'.format('ctype', ctype))
+
+    res = efpobj.cwrapped_set_frag_coordinates(ifr, ctype, coord)
+    _pywrapped_result_to_error(res)
+
 
 def _pywrapped_get_frag_name(efpobj, ifr=None):
     """Gets system name on fragment(s) of `efpobj`.
@@ -647,7 +677,6 @@ def _pywrapped_get_frag_name(efpobj, ifr=None):
 
     """
     nfr = efpobj.get_frag_count()
-    print('get_frag_name', ifr, 'of', nfr)
 
     if ifr is None:
         frags = []
@@ -841,6 +870,7 @@ core.efp.to_dict = to_dict
 core.efp.get_frag_name = _pywrapped_get_frag_name
 core.efp.get_frag_charge = _pywrapped_get_frag_charge
 core.efp.get_frag_multiplicity = _pywrapped_get_frag_multiplicity
+core.efp.set_frag_coordinates = _pywrapped_set_frag_coordinates
 
 
 def from_dict(efp_init):
@@ -849,7 +879,7 @@ def from_dict(efp_init):
     sys.create()
 
     for ifr, fr in enumerate(efp_init['full_fragments']):
-        sys.add_potential(fr['fragment_file'])
+        sys.add_potential(fr['fragment_file'], duplicates_ok=True)
         sys.add_fragment(fr['fragment_file'])
         sys.set_frag_coordinates(ifr, fr['efp_type'], fr['coordinates_hint'])
 
