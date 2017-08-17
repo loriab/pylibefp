@@ -46,3 +46,15 @@ def test_multifrag_pass():
     asdf.prepare()
     assert(compare_integers(5, asdf.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag'))
 
+def test_frag_fail_1():
+    asdf = system_1()
+
+    with pytest.raises(pylibefp.PyEFPSyntaxError) as e_info:
+        asdf.get_frag_multiplicity(3)
+
+def test_frag_fail_2():
+    asdf = system_1()
+
+    with pytest.raises(pylibefp.PyEFPSyntaxError) as e_info:
+        asdf.get_frag_name(-1)
+

@@ -69,3 +69,5 @@ def compare_dicts(expected, computed, tol, label):
         pprint.pprint(ans)
     return compare_integers(True, clean, label)
 
+
+compare_strings = compare_integers

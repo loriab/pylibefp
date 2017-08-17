@@ -625,81 +625,126 @@ def nuclear_repulsion_energy(efpobj):
     return nre
 
 
-def _frag_idx_validation(efpobj, ifr):
-    nfr = efpobj.get_frag_count()
-    if (ifr < 0) or (ifr >= nfr):
-        raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
+#def _frag_idx_validation(efpobj, ifr):
+#    nfr = efpobj.get_frag_count()
+#    if (ifr < 0) or (ifr >= nfr):
+#        raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
 
-def _pywrapped_get_frag_name(efpobj, ifr):
-    """Gets system name on fragment `ifr` of `efpobj`.
+def _pywrapped_get_frag_name(efpobj, ifr=None):
+    """Gets system name on fragment(s) of `efpobj`.
 
     Parameters
     ----------
-    ifr : int
-        Index of fragment (0-indexed).
+    ifr : int, optional
+        Index of fragment (0-indexed) if not all.
 
     Returns
     -------
-    str
-        Name of fragment.
+    str, list of str
+        If `ifr`, name of fragment `ifr`. Otherwise, names of all
+        fragments in list.
 
     """
-    _frag_idx_validation(efpobj, ifr)
+    nfr = efpobj.get_frag_count()
+    print('get_frag_name', ifr, 'of', nfr)
 
-    (res, fname) = efpobj.cwrapped_get_frag_name(ifr)
-    _pywrapped_result_to_error(res)
+    if ifr is None:
+        frags = []
+        for fr in range(nfr):
+            (res, fname) = efpobj.cwrapped_get_frag_name(fr)
+            _pywrapped_result_to_error(res)
+            frags.append(fname)
 
-    return fname
+        return frags
+
+    else:
+        if ifr in range(nfr):
+            (res, fname) = efpobj.cwrapped_get_frag_name(ifr)
+            _pywrapped_result_to_error(res)
+
+            return fname
+        else:
+            raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
 
-def _pywrapped_get_frag_charge(efpobj, ifr, zero=1e-8):
-    """Gets total charge on fragment `ifr` of `efpobj`.
+def _pywrapped_get_frag_charge(efpobj, ifr=None, zero=1e-8):
+    """Gets total charge on fragment(s) of `efpobj`.
 
     Parameters
     ----------
-    ifr : int
-        Index of fragment (0-indexed).
+    ifr : int, optional
+        Index of fragment (0-indexed) if not all.
     zero : float, optional
         Absolute value under which to zero charge.
 
     Returns
     -------
-    int
-        Charge on fragment.
+    str, list of str
+        If `ifr`, charge of fragment `ifr`. Otherwise, charges of all
+        fragments in list.
 
     """
-    _frag_idx_validation(efpobj, ifr)
-    
-    (res, chg) = efpobj.cwrapped_get_frag_charge(ifr)
-    _pywrapped_result_to_error(res)
+    nfr = efpobj.get_frag_count()
 
-    if math.fabs(chg) < zero:
-        return 0.0
+    if ifr is None:
+        frags = []
+        for fr in range(nfr):
+            (res, chg) = efpobj.cwrapped_get_frag_charge(fr)
+            _pywrapped_result_to_error(res)
+
+            if math.fabs(chg) < zero:
+                frags.append(0.0)
+            else:
+                frags.append(chg)
+        return frags
+
     else:
-        return chg
+        if ifr in range(nfr):
+            (res, chg) = efpobj.cwrapped_get_frag_charge(ifr)
+            _pywrapped_result_to_error(res)
+
+            if math.fabs(chg) < zero:
+                return 0.0
+            else:
+                return chg
+        else:
+            raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
 
-def _pywrapped_get_frag_multiplicity(efpobj, ifr):
-    """Gets spin multiplicity on fragment `ifr` of `efpobj`.
+def _pywrapped_get_frag_multiplicity(efpobj, ifr=None):
+    """Gets spin multiplicity on fragment(s) of `efpobj`.
 
     Parameters
     ----------
-    ifr : int
-        Index of fragment (0-indexed).
+    ifr : int, optional
+        Index of fragment (0-indexed) if not all.
 
     Returns
     -------
-    int
-        Multiplicity of fragment.
+    str, list of str
+        If `ifr`, multiplicity of fragment `ifr`. Otherwise, multiplicity
+        of all fragments in list.
 
     """
-    _frag_idx_validation(efpobj, ifr)
+    nfr = efpobj.get_frag_count()
 
-    (res, mult) = efpobj.cwrapped_get_frag_multiplicity(ifr)
-    _pywrapped_result_to_error(res)
+    if ifr is None:
+        frags = []
+        for fr in range(nfr):
+            (res, mult) = efpobj.cwrapped_get_frag_multiplicity(fr)
+            _pywrapped_result_to_error(res)
+            frags.append(mult)
+        return frags
 
-    return mult
+    else:
+        if ifr in range(nfr):
+            (res, mult) = efpobj.cwrapped_get_frag_multiplicity(ifr)
+            _pywrapped_result_to_error(res)
+
+            return mult
+        else:
+            raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
 
 def to_viz_dict(efpobj):
