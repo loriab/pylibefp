@@ -65,6 +65,27 @@ efp_result cwrapped_efp_set_frag_coordinates(efp* efp, size_t frag_idx, efp_coor
     return res;
 }
 
+
+efp_result cwrapped_efp_set_point_charges(efp* efp, size_t n_ptc, py::list ptc, py::list xyz) {
+    enum efp_result res;
+
+    double *cptc = NULL;
+    cptc = new double[n_ptc];
+    double *pptc = cptc;
+    for (auto itm : ptc)
+        *pptc++ = itm.cast<double>();
+
+    double *cxyz = NULL;
+    cxyz = new double[3 * n_ptc];
+    double *pxyz = cxyz;
+    for (auto itm : xyz)
+        *pxyz++ = itm.cast<double>();
+
+    res = efp_set_point_charges(efp, n_ptc, cptc, cxyz);
+    return res;
+}
+
+
 int wrapped_efp_get_frag_multiplicity(efp* efp, size_t frag_idx) {
     enum efp_result res;
     int multiplicity=0;
@@ -385,7 +406,7 @@ PYBIND11_PLUGIN(core) {
 //        .def("skip_fragments", &efp_skip_fragments, "Skip interactions between the fragments *arg0* and *arg1* inclusive if *arg2*")
 //        .def("set_electron_density_field_fn", &efp_set_electron_density_field_fn, "Sets the callback function which computes electric field from electrons in ab initio subsystem to *arg0*")
 //        .def("set_electron_density_field_user_data", &efp_set_electron_density_field_user_data, "Sets user data *arg0* to be passed to ::efp_electron_density_field_fn")
-//        .def("set_point_charges", &efp_set_point_charges, "Setup *arg0* arbitrary point charges of magnitude *arg1* at locations *arg2* interacting with EFP subsystem")
+        .def("cwrapped_set_point_charges", cwrapped_efp_set_point_charges, "Setup *arg0* arbitrary point charges of magnitude *arg1* at locations *arg2* interacting with EFP subsystem")
 //        .def("get_point_charge_count", &efp_get_point_charge_count, "Gets the number of currently set point charges and return it in *arg0*")
 //        .def("get_point_charge_values", &efp_get_point_charge_values, "Gets values of currently set point charges and returns them in *arg1*")
 //        .def("set_point_charge_values", &efp_set_point_charge_values, "Sets values of point charges *arg0*")

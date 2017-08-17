@@ -90,14 +90,12 @@ def _pywrapped_add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_o
         relative paths, $-marked environment variables, and the word
         LIBRARY, all of which will be expanded with LIBRARY expanded
         to the native libefp fragment library.
-
     duplicates_ok : bool, optional
         Whether to continue or to return pylibefp.Fatal if asked
         to load a duplicate potential according to libefp default
         behavior. The `potential` list is always filtered to avoid
         duplicates. Activating `duplicates_ok` additionally allows
         repeated calls to this function to add duplicate potentials.
-
     label : str, optional
         Returned dictionary keys are identical to libefp efp_opts struct
         names unless custom renaming requested via `label`.
@@ -107,6 +105,7 @@ def _pywrapped_add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_o
     None
 
     """
+    # TODO handle casing of potential
     # form unified path list for efpfrags
     paths = []
     for pth in fragpath.split(os.pathsep):
@@ -661,6 +660,15 @@ def _pywrapped_set_frag_coordinates(efpobj, ifr, ctype, coord):
     _pywrapped_result_to_error(res)
 
 
+def _pywrapped_set_point_charges(efpobj, ptc, coord):
+
+    if (len(ptc) * 3) != len(coord):
+        print('Protest~')
+
+    res = efpobj.cwrapped_set_point_charges(len(ptc), ptc, coord)
+    _pywrapped_result_to_error(res)
+
+
 def _pywrapped_get_frag_name(efpobj, ifr=None):
     """Gets system name on fragment(s) of `efpobj`.
 
@@ -871,6 +879,7 @@ core.efp.get_frag_name = _pywrapped_get_frag_name
 core.efp.get_frag_charge = _pywrapped_get_frag_charge
 core.efp.get_frag_multiplicity = _pywrapped_get_frag_multiplicity
 core.efp.set_frag_coordinates = _pywrapped_set_frag_coordinates
+core.efp.set_point_charges = _pywrapped_set_point_charges
 
 
 def from_dict(efp_init):
