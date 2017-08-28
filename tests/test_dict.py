@@ -20,7 +20,7 @@ def test_dict_1():
     pprint.pprint(ene)
     print('<<< get_opts():  ', sys1p.get_opts(), '>>>')
     print('<<< get_energy():', ene, '>>>')
-    print('<<< get_atoms(): ', sys1p.get_atoms(), '>>>')
+    print('<<< get_atoms(): ', sys1p.py_get_atoms(), '>>>')
     print(sys1p.energy_summary())
     print(sys1p.print_geometry(units_to_bohr=b2a))
     print(sys1p.print_geometry(units_to_bohr=1.0))

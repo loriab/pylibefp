@@ -514,6 +514,225 @@ def _pywrapped_get_frag_count(efpobj):
     return nfrag
 
 
+def _pywrapped_get_multipole_count(efpobj):
+    """Gets the number of multipoles in *efpobj* computation.
+
+    Returns
+    -------
+    int
+        Total number of multipoles from electrostatics calculation.
+
+    """
+    (res, nmult) = efpobj.cwrapped_get_multipole_count()
+    _pywrapped_result_to_error(res)
+
+    return nmult
+
+
+def _pywrapped_get_multipole_coordinates(efpobj, quiet=False):
+    """Gets the coordinates of *efpobj* electrostatics multipoles.
+
+    Parameters
+    ----------
+    quiet : bool, optional
+        Print out the multipole coordinates.
+
+    Returns
+    -------
+    list
+        3 x n_mult (flat) array of multipole locations.
+
+    """
+    nmult = efpobj.get_multipole_count()
+    (res, xyz) = efpobj.cwrapped_get_multipole_coordinates(nmult)
+    _pywrapped_result_to_error(res)
+
+    if not quiet:
+        xyz3 = list(map(list, zip(*[iter(xyz)] * 3)))
+
+        text = '\n  ==>  EFP Multipole Coordinates  <==\n\n'
+        for mu in range(nmult):
+            text += '{:6d}   {:14.8f} {:14.8f} {:14.8f}\n'.format(
+                mu, *xyz3[mu])
+        print(text)
+
+    return xyz
+
+
+def _pywrapped_get_multipole_values(efpobj, quiet=False):
+    """Gets the computed per-point multipoles of *efpobj*.
+
+    Parameters
+    ----------
+    quiet : bool, optional
+        Print out the multipole array.
+
+    Returns
+    -------
+    list
+        20 x n_mult (flat) array of per-point multipole values including
+        charges + dipoles + quadrupoles + octupoles.
+        dipoles stored as     x,y,z
+        quadrupoles stored as xx,yy,zz,xy,xz,yz
+        octupoles stored as   xxx,yyy,zzz,xxy,xxz,xyy,yyz,xzz,yzz,xyz
+
+    Examples
+    --------
+    Use with NumPy
+    >>> n_mp = efpobj.get_multipole_count()
+    >>> val_mp = np.asarray(efpobj.get_multipole_values()).reshape(n_mp, 20)
+
+    """
+    nmult = efpobj.get_multipole_count()
+    (res, mult) = efpobj.cwrapped_get_multipole_values(nmult)
+    _pywrapped_result_to_error(res)
+
+    if not quiet:
+        mult20 = list(map(list, zip(*[iter(mult)] * 20)))
+
+        text = '\n  ==>  EFP Multipoles: Charge & Dipole  <==\n\n'
+        for mu in range(nmult):
+            text += '{:6d}   {:14.8f}   {:14.8f} {:14.8f} {:14.8f}\n'.format(
+                mu, *mult20[mu][:4])
+        text += '\n  ==>  EFP Multipoles: Quadrupole  <==\n\n'
+        for mu in range(nmult):
+            text += '{:6d}   {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f}\n'.format(
+                mu, *mult20[mu][4:10])
+        text += '\n  ==>  EFP Multipoles: Octupole  <==\n\n'
+        for mu in range(nmult):
+            text += '{:6d}   {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f}\n'.format(
+                mu, *mult20[mu][10:])
+        print(text)
+
+    return mult
+
+
+def _pywrapped_get_induced_dipole_count(efpobj):
+    """Gets the number of polarization induced dipoles in *efpobj* computation.
+
+    Returns
+    -------
+    int
+        Total number of polarization induced dipoles.
+
+    """
+    (res, ndip) = efpobj.cwrapped_get_induced_dipole_count()
+    _pywrapped_result_to_error(res)
+
+    return ndip
+
+
+def _pywrapped_get_induced_dipole_coordinates(efpobj, quiet=False):
+    """Gets the coordinates of *efpobj* induced dipoles.
+
+    Parameters
+    ----------
+    quiet : bool, optional
+        Print out the induced dipole coordinates.
+
+    Returns
+    -------
+    list
+        3 x n_dip (flat) array of induced dipole locations.
+
+    """
+    ndip = efpobj.get_induced_dipole_count()
+    (res, xyz) = efpobj.cwrapped_get_induced_dipole_coordinates(ndip)
+    _pywrapped_result_to_error(res)
+
+    if not quiet:
+        xyz3 = list(map(list, zip(*[iter(xyz)] * 3)))
+
+        text = '\n  ==>  EFP Induced Dipole Coordinates  <==\n\n'
+        for mu in range(ndip):
+            text += '{:6d}   {:14.8f} {:14.8f} {:14.8f}\n'.format(
+                mu, *xyz3[mu])
+        print(text)
+
+    return xyz
+
+
+def _pywrapped_get_induced_dipole_values(efpobj, quiet=False):
+    """Gets the values of polarization induced dipoles of *efpobj*.
+
+    Parameters
+    ----------
+    quiet : bool, optional
+        Print out the induced dipole array.
+
+    Returns
+    -------
+    list
+        3 x n_dip (flat) array of polarization induced dipole values.
+
+    Examples
+    --------
+    Use with NumPy
+    >>> n_dip = efpobj.get_induced_dipole_count()
+    >>> val_dip = np.asarray(efpobj.get_induced_dipole_values()).reshape(n_dip, 3)
+
+    """
+    ndip = efpobj.get_induced_dipole_count()
+    (res, vals) = efpobj.cwrapped_get_induced_dipole_values(ndip)
+    _pywrapped_result_to_error(res)
+
+    if not quiet:
+        vals3 = list(map(list, zip(*[iter(vals)] * 3)))
+
+        text = '\n  ==>  EFP Induced Dipoles  <==\n\n'
+        for mu in range(ndip):
+            text += '{:6d}   {:14.8f} {:14.8f} {:14.8f}\n'.format(
+                mu, *vals3[mu])
+        print(text)
+
+    return vals
+
+
+def _pywrapped_get_induced_dipole_conj_values(efpobj, quiet=False):
+    """Gets the values of polarization conjugated induced dipoles of *efpobj*.
+
+    Parameters
+    ----------
+    quiet : bool, optional
+        Print out the induced dipole array.
+
+    Returns
+    -------
+    list
+        3 x n_dip (flat) array of conjugate induced dipole values.
+
+    """
+    ndip = efpobj.get_induced_dipole_count()
+    (res, vals) = efpobj.cwrapped_get_induced_dipole_conj_values(ndip)
+    _pywrapped_result_to_error(res)
+
+    if not quiet:
+        vals3 = list(map(list, zip(*[iter(vals)] * 3)))
+
+        text = '\n  ==>  EFP Conj. Induced Dipoles  <==\n\n'
+        for mu in range(ndip):
+            text += '{:6d}   {:14.8f} {:14.8f} {:14.8f}\n'.format(
+                mu, *vals3[mu])
+        print(text)
+
+    return vals
+
+
+def _pywrapped_get_wavefunction_dependent_energy(efpobj):
+    """Updates wavefunction-dependent energy terms for SCF.
+
+    Returns
+    -------
+    float
+        Wavefunction-dependent EFP energy.
+
+    """
+    (res, wde) = efpobj.cwrapped_get_wavefunction_dependent_energy()
+    _pywrapped_result_to_error(res)
+
+    return wde
+
+
 def _pywrapped_get_gradient(efpobj, quiet=False):
     """Gets the computed per-fragment EFP energy gradient of *efpobj*.
 
@@ -544,14 +763,30 @@ def _pywrapped_get_gradient(efpobj, quiet=False):
     return grad
 
 
-def energy_summary(efpobj):
+def energy_summary(efpobj, label='libefp', scfefp=None):
+    """Forms summary of EFP and SCFEFP energy components from `efpobj`.
 
+    Parameters
+    ----------
+    label : str, optional
+        Text labels use libefp terms names unless custom renaming
+        requested via `label`.
+    scfefp : float, optional
+        Total SCF energy (Hartrees) including EFP wavefunction dependent
+        and wavefunction independent terms. Used for add'l printing.
+
+    Returns
+    -------
+    str
+        Summary suitable for printing indicating energy components
+        (electrostatics, exchange, induction, dispersion, total), whether
+        each are enabled in options, and breakdown into pure-EFP and
+        QM-EFP, where available. If scfefp, includes a section on SCF
+        iterated and SCF total.
+
+    """
     opt = efpobj.get_opts()
     ene = efpobj.get_energy()
-
-    print('ENERGY SUMM', opt, ene)
-
-#{'pol_damp': 'tt', 'elec_damp': 'screen', 'enable_cutoff': 0, 'enable_pbc': 0, 'pol_driver': 'iterative',  'pol': False, 'swf_cutoff': 0.0, 'ai_pol': False, 'disp_damp': 'overlap', 'disp': False, 'xr': False
 
     def _enabled(tf, t='*', f=''):
         if tf:
@@ -559,49 +794,48 @@ def energy_summary(efpobj):
         else:
             return f
 
-    text = ''
-    text += '\n'
+    elec = 'Electrostatics'
+    disp = 'Dispersion'
+    if label == 'libefp':
+        xr = 'Exchange-Repulsion'
+        indc = 'Polarization'
+    elif label == 'psi':
+        xr = 'Exchange'
+        indc = 'Induction'
+
+    text = '\n'
     text += '\n    EFP Results\n'
     text +=   '  ------------------------------------------------------------\n'
-    text +=   '    Electrostatics                {:20.12f} [Eh] {}\n'.format(
-                                      ene['electrostatic'] +
-                                      ene['charge_penetration'] +
-                                      ene['electrostatic_point_charges'],
-                                      _enabled(opt['elec'] or opt['ai_elec']))
-    text +=   '      EFP/EFP                     {:20.12f} [Eh] {}\n'.format(
-                                      ene['electrostatic'] +
-                                      ene['charge_penetration'],
-                                      _enabled(opt['elec']))
-    text +=   '      QM-Nuc/EFP                  {:20.12f} [Eh] {}\n'.format(
-                                      ene['electrostatic_point_charges'],
-                                      _enabled(opt['ai_elec']))
-    text += '\n    Exchange                      {:20.12f} [Eh] {}\n'.format(
-                                      ene['exchange_repulsion'],
-                                      _enabled(opt['xr']))
-    text +=   '      EFP/EFP                     {:20.12f} [Eh] {}\n'.format(
-                                      ene['exchange_repulsion'],
-                                      _enabled(opt['xr']))
-    text +=   '      QM/EFP                      {:20.12f} [Eh] {}\n'.format(
-                                      0.0,
-                                      '')
-    text += '\n    Induction                     {:20.12f} [Eh] {}\n'.format(
-                                      ene['polarization'],
-                                      _enabled(opt['pol'] or opt['ai_pol']))
-    text +=   '      {:7}                     {:20.12f} [Eh] {}\n'.format(
-                                      _enabled(opt['ai_pol'], t='QM/EFP', f='EFP/EFP'),
-                                      ene['polarization'],
-                                      _enabled(opt['pol'] or opt['ai_pol']))
-    text += '\n    Dispersion                    {:20.12f} [Eh] {}\n'.format(
-                                      ene['dispersion'],
-                                      _enabled(opt['disp']))
-    text +=   '      EFP/EFP                     {:20.12f} [Eh] {}\n'.format(
-                                      ene['dispersion'],
-                                      _enabled(opt['disp']))
-    text +=   '      QM/EFP                      {:20.12f} [Eh] {}\n'.format(
-                                      0.0,
-                                      '')
-    text += '\n    Total EFP                     {:20.12f} [Eh]\n'.format(
-                                      ene['total'])
+    text +=   '    {:<30}{:20.12f} [Eh] {}\n'.format(elec, ene['electrostatic'] +
+                                                           ene['charge_penetration'] +
+                                                           ene['electrostatic_point_charges'],
+                                                     _enabled(opt['elec'] or opt['ai_elec']))
+    text += '      {:<28}{:20.12f} [Eh] {}\n'.format('EFP/EFP', ene['electrostatic'] +
+                                                                ene['charge_penetration'],
+                                                     _enabled(opt['elec']))
+    text += '      {:<28}{:20.12f} [Eh] {}\n'.format('QM-Nuc/EFP',
+                                                     ene['electrostatic_point_charges'],
+                                                     _enabled(opt['ai_elec']))
+    text += '\n    {:<30}{:20.12f} [Eh] {}\n'.format(xr, ene['exchange_repulsion'],
+                                                     _enabled(opt['xr']))
+    text += '      {:<28}{:20.12f} [Eh] {}\n'.format('EFP/EFP', ene['exchange_repulsion'],
+                                                     _enabled(opt['xr']))
+    text += '      {:<28}{:20.12f} [Eh] {}\n'.format('QM/EFP', 0.0, '')
+    text += '\n    {:<30}{:20.12f} [Eh] {}\n'.format(indc, ene['polarization'],
+                                                     _enabled(opt['pol'] or opt['ai_pol']))
+    text += '      {:<28}{:20.12f} [Eh] {}\n'.format(_enabled(opt['ai_pol'], t='QM/EFP', f='EFP/EFP'),
+                                                     ene['polarization'],
+                                                     _enabled(opt['pol'] or opt['ai_pol']))
+    text += '\n    {:<30}{:20.12f} [Eh] {}\n'.format(disp, ene['dispersion'], _enabled(opt['disp']))
+    text += '      {:<28}{:20.12f} [Eh] {}\n'.format('EFP/EFP', ene['dispersion'],
+                                                     _enabled(opt['disp']))
+    text += '      {:<28}{:20.12f} [Eh] {}\n'.format('QM/EFP', 0.0, '')
+    text += '\n    {:<30}{:20.12f} [Eh]\n'.format('Total EFP', ene['total'])
+    if scfefp is not None:
+        wie = ene['total'] - ene['pol']
+        text +=   '    EFP excluding EFP {:<12}{:20.12f} [Eh]\n'.format(indc, wie)
+        text +=   '    SCF including EFP {:<12}{:20.12f} [Eh]\n'.format(indc, scfefp - wie)
+        text +=   '    Total SCF including Total EFP {:20.12f} [Eh]\n'.format(scfefp)
 
     return text
 
@@ -644,7 +878,7 @@ def _pywrapped_set_frag_coordinates(efpobj, ifr, ctype, coord):
     Returns
     -------
     None
-    
+
     """
     if isinstance(ctype, basestring):
         try:
@@ -784,6 +1018,121 @@ def _pywrapped_get_frag_multiplicity(efpobj, ifr=None):
             raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
 
+def _pywrapped_get_frag_atom_count(efpobj, ifr=None):
+    """Gets atom count on fragment(s) of `efpobj`.
+
+    Parameters
+    ----------
+    ifr : int, optional
+        Index of fragment (0-indexed) if not all.
+
+    Returns
+    -------
+    str, list of str
+        If `ifr`, atom count of fragment `ifr`. Otherwise, atom counts
+        of all fragments in list.
+
+    """
+    nfr = efpobj.get_frag_count()
+
+    if ifr is None:
+        frags = []
+        for fr in range(nfr):
+            (res, natom) = efpobj.cwrapped_get_frag_atom_count(fr)
+            _pywrapped_result_to_error(res)
+            frags.append(natom)
+        return frags
+
+    else:
+        if ifr in range(nfr):
+            (res, natom) = efpobj.cwrapped_get_frag_atom_count(ifr)
+            _pywrapped_result_to_error(res)
+
+            return natom
+        else:
+            raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
+
+
+def _pywrapped_get_frag_atoms(efpobj, ifr):
+    """Gets geometry information for atoms modeled by fragment in `efpobj`.
+
+    Parameters
+    ----------
+    ifr : int
+        Index of fragment (0-indexed).
+
+    Returns
+    -------
+    list of dict
+        Each atom in fragment `ifr` has position, charge, and element fields below in a dictionary at list index `ifr`
+
+        Z : float               nuclear charge.
+        label : str             atom label from EFP file, e.g., A02H2.
+        x : float               X coordinate of atom position.
+        y : float               Y coordinate of atom position.
+        z : float               Z coordinate of atom position.
+        mass : float            atom mass [amu]
+        symbol : str            atomic symbol extracted from label.
+#        xyz : list of float     list [x, y, z]
+
+    """
+    nfr = efpobj.get_frag_count()
+    nat = efpobj.get_frag_atom_count(ifr)
+
+    if ifr in range(nfr):
+        (res, atoms) = efpobj.cwrapped_get_frag_atoms(ifr, nat)
+        _pywrapped_result_to_error(res)
+
+        for at in atoms:
+            mobj = re.match(r'\AA\d*(?P<symbol>[A-Z]{1,3})\d*\Z', at['label'])
+            if mobj:
+                at['symbol'] = mobj.group('symbol').capitalize()
+#            at['xyz'] = [at['x'], at['y'], at['z']]
+
+        return atoms
+    else:
+        raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
+
+
+
+def py_get_atoms(efpobj):
+    #enum efp_result res;
+    #size_t frag_natom, natom=0;
+    #double frag_chg;
+    #int frag_mult;
+    #py::list fr, frt, frcg, frmp, full_atoms;
+
+
+    natom = 0
+    frag_count = efpobj.get_frag_count()
+    frag_natom = efpobj.get_frag_atom_count()
+    fr = []
+    full_atoms = []
+    for ifr in range(frag_count):
+        frat = frag_natom[ifr]
+
+        fr.append([natom, natom + frat])
+        natom += frat
+
+        pyat = efpobj.get_frag_atoms(ifr)
+        full_atoms.append(pyat)
+
+    mol_info = {}
+    mol_info["units"] = "Bohr"
+    mol_info["input_units_to_au"] = 1.0
+    mol_info["fix_com"] = True
+    mol_info["fix_orientation"] = True
+    mol_info["fix_symmetry"] = "c1"
+
+    mol_info['fragments'] = fr
+    mol_info['fragment_types'] = ['Real'] * frag_count
+    mol_info['fragment_charges'] = efpobj.get_frag_charge()
+    mol_info['fragment_multiplicities'] = efpobj.get_frag_multiplicity()
+    mol_info['full_atoms'] = full_atoms
+
+    return mol_info
+
+
 def to_viz_dict(efpobj):
 
     pyat = efpobj.get_atoms()
@@ -880,6 +1229,18 @@ core.efp.get_frag_charge = _pywrapped_get_frag_charge
 core.efp.get_frag_multiplicity = _pywrapped_get_frag_multiplicity
 core.efp.set_frag_coordinates = _pywrapped_set_frag_coordinates
 core.efp.set_point_charges = _pywrapped_set_point_charges
+core.efp.get_multipole_count = _pywrapped_get_multipole_count
+core.efp.get_multipole_coordinates = _pywrapped_get_multipole_coordinates
+core.efp.get_multipole_values = _pywrapped_get_multipole_values
+core.efp.get_induced_dipole_count = _pywrapped_get_induced_dipole_count
+core.efp.get_induced_dipole_coordinates = _pywrapped_get_induced_dipole_coordinates
+core.efp.get_induced_dipole_values = _pywrapped_get_induced_dipole_values
+core.efp.get_induced_dipole_conj_values = _pywrapped_get_induced_dipole_conj_values
+core.efp.get_frag_atom_count = _pywrapped_get_frag_atom_count
+core.efp.get_wavefunction_dependent_energy = _pywrapped_get_wavefunction_dependent_energy
+
+core.efp.get_frag_atoms = _pywrapped_get_frag_atoms
+core.efp.py_get_atoms = py_get_atoms
 
 
 def from_dict(efp_init):
@@ -894,5 +1255,3 @@ def from_dict(efp_init):
 
     sys.prepare()
     return sys
-
-
