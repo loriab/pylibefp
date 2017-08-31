@@ -75,7 +75,7 @@ install:
   - conda info -a
 
 # Build out environment
-  - conda create -n tenv python=$PYTHON_VER cmake
+  - conda create -n tenv python=$PYTHON_VER cmake numpy ci-psi4 psi4
   - source activate tenv
   - conda install pytest pytest-cov codecov -c conda-forge
   - pip install deepdiff

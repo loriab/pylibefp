@@ -13,12 +13,14 @@ def test_grad_fail():
         grad = asdf.get_gradient()
 
 
-def test_frag_file_fail():
-    asdf = pylibefp.core.efp()
-    asdf.create()
-
-    with pytest.raises(pylibefp.FileNotFound) as e_info:
-        asdf.add_potential('buckyball')
+#def test_frag_file_fail():
+#    asdf = pylibefp.core.efp()
+#    asdf.create()
+#
+#    with pytest.raises(pylibefp.FileNotFound) as e_info:
+#        #print('a', e_info)
+#        asdf.add_potential('buckyball')
+#        print('b', e_info)
 
 
 def test_frag_missing_fail():

@@ -86,19 +86,17 @@ def _pywrapped_add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_o
         Single fragment name or a list of fragments, with or without
         ".efp" extension.
     fragpath : string, optional
-        String with :-separated paths that may include absolute paths,
-        relative paths, $-marked environment variables, and the word
-        LIBRARY, all of which will be expanded with LIBRARY expanded
-        to the native libefp fragment library.
+        String with ":"-separated paths that may include absolute
+        paths, relative paths, "$"-marked environment variables, and
+        the word LIBRARY. Relative paths and environment variables will
+        be expanded. "LIBRARY" will be expanded to the native libefp
+        fragment library.
     duplicates_ok : bool, optional
         Whether to continue or to return pylibefp.Fatal if asked
         to load a duplicate potential according to libefp default
         behavior. The `potential` list is always filtered to avoid
         duplicates. Activating `duplicates_ok` additionally allows
         repeated calls to this function to add duplicate potentials.
-    label : str, optional
-        Returned dictionary keys are identical to libefp efp_opts struct
-        names unless custom renaming requested via `label`.
 
     Returns
     -------
@@ -534,13 +532,19 @@ def _pywrapped_get_multipole_coordinates(efpobj, quiet=False):
 
     Parameters
     ----------
-    quiet : bool, optional
+    quiet : bool,optional
         Print out the multipole coordinates.
 
     Returns
     -------
     list
-        3 x n_mult (flat) array of multipole locations.
+        3 x `n_mult` (flat) array of multipole locations.
+
+    Examples
+    --------
+    >>> # Use with NumPy
+    >>> n_mp = efpobj.get_multipole_count()
+    >>> xyz_mp = np.asarray(efpobj.get_multipole_coordinates()).reshape(n_mp, 3)
 
     """
     nmult = efpobj.get_multipole_count()
@@ -570,7 +574,7 @@ def _pywrapped_get_multipole_values(efpobj, quiet=False):
     Returns
     -------
     list
-        20 x n_mult (flat) array of per-point multipole values including
+        20 x `n_mult` (flat) array of per-point multipole values including
         charges + dipoles + quadrupoles + octupoles.
         dipoles stored as     x,y,z
         quadrupoles stored as xx,yy,zz,xy,xz,yz
@@ -578,7 +582,7 @@ def _pywrapped_get_multipole_values(efpobj, quiet=False):
 
     Examples
     --------
-    Use with NumPy
+    >>> # Use with NumPy
     >>> n_mp = efpobj.get_multipole_count()
     >>> val_mp = np.asarray(efpobj.get_multipole_values()).reshape(n_mp, 20)
 
@@ -1064,8 +1068,8 @@ def _pywrapped_get_frag_atoms(efpobj, ifr):
     Returns
     -------
     list of dict
-        Each atom in fragment `ifr` has position, charge, and element fields below in a dictionary at list index `ifr`
-
+        Each atom in fragment `ifr` has position, charge, and element
+        fields below in a dictionary at list index `ifr`
         Z : float               nuclear charge.
         label : str             atom label from EFP file, e.g., A02H2.
         x : float               X coordinate of atom position.

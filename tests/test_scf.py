@@ -20,6 +20,7 @@ __date__      = "2017-08-28"
 
 import pytest
 from utils import *
+from addons import *
 import time
 import numpy as np
 np.set_printoptions(precision=5, linewidth=200, suppress=True)
@@ -31,6 +32,7 @@ print('Psi4  loc:', os.path.abspath(psi4.__file__))
 print('PyLibEFP  loc:', os.path.abspath(pylibefp.__file__))
 
 
+@using_psi4_goodnuff
 def test_qmefp():
 
     # Memory for Psi4 in GB
