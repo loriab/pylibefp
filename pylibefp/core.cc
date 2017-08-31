@@ -298,7 +298,7 @@ py::tuple cwrapped_efp_get_frag_atoms(efp* efp, size_t frag_idx, size_t frag_nat
     struct efp_atom atoms[frag_natom];
     py::list ats_info;
 
-    if (res = efp_get_frag_atoms(efp, frag_idx, frag_natom, atoms)) {
+    if ((res = efp_get_frag_atoms(efp, frag_idx, frag_natom, atoms))) {
         py::tuple rets = py::make_tuple(res, ats_info);
         return rets;
     }
