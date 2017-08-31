@@ -421,41 +421,41 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
 
 
 
-def opts_summary(efpobj, labels='libefp'):
-
-    opts = efpobj.get_opts()
-#    py::dict opts = opts_to_dict(efp);
-
-    elec = 'Electrostatics'
-    xr = 'Exchange'
-    disp = 'Dispersion'
-    if labels == 'libefp':
-        pol = 'Polarization'
-    elif labels == 'psi4':
-        pol = 'Induction'
-
-    text = ''
-    text += '\n  ==> EFP/EFP Setup <==\n\n'
-    text +=   '  {:<30} {:12}\n'.format(elec + ' enabled?:', 'true' if opts["elec"] else 'false')
-    text +=   '  {:<30} {:12}\n'.format(pol + ' enabled?:', 'true' if opts["pol"] else 'false')
-    text +=   '  {:<30} {:12}\n'.format(disp + ' enabled?:', 'true' if opts["disp"] else 'false')
-    text +=   '  {:<30} {:12}\n'.format(xr + ' enabled?:', 'true' if opts["xr"] else 'false')
-    text +=   '  {:<30} {:12}\n'.format('Charge-Transfer enabled?:', 'undefined')
-
-    text += '\n  {:<30} {:12}\n'.format(elec + ' damping:', opts["elec_damp"])
-    text +=   '  {:<30} {:12}\n'.format(pol + 'damping:', opts["pol_damp"])
-    text +=   '  {:<30} {:12}\n'.format(disp + ' damping:', opts["disp_damp"])
-    text +=   '  {:<30} {:12}\n'.format(pol + ' driver:', opts["pol_driver"])
-
-    text += '\n  ==> QM/EFP Setup <==\n\n'
-#//    sprintf(buffer, "  Number of QM fragments:  %12d\n", -1); //, nfrag_);
-    text += '  Electrostatics enabled?:   {:12}\n'.format('true' if opts["ai_elec"] else 'false')
-    text += '  Polarization enabled?:     {:12}\n'.format('true' if opts["ai_pol"] else 'false')
-    text += '  Dispersion enabled?:       {:12}\n'.format('undefined')
-    text += '  Exchange enabled?:         {:12}\n'.format('undefined')
-    text += '  Charge-Transfer enabled?:  {:12}\n'.format('undefined')
-
-    return text
+#def opts_summary(efpobj, labels='libefp'):
+#
+#    opts = efpobj.get_opts()
+##    py::dict opts = opts_to_dict(efp);
+#
+#    elec = 'Electrostatics'
+#    xr = 'Exchange'
+#    disp = 'Dispersion'
+#    if labels == 'libefp':
+#        pol = 'Polarization'
+#    elif labels == 'psi4':
+#        pol = 'Induction'
+#
+#    text = ''
+#    text += '\n  ==> EFP/EFP Setup <==\n\n'
+#    text +=   '  {:<30} {:12}\n'.format(elec + ' enabled?:', 'true' if opts["elec"] else 'false')
+#    text +=   '  {:<30} {:12}\n'.format(pol + ' enabled?:', 'true' if opts["pol"] else 'false')
+#    text +=   '  {:<30} {:12}\n'.format(disp + ' enabled?:', 'true' if opts["disp"] else 'false')
+#    text +=   '  {:<30} {:12}\n'.format(xr + ' enabled?:', 'true' if opts["xr"] else 'false')
+#    text +=   '  {:<30} {:12}\n'.format('Charge-Transfer enabled?:', 'undefined')
+#
+#    text += '\n  {:<30} {:12}\n'.format(elec + ' damping:', opts["elec_damp"])
+#    text +=   '  {:<30} {:12}\n'.format(pol + 'damping:', opts["pol_damp"])
+#    text +=   '  {:<30} {:12}\n'.format(disp + ' damping:', opts["disp_damp"])
+#    text +=   '  {:<30} {:12}\n'.format(pol + ' driver:', opts["pol_driver"])
+#
+#    text += '\n  ==> QM/EFP Setup <==\n\n'
+##//    sprintf(buffer, "  Number of QM fragments:  %12d\n", -1); //, nfrag_);
+#    text += '  Electrostatics enabled?:   {:12}\n'.format('true' if opts["ai_elec"] else 'false')
+#    text += '  Polarization enabled?:     {:12}\n'.format('true' if opts["ai_pol"] else 'false')
+#    text += '  Dispersion enabled?:       {:12}\n'.format('undefined')
+#    text += '  Exchange enabled?:         {:12}\n'.format('undefined')
+#    text += '  Charge-Transfer enabled?:  {:12}\n'.format('undefined')
+#
+#    return text
 
 
 def _pywrapped_get_energy(efpobj, label='libefp'):
@@ -844,22 +844,22 @@ def energy_summary(efpobj, label='libefp', scfefp=None):
     return text
 
 
-def nuclear_repulsion_energy(efpobj):
-    """Computes nuclear repulsion energy."""
-
-    pyat = efpobj.get_atoms()
-    nre = 0.0
-    for iat1, at1 in enumerate(pyat['full_atoms']):
-        for iat2, at2 in enumerate(pyat['full_atoms']):
-            if iat2 < iat1:
-                ZZ = at1['Z'] * at2['Z']
-                dx = at1['x'] - at2['x']
-                dy = at1['y'] - at2['y']
-                dz = at1['z'] - at2['z']
-                dist = math.sqrt(dx * dx + dy * dy + dz * dz)
-                nre += ZZ / dist
-
-    return nre
+#def nuclear_repulsion_energy(efpobj):
+#    """Computes nuclear repulsion energy."""
+#
+#    pyat = efpobj.get_atoms()
+#    nre = 0.0
+#    for iat1, at1 in enumerate(pyat['full_atoms']):
+#        for iat2, at2 in enumerate(pyat['full_atoms']):
+#            if iat2 < iat1:
+#                ZZ = at1['Z'] * at2['Z']
+#                dx = at1['x'] - at2['x']
+#                dy = at1['y'] - at2['y']
+#                dz = at1['z'] - at2['z']
+#                dist = math.sqrt(dx * dx + dy * dy + dz * dz)
+#                nre += ZZ / dist
+#
+#    return nre
 
 
 #def _frag_idx_validation(efpobj, ifr):
@@ -1224,7 +1224,7 @@ core.efp.get_frag_count = _pywrapped_get_frag_count
 core.efp.get_energy = _pywrapped_get_energy
 core.efp.get_gradient = _pywrapped_get_gradient
 core.efp.energy_summary = energy_summary
-core.efp.nuclear_repulsion_energy = nuclear_repulsion_energy
+#core.efp.nuclear_repulsion_energy = nuclear_repulsion_energy
 core.efp.to_viz_dict = to_viz_dict
 core.efp.to_dict = to_dict
 core.efp.get_frag_name = _pywrapped_get_frag_name

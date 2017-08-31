@@ -73,8 +73,8 @@ def test_qmefp():
         # get multipoles count, pos'n, values from libefp
         #   charge + dipoles + quadrupoles + octupoles = 20
         n_mp = efpobj.get_multipole_count()
-        xyz_mp = np.asarray(efpobj.get_multipole_coordinates(quiet=True)).reshape(n_mp, 3)
-        val_mp = np.asarray(efpobj.get_multipole_values(quiet=True)).reshape(n_mp, 20)
+        xyz_mp = np.asarray(efpobj.get_multipole_coordinates()).reshape(n_mp, 3)
+        val_mp = np.asarray(efpobj.get_multipole_values()).reshape(n_mp, 20)
     
         #                    0  X  Y  Z  XX   YY   ZZ   XY   XZ   YZ
         prefacs = np.array([ 1, 1, 1, 1, 1/3, 1/3, 1/3, 2/3, 2/3, 2/3,
@@ -111,7 +111,7 @@ def test_qmefp():
         return V2
     
     
-    def modify_Fock_induced(nbf, efpobj):
+    def modify_Fock_induced(nbf, efpobj, quiet=False):
         """Returns shared matrix containing the EFP contribution to the potential
         felt by QM atoms, due to EFP induced dipoles, in a SCF procedure.
     
@@ -119,9 +119,9 @@ def test_qmefp():
         # get induced dipoles count, pos'n, values from libefp
         #   dipoles = 3
         n_id = efpobj.get_induced_dipole_count()
-        xyz_id = np.asarray(efpobj.get_induced_dipole_coordinates(quiet=True)).reshape(n_id, 3)
-        val_id = np.asarray(efpobj.get_induced_dipole_values(quiet=True)).reshape(n_id, 3)
-        val_idt = np.asarray(efpobj.get_induced_dipole_conj_values(quiet=True)).reshape(n_id, 3)
+        xyz_id = np.asarray(efpobj.get_induced_dipole_coordinates(quiet=quiet)).reshape(n_id, 3)
+        val_id = np.asarray(efpobj.get_induced_dipole_values(quiet=quiet)).reshape(n_id, 3)
+        val_idt = np.asarray(efpobj.get_induced_dipole_conj_values(quiet=quiet)).reshape(n_id, 3)
     
         # take average of induced dipole and conjugate
         val_id = (val_id + val_idt) * 0.5
@@ -315,7 +315,8 @@ def test_qmefp():
     
         # <-- efp: add contribution to Fock matrix
         H = Horig
-        Vefp = modify_Fock_induced(nbf, efpmol)
+        quiet_dipoles = False if (SCF_ITER == 1) else True
+        Vefp = modify_Fock_induced(nbf, efpmol, quiet=quiet_dipoles)
         H = H + Vefp
         # --> efp
     
