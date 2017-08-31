@@ -437,11 +437,13 @@ efp_result cwrapped_field_fn(size_t n_pt, const double* xyz, double* field, void
     return EFP_RESULT_SUCCESS;
 }
 
-
 void set_field_fn_callback(efp* efp, py::function fn) {
     field_fn_callback = fn;
     efp_set_electron_density_field_fn(efp, cwrapped_field_fn);
 }
+
+py::function dummy;
+void clear_field_fn_callback(efp* efp) { field_fn_callback = dummy; }
 
 
 //      //  py::list coord --> double* ccoords
@@ -592,7 +594,8 @@ PYBIND11_PLUGIN(core) {
         .def_readwrite("mass", &efp_atom::mass)                               /* Atom mass. */
         .def_readwrite("znuc", &efp_atom::znuc);                              /* Nuclear charge. */
 
-    py::class_<efp>(m, "efp", "Main libefp opaque structure")
+    py::class_<efp, std::unique_ptr<efp, py::nodelete>>(m, "efp", "Main libefp opaque structure")
+    //py::class_<efp>(m, "efp", "Main libefp opaque structure")
         .def(py::init())
         .def("banner", wrapped_efp_banner, "Gets a human readable banner string with information about the library")
         .def_static("create", &efp_create, "Creates a new efp object")
@@ -604,6 +607,7 @@ PYBIND11_PLUGIN(core) {
         .def("raw_prepare", &efp_prepare, "Prepares the calculation")
 //        .def("skip_fragments", &efp_skip_fragments, "Skip interactions between the fragments *arg0* and *arg1* inclusive if *arg2*")
         .def("set_electron_density_field_fn", set_field_fn_callback, "Sets the callback function which computes electric field from electrons in ab initio subsystem to *arg0*")
+        .def("clear_electron_density_field_fn", clear_field_fn_callback, "docstring")
         .def("cwrapped_set_point_charges", cwrapped_efp_set_point_charges, "Setup *arg0* arbitrary point charges of magnitude *arg1* at locations *arg2* interacting with EFP subsystem")
 //        .def("get_point_charge_count", &efp_get_point_charge_count, "Gets the number of currently set point charges and return it in *arg0*")
 //        .def("get_point_charge_values", &efp_get_point_charge_values, "Gets values of currently set point charges and returns them in *arg1*")
@@ -654,7 +658,7 @@ PYBIND11_PLUGIN(core) {
 //        .def("get_electric_field", &efp_get_electric_field, "Gets electric field for a point on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("torque_to_derivative", &efp_torque_to_derivative, "Convert rigid body torque *arg1* to derivatives *arg2* of energy by Euler angles *arg0*")
 //        .def("result_to_string", &efp_result_to_string, "Result value to be converted to string");
-//        .def("shutdown", &efp_shutdown, "Release all resources used by this EFP")
+        .def("shutdown", &efp_shutdown, "Release all resources used by this EFP")
         ;
 
     return m.ptr();

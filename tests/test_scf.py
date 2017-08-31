@@ -371,6 +371,8 @@ def test_qmefp():
     assert(compare_values( 0.0056859871, efpene['exch'], 6, 'EFP-EFP Exch'))
     assert(compare_values( 0.2504904057, efpene['total'], 6, 'EFP-EFP Totl'))
     assert(compare_values(-76.0139362744, SCF_E, 6, 'SCF'))
+    efpmol.clear_electron_density_field_fn()
+    efpmol.shutdown()
 
 if __name__ == '__main__':
     test_qmefp()

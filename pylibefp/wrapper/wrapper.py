@@ -1073,7 +1073,6 @@ def _pywrapped_get_frag_atoms(efpobj, ifr):
         z : float               Z coordinate of atom position.
         mass : float            atom mass [amu]
         symbol : str            atomic symbol extracted from label.
-#        xyz : list of float     list [x, y, z]
 
     """
     nfr = efpobj.get_frag_count()
