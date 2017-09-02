@@ -355,7 +355,6 @@ def test_efpefp_bz2():
     a2b = 1.0 / b2a
 
     asdf = pylibefp.core.efp()
-    asdf.create()
 
     frags = ['c6h6', 'c6h6']
     asdf.add_potential(frags)

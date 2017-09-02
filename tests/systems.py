@@ -7,7 +7,6 @@ a2b = 1.0 / b2a
 
 def system_1():
     sys = pylibefp.core.efp()
-    sys.create()
 
     frags = ['h2o', 'nh3']
     sys.add_potential(frags)
@@ -25,7 +24,6 @@ def system_1():
 
 def system_2():
     sys = pylibefp.core.efp()
-    sys.create()
 
     frags = ['h2o', 'nh3', 'h2o', 'h2o', 'nh3']
     sys.add_potential(frags)
@@ -49,7 +47,6 @@ def system_2():
 
 def system_3():
     sys = pylibefp.core.efp()
-    sys.create()
 
     frags = ['h2o', 'nh3', 'nh3', 'nh3', 'ch3oh', 'h2o', 'h2o', 'ch3oh', 'h2o']
     sys.add_potential(frags)
@@ -82,7 +79,6 @@ def system_3():
 
 def system_4():
     sys = pylibefp.core.efp()
-    sys.create()
 
     frags = ['acetone', 'c2h5oh', 'c6h6', 'ccl4', 'ch3oh', 'ch4', 'cl2', 'dcm', 'dmso', 'h2', 'h2o', 'nh3']
     sys.add_potential(frags)

@@ -221,7 +221,6 @@ def test_qmefp():
     
     # <-- efp
     efpmol = pylibefp.core.efp()
-    efpmol.create()
     frags = ['h2o', 'nh3', 'nh3']
     #frags = ['h2o', 'h2']
     efpmol.add_potential(frags)

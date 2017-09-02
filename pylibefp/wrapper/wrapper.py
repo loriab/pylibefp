@@ -1249,7 +1249,6 @@ core.efp.py_get_atoms = py_get_atoms
 def from_dict(efp_init):
 
     sys = core.efp()
-    sys.create()
 
     for ifr, fr in enumerate(efp_init['full_fragments']):
         sys.add_potential(fr['fragment_file'], duplicates_ok=True)

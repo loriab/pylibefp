@@ -15,7 +15,6 @@ def test_grad_fail():
 
 #def test_frag_file_fail():
 #    asdf = pylibefp.core.efp()
-#    asdf.create()
 #
 #    with pytest.raises(pylibefp.FileNotFound) as e_info:
 #        #print('a', e_info)
@@ -25,14 +24,12 @@ def test_grad_fail():
 
 def test_frag_missing_fail():
     asdf = pylibefp.core.efp()
-    asdf.create()
 
     with pytest.raises(pylibefp.UnknownFragment) as e_info:
         asdf.add_fragment('h2o')
 
 def test_multifrag_fail():
     asdf = pylibefp.core.efp()
-    asdf.create()
 
     asdf.add_potential(['nh3', 'nh3'])
     with pytest.raises(pylibefp.Fatal) as e_info:
@@ -40,7 +37,6 @@ def test_multifrag_fail():
 
 def test_multifrag_pass():
     asdf = pylibefp.core.efp()
-    asdf.create()
 
     asdf.add_potential(['nh3', 'nh3'])
     asdf.add_potential('nh3', duplicates_ok=True)

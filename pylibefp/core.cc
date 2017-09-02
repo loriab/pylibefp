@@ -595,10 +595,8 @@ PYBIND11_PLUGIN(core) {
         .def_readwrite("znuc", &efp_atom::znuc);                              /* Nuclear charge. */
 
     py::class_<efp, std::unique_ptr<efp, py::nodelete>>(m, "efp", "Main libefp opaque structure")
-    //py::class_<efp>(m, "efp", "Main libefp opaque structure")
-        .def(py::init())
+        .def(py::init(&efp_create), "Creates a new efp object via `efp_create`")
         .def("banner", wrapped_efp_banner, "Gets a human readable banner string with information about the library")
-        .def_static("create", &efp_create, "Creates a new efp object")
 //        .def("set_error_log", &efp_set_error_log, "Sets the error log callback function")
         .def("raw_set_opts", &efp_set_opts, "Set computation options to *arg0*")
         .def("raw_get_opts", &efp_get_opts, "Gets currently set computation options")
