@@ -435,7 +435,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
 #        pol = 'Induction'
 #
 #    text = ''
-#    text += '\n  ==> EFP/EFP Setup <==\n\n'
+#    text += '\n  ==>  EFP/EFP Setup  <==\n\n'
 #    text +=   '  {:<30} {:12}\n'.format(elec + ' enabled?:', 'true' if opts["elec"] else 'false')
 #    text +=   '  {:<30} {:12}\n'.format(pol + ' enabled?:', 'true' if opts["pol"] else 'false')
 #    text +=   '  {:<30} {:12}\n'.format(disp + ' enabled?:', 'true' if opts["disp"] else 'false')
@@ -447,7 +447,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
 #    text +=   '  {:<30} {:12}\n'.format(disp + ' damping:', opts["disp_damp"])
 #    text +=   '  {:<30} {:12}\n'.format(pol + ' driver:', opts["pol_driver"])
 #
-#    text += '\n  ==> QM/EFP Setup <==\n\n'
+#    text += '\n  ==>  QM/EFP Setup  <==\n\n'
 ##//    sprintf(buffer, "  Number of QM fragments:  %12d\n", -1); //, nfrag_);
 #    text += '  Electrostatics enabled?:   {:12}\n'.format('true' if opts["ai_elec"] else 'false')
 #    text += '  Polarization enabled?:     {:12}\n'.format('true' if opts["ai_pol"] else 'false')
@@ -527,31 +527,33 @@ def _pywrapped_get_multipole_count(efpobj):
     return nmult
 
 
-def _pywrapped_get_multipole_coordinates(efpobj, quiet=False):
-    """Gets the coordinates of *efpobj* electrostatics multipoles.
+def _pywrapped_get_multipole_coordinates(efpobj, verbose=1):
+    """Gets the coordinates of `efpobj` electrostatics multipoles.
 
     Parameters
     ----------
-    quiet : bool,optional
-        Print out the multipole coordinates.
+    verbose : int, optional
+        Whether to print out the multipole coordinates. 0: no printing. 1:
+        print charges and dipoles. 2: additionally print quadrupoles
+        and octupoles.
 
     Returns
     -------
     list
-        3 x `n_mult` (flat) array of multipole locations.
+        ``3 n_mult`` (flat) array of multipole locations.
 
     Examples
     --------
     >>> # Use with NumPy
-    >>> n_mp = efpobj.get_multipole_count()
-    >>> xyz_mp = np.asarray(efpobj.get_multipole_coordinates()).reshape(n_mp, 3)
+    >>> n_mult = efpobj.get_multipole_count()
+    >>> xyz_mult = np.asarray(efpobj.get_multipole_coordinates()).reshape(n_mult, 3)
 
     """
     nmult = efpobj.get_multipole_count()
     (res, xyz) = efpobj.cwrapped_get_multipole_coordinates(nmult)
     _pywrapped_result_to_error(res)
 
-    if not quiet:
+    if verbose >= 1:
         xyz3 = list(map(list, zip(*[iter(xyz)] * 3)))
 
         text = '\n  ==>  EFP Multipole Coordinates  <==\n\n'
@@ -563,56 +565,60 @@ def _pywrapped_get_multipole_coordinates(efpobj, quiet=False):
     return xyz
 
 
-def _pywrapped_get_multipole_values(efpobj, quiet=False):
-    """Gets the computed per-point multipoles of *efpobj*.
+def _pywrapped_get_multipole_values(efpobj, verbose=1):
+    """Gets the computed per-point multipoles of `efpobj`.
 
     Parameters
     ----------
-    quiet : bool, optional
-        Print out the multipole array.
+    verbose : int, optional
+        Whether to print out the multipole arrays. 0: no printing. 1:
+        print charges and dipoles. 2: additionally print quadrupoles
+        and octupoles.
 
     Returns
     -------
     list
-        20 x `n_mult` (flat) array of per-point multipole values including
+        ``20 n_mult`` (flat) array of per-point multipole values including
         charges + dipoles + quadrupoles + octupoles.
-        dipoles stored as     x,y,z
-        quadrupoles stored as xx,yy,zz,xy,xz,yz
-        octupoles stored as   xxx,yyy,zzz,xxy,xxz,xyy,yyz,xzz,yzz,xyz
+        Dipoles stored as     x, y, z.
+        Quadrupoles stored as xx, yy, zz, xy, xz, yz.
+        Octupoles stored as   xxx, yyy, zzz, xxy, xxz, xyy, yyz, xzz, yzz, xyz.
 
     Examples
     --------
     >>> # Use with NumPy
-    >>> n_mp = efpobj.get_multipole_count()
-    >>> val_mp = np.asarray(efpobj.get_multipole_values()).reshape(n_mp, 20)
+    >>> n_mult = efpobj.get_multipole_count()
+    >>> val_mult = np.asarray(efpobj.get_multipole_values()).reshape(n_mult, 20)
 
     """
     nmult = efpobj.get_multipole_count()
     (res, mult) = efpobj.cwrapped_get_multipole_values(nmult)
     _pywrapped_result_to_error(res)
 
-    if not quiet:
+    if verbose >= 1:
         mult20 = list(map(list, zip(*[iter(mult)] * 20)))
 
         text = '\n  ==>  EFP Multipoles: Charge & Dipole  <==\n\n'
         for mu in range(nmult):
             text += '{:6d}   {:14.8f}   {:14.8f} {:14.8f} {:14.8f}\n'.format(
                 mu, *mult20[mu][:4])
-        text += '\n  ==>  EFP Multipoles: Quadrupole  <==\n\n'
-        for mu in range(nmult):
-            text += '{:6d}   {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f}\n'.format(
-                mu, *mult20[mu][4:10])
-        text += '\n  ==>  EFP Multipoles: Octupole  <==\n\n'
-        for mu in range(nmult):
-            text += '{:6d}   {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f}\n'.format(
-                mu, *mult20[mu][10:])
+
+        if verbose >= 2:
+            text += '\n  ==>  EFP Multipoles: Quadrupole  <==\n\n'
+            for mu in range(nmult):
+                text += '{:6d}   {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f}\n'.format(
+                    mu, *mult20[mu][4:10])
+            text += '\n  ==>  EFP Multipoles: Octupole  <==\n\n'
+            for mu in range(nmult):
+                text += '{:6d}   {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f}\n'.format(
+                    mu, *mult20[mu][10:])
         print(text)
 
     return mult
 
 
 def _pywrapped_get_induced_dipole_count(efpobj):
-    """Gets the number of polarization induced dipoles in *efpobj* computation.
+    """Gets the number of polarization induced dipoles in `efpobj` computation.
 
     Returns
     -------
@@ -626,13 +632,14 @@ def _pywrapped_get_induced_dipole_count(efpobj):
     return ndip
 
 
-def _pywrapped_get_induced_dipole_coordinates(efpobj, quiet=False):
-    """Gets the coordinates of *efpobj* induced dipoles.
+def _pywrapped_get_induced_dipole_coordinates(efpobj, verbose=1):
+    """Gets the coordinates of `efpobj` induced dipoles.
 
     Parameters
     ----------
-    quiet : bool, optional
-        Print out the induced dipole coordinates.
+    verbose : int, optional
+        Whether to print out the multipole arrays. 0: no printing. 1:
+        print induced dipole coordinates.
 
     Returns
     -------
@@ -644,7 +651,7 @@ def _pywrapped_get_induced_dipole_coordinates(efpobj, quiet=False):
     (res, xyz) = efpobj.cwrapped_get_induced_dipole_coordinates(ndip)
     _pywrapped_result_to_error(res)
 
-    if not quiet:
+    if verbose >= 1:
         xyz3 = list(map(list, zip(*[iter(xyz)] * 3)))
 
         text = '\n  ==>  EFP Induced Dipole Coordinates  <==\n\n'
@@ -656,22 +663,23 @@ def _pywrapped_get_induced_dipole_coordinates(efpobj, quiet=False):
     return xyz
 
 
-def _pywrapped_get_induced_dipole_values(efpobj, quiet=False):
-    """Gets the values of polarization induced dipoles of *efpobj*.
+def _pywrapped_get_induced_dipole_values(efpobj, verbose=1):
+    """Gets the values of polarization induced dipoles of `efpobj`.
 
     Parameters
     ----------
-    quiet : bool, optional
-        Print out the induced dipole array.
+    verbose : int, optional
+        Whether to print out the induced dipole arrays. 0: no
+        printing. 1: print induced dipole coordinates.
 
     Returns
     -------
     list
-        3 x n_dip (flat) array of polarization induced dipole values.
+        ``3 * n_dip`` (flat) array of polarization induced dipole values.
 
     Examples
     --------
-    Use with NumPy
+    >>> # Use with NumPy
     >>> n_dip = efpobj.get_induced_dipole_count()
     >>> val_dip = np.asarray(efpobj.get_induced_dipole_values()).reshape(n_dip, 3)
 
@@ -680,7 +688,7 @@ def _pywrapped_get_induced_dipole_values(efpobj, quiet=False):
     (res, vals) = efpobj.cwrapped_get_induced_dipole_values(ndip)
     _pywrapped_result_to_error(res)
 
-    if not quiet:
+    if verbose >= 1:
         vals3 = list(map(list, zip(*[iter(vals)] * 3)))
 
         text = '\n  ==>  EFP Induced Dipoles  <==\n\n'
@@ -692,13 +700,14 @@ def _pywrapped_get_induced_dipole_values(efpobj, quiet=False):
     return vals
 
 
-def _pywrapped_get_induced_dipole_conj_values(efpobj, quiet=False):
+def _pywrapped_get_induced_dipole_conj_values(efpobj, verbose=1):
     """Gets the values of polarization conjugated induced dipoles of *efpobj*.
 
     Parameters
     ----------
-    quiet : bool, optional
-        Print out the induced dipole array.
+    verbose : int, optional
+        Whether to print out the induced dipole conj arrays.
+        0: no printing. 1: print induced dipole coordinates.
 
     Returns
     -------
@@ -710,7 +719,7 @@ def _pywrapped_get_induced_dipole_conj_values(efpobj, quiet=False):
     (res, vals) = efpobj.cwrapped_get_induced_dipole_conj_values(ndip)
     _pywrapped_result_to_error(res)
 
-    if not quiet:
+    if verbose >= 1:
         vals3 = list(map(list, zip(*[iter(vals)] * 3)))
 
         text = '\n  ==>  EFP Conj. Induced Dipoles  <==\n\n'
@@ -737,28 +746,29 @@ def _pywrapped_get_wavefunction_dependent_energy(efpobj):
     return wde
 
 
-def _pywrapped_get_gradient(efpobj, quiet=False):
-    """Gets the computed per-fragment EFP energy gradient of *efpobj*.
+def _pywrapped_get_gradient(efpobj, verbose=1):
+    """Gets the computed per-fragment EFP energy gradient of `efpobj`.
 
     Parameters
     ----------
-    quiet : bool, optional
-        Print out the gradient array.
+    verbose : int, optional
+        Whether to print out the gradient array. 0: no printing. 1:
+        print gradient and torque.
 
     Returns
     -------
     list
-        6 x n_frag array of per-fragment negative force and torque.
+        ``6 x n_frag`` array of per-fragment negative force and torque.
 
     """
     nfrag = efpobj.get_frag_count()
     (res, grad) = efpobj.cwrapped_get_gradient(nfrag)
     _pywrapped_result_to_error(res)
 
-    if not quiet:
+    if verbose >= 1:
         grad6 = list(map(list, zip(*[iter(grad)] * 6)))
 
-        text = '\n  ==> EFP Gradient <==\n\n'
+        text = '\n  ==>  EFP Gradient  <==\n\n'
         for fr in range(nfrag):
             text += '{:14.8f} {:14.8f} {:14.8f}   {:14.8f} {:14.8f} {:14.8f}\n'.format(
                 *grad6[fr])

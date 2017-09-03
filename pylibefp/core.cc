@@ -424,6 +424,11 @@ void set_field_fn_callback(efp* efp, py::function fn) {
 py::function dummy;
 void clear_field_fn_callback(efp* efp) { field_fn_callback = dummy; }
 
+void _clean(efp* efp) {
+    clear_field_fn_callback(efp);
+    efp_shutdown(efp);
+}
+    
 
 //      //  py::list coord --> double* ccoords
 //          double* ccoords = NULL;
@@ -602,10 +607,8 @@ PYBIND11_MODULE(core, m) {
 //        .def("get_electric_field", &efp_get_electric_field, "Gets electric field for a point on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("torque_to_derivative", &efp_torque_to_derivative, "Convert rigid body torque *arg1* to derivatives *arg2* of energy by Euler angles *arg0*")
 //        .def("result_to_string", &efp_result_to_string, "Result value to be converted to string");
-        .def("shutdown", &efp_shutdown, "Release all resources used by this EFP")
-        ;
-
-    return m.ptr();
+        .def("clean", &_clean, "Preferred destructor combining libefp::efp_shutdown and field_fn release")
+        .def("shutdown", &efp_shutdown, "Release all resources used by this EFP");
 }
 
 // Unwrapped

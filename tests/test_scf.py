@@ -111,7 +111,7 @@ def test_qmefp():
         return V2
     
     
-    def modify_Fock_induced(nbf, efpobj, quiet=False):
+    def modify_Fock_induced(nbf, efpobj, verbose=1):
         """Returns shared matrix containing the EFP contribution to the potential
         felt by QM atoms, due to EFP induced dipoles, in a SCF procedure.
     
@@ -119,9 +119,9 @@ def test_qmefp():
         # get induced dipoles count, pos'n, values from libefp
         #   dipoles = 3
         n_id = efpobj.get_induced_dipole_count()
-        xyz_id = np.asarray(efpobj.get_induced_dipole_coordinates(quiet=quiet)).reshape(n_id, 3)
-        val_id = np.asarray(efpobj.get_induced_dipole_values(quiet=quiet)).reshape(n_id, 3)
-        val_idt = np.asarray(efpobj.get_induced_dipole_conj_values(quiet=quiet)).reshape(n_id, 3)
+        xyz_id = np.asarray(efpobj.get_induced_dipole_coordinates(verbose=verbose)).reshape(n_id, 3)
+        val_id = np.asarray(efpobj.get_induced_dipole_values(verbose=verbose)).reshape(n_id, 3)
+        val_idt = np.asarray(efpobj.get_induced_dipole_conj_values(verbose=verbose)).reshape(n_id, 3)
     
         # take average of induced dipole and conjugate
         val_id = (val_id + val_idt) * 0.5
@@ -314,8 +314,8 @@ def test_qmefp():
     
         # <-- efp: add contribution to Fock matrix
         H = Horig
-        quiet_dipoles = False if (SCF_ITER == 1) else True
-        Vefp = modify_Fock_induced(nbf, efpmol, quiet=quiet_dipoles)
+        verbose_dipoles = 1 if (SCF_ITER == 1) else 0
+        Vefp = modify_Fock_induced(nbf, efpmol, verbose=verbose_dipoles)
         H = H + Vefp
         # --> efp
     
@@ -373,8 +373,9 @@ def test_qmefp():
     assert(compare_values( 0.0056859871, efpene['exch'], 6, 'EFP-EFP Exch'))
     assert(compare_values( 0.2504904057, efpene['total'], 6, 'EFP-EFP Totl'))
     assert(compare_values(-76.0139362744, SCF_E, 6, 'SCF'))
-    efpmol.clear_electron_density_field_fn()
-    efpmol.shutdown()
+#    efpmol.clear_electron_density_field_fn()
+#    efpmol.shutdown()
+    efpmol.clean()
 
 if __name__ == '__main__':
     test_qmefp()
