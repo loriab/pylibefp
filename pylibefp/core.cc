@@ -407,7 +407,7 @@ void _clean(efp* efp) {
     clear_field_fn_callback(efp);
     efp_shutdown(efp);
 }
-    
+
 
 //      //  py::list coord --> double* ccoords
 //          double* ccoords = NULL;
