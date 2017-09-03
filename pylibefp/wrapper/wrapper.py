@@ -844,6 +844,40 @@ def energy_summary(efpobj, label='libefp', scfefp=None):
     return text
 
 
+def geometry_summary(efpobj, units_to_bohr=1.0):
+    """Formatted geometry and fragments for `efpobj`.
+
+    Parameters
+    ----------
+    units_to_bohr : float,optional
+        Conversion factor for printing; ~0.529177 for Angstroms.
+
+    Returns
+    -------
+    str
+        Summary of EFP geometry suitable for printing.
+
+    """
+    text = ''
+    text += '\n  ==>  EFP Geometry  <==\n\n'
+    text +=   '    Geometry (in {} * {:12.8f}):\n\n'.format('Bohr', units_to_bohr)
+    text +=   '       Center              X                  Y                   Z       \n'
+    text +=   '    ------------   -----------------  -----------------  -----------------\n'
+
+    mol_info = efpobj.get_atoms()
+    terminal_frag = [fr[1] for fr in mol_info['fragments']]
+    
+    for iat, at in enumerate(mol_info['full_atoms']):
+        text += '    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}\n'.format(at['label'], '',
+                at['x'] * units_to_bohr,
+                at['y'] * units_to_bohr,
+                at['z'] * units_to_bohr)
+        if iat in terminal_frag:
+            text +=   '    ------------\n'
+    
+    return text
+
+
 #def nuclear_repulsion_energy(efpobj):
 #    """Computes nuclear repulsion energy."""
 #
@@ -1098,7 +1132,7 @@ def _pywrapped_get_frag_atoms(efpobj, ifr):
 
 
 
-def py_get_atoms(efpobj):
+def get_atoms(efpobj):
     #enum efp_result res;
     #size_t frag_natom, natom=0;
     #double frag_chg;
@@ -1243,7 +1277,8 @@ core.efp.get_frag_atom_count = _pywrapped_get_frag_atom_count
 core.efp.get_wavefunction_dependent_energy = _pywrapped_get_wavefunction_dependent_energy
 
 core.efp.get_frag_atoms = _pywrapped_get_frag_atoms
-core.efp.py_get_atoms = py_get_atoms
+core.efp.get_atoms = get_atoms
+core.efp.geometry_summary = geometry_summary
 
 
 def from_dict(efp_init):

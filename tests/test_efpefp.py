@@ -124,8 +124,8 @@ def test_total_1a():
     print('<<< get_energy():', ene, '>>>')
     print('<<< get_atoms(): ', asdf.get_atoms(), '>>>')
     print(asdf.energy_summary())
-    print(asdf.print_geometry(units_to_bohr=b2a))
-    print(asdf.print_geometry(units_to_bohr=1.0))
+    print(asdf.geometry_summary(units_to_bohr=b2a))
+    print(asdf.geometry_summary(units_to_bohr=1.0))
 
     expected_ene = blank_ene()
     expected_ene['elec'] = expected_ene['electrostatic'] = 0.0002900482

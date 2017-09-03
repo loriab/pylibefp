@@ -271,27 +271,6 @@ py::tuple cwrapped_efp_get_induced_dipole_conj_values(efp* efp, size_t n_dip) {
 
 // TODO: probably filling would fail if res not good in a lot of these
 
-size_t twrapped_efp_get_frag_count(efp* efp) {
-    enum efp_result res;
-    size_t n=0;
-
-    if ((res = efp_get_frag_count(efp, &n))) {
-        std::string sres = "efp_get_frag_count: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
-    return n;
-}
-
-size_t twrapped_efp_get_frag_atom_count(efp* efp, size_t frag_idx) {
-    enum efp_result res;
-    size_t n=0;
-
-    if ((res = efp_get_frag_atom_count(efp, frag_idx, &n))) {
-        std::string sres = "efp_get_frag_atom_count: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
-    return n;
-}
 
 py::tuple cwrapped_efp_get_frag_atoms(efp* efp, size_t frag_idx, size_t frag_natom) {
     enum efp_result res;
@@ -318,58 +297,58 @@ py::tuple cwrapped_efp_get_frag_atoms(efp* efp, size_t frag_idx, size_t frag_nat
     return rets;
 }
 
-py::dict extend_efp_get_atoms(efp* efp) {
-    enum efp_result res;
-    size_t frag_natom, natom=0;
-    double frag_chg;
-    int frag_mult;
-    py::list fr, frt, frcg, frmp, full_atoms;
-
-    py::dict mol_info;
-    mol_info[py::str("units")] = "Bohr";
-    mol_info[py::str("input_units_to_au")] = 1.0;
-    mol_info[py::str("fix_com")] = true;
-    mol_info[py::str("fix_orientation")] = true;
-    mol_info[py::str("fix_symmetry")] = "c1";
-
-    size_t frag_count = twrapped_efp_get_frag_count(efp);
-    for (int ifr = 0; ifr < frag_count; ++ifr) {
-        frag_natom = twrapped_efp_get_frag_atom_count(efp, ifr);
-        py::list f;
-        f.append(natom);
-        natom = natom + frag_natom;
-        f.append(natom);
-        fr.append(f);
-        frt.append("Real");
-        frcg.append(static_cast<int>(wrapped_efp_get_frag_charge(efp, ifr)));
-        frmp.append(wrapped_efp_get_frag_multiplicity(efp, ifr));
-
-        struct efp_atom atoms[frag_natom];
-        if ((res = efp_get_frag_atoms(efp, ifr, frag_natom, atoms))) {
-            std::string sres = "efp_get_frag_atoms: " + rts(res) + "\n";
-            throw libefpException(sres.c_str());
-        }
-
-        for (size_t iat = 0; iat < frag_natom; ++iat) {
-            py::dict at_init;
-            at_init[py::str("Z")] = atoms[iat].znuc;
-            at_init[py::str("mass")] = atoms[iat].mass;
-            at_init[py::str("label")] = atoms[iat].label;
-            at_init[py::str("x")] = atoms[iat].x;
-            at_init[py::str("y")] = atoms[iat].y;
-            at_init[py::str("z")] = atoms[iat].z;
-            full_atoms.append(at_init);
-        }
-    }
-
-    mol_info[py::str("fragments")] = fr;
-    mol_info[py::str("fragment_types")] = frt;
-    mol_info[py::str("fragment_charges")] = frcg;
-    mol_info[py::str("fragment_multiplicities")] = frmp;
-    mol_info[py::str("full_atoms")] = full_atoms;
-
-    return mol_info;
-}
+//py::dict extend_efp_get_atoms(efp* efp) {
+//    enum efp_result res;
+//    size_t frag_natom, natom=0;
+//    double frag_chg;
+//    int frag_mult;
+//    py::list fr, frt, frcg, frmp, full_atoms;
+//
+//    py::dict mol_info;
+//    mol_info[py::str("units")] = "Bohr";
+//    mol_info[py::str("input_units_to_au")] = 1.0;
+//    mol_info[py::str("fix_com")] = true;
+//    mol_info[py::str("fix_orientation")] = true;
+//    mol_info[py::str("fix_symmetry")] = "c1";
+//
+//    size_t frag_count = twrapped_efp_get_frag_count(efp);
+//    for (int ifr = 0; ifr < frag_count; ++ifr) {
+//        frag_natom = twrapped_efp_get_frag_atom_count(efp, ifr);
+//        py::list f;
+//        f.append(natom);
+//        natom = natom + frag_natom;
+//        f.append(natom);
+//        fr.append(f);
+//        frt.append("Real");
+//        frcg.append(static_cast<int>(wrapped_efp_get_frag_charge(efp, ifr)));
+//        frmp.append(wrapped_efp_get_frag_multiplicity(efp, ifr));
+//
+//        struct efp_atom atoms[frag_natom];
+//        if ((res = efp_get_frag_atoms(efp, ifr, frag_natom, atoms))) {
+//            std::string sres = "efp_get_frag_atoms: " + rts(res) + "\n";
+//            throw libefpException(sres.c_str());
+//        }
+//
+//        for (size_t iat = 0; iat < frag_natom; ++iat) {
+//            py::dict at_init;
+//            at_init[py::str("Z")] = atoms[iat].znuc;
+//            at_init[py::str("mass")] = atoms[iat].mass;
+//            at_init[py::str("label")] = atoms[iat].label;
+//            at_init[py::str("x")] = atoms[iat].x;
+//            at_init[py::str("y")] = atoms[iat].y;
+//            at_init[py::str("z")] = atoms[iat].z;
+//            full_atoms.append(at_init);
+//        }
+//    }
+//
+//    mol_info[py::str("fragments")] = fr;
+//    mol_info[py::str("fragment_types")] = frt;
+//    mol_info[py::str("fragment_charges")] = frcg;
+//    mol_info[py::str("fragment_multiplicities")] = frmp;
+//    mol_info[py::str("full_atoms")] = full_atoms;
+//
+//    return mol_info;
+//}
 
 
 py::tuple cwrapped_efp_get_coordinates(efp* efp, size_t n_frag) {
@@ -466,35 +445,6 @@ void clear_field_fn_callback(efp* efp) { field_fn_callback = dummy; }
 //          for (size_t ic = 0; ic < 12; ++ic)
 //              coord.append(ccoords[ic]);
 
-
-
-std::string extended_efp_geometry_str(efp* efp, double units_to_bohr=1.0) {
-    char buffer[120];
-    std::stringstream ss;
-
-    sprintf(buffer, "\n");
-    ss << buffer;
-    sprintf(buffer, "  ==> EFP Geometry <==\n\n");
-    ss << buffer;
-    sprintf(buffer, "    Geometry (in %s * %12.8f):\n\n", "Bohr", units_to_bohr); //, charge = %d, multiplicity = %d:\n\n",
-    ss << buffer;
-    sprintf(buffer, "       Center              X                  Y                   Z       \n");
-    ss << buffer;
-    sprintf(buffer, "    ------------   -----------------  -----------------  -----------------\n");
-    ss << buffer;
-
-    py::dict mol_info = extend_efp_get_atoms(efp);
-
-    for (auto atm : mol_info["full_atoms"]) {
-            sprintf(buffer, "    %8s%4s   %17.12lf  %17.12lf  %17.12lf\n",
-                atm["label"].cast<std::string>().c_str(), "",
-                atm["x"].cast<double>() * units_to_bohr,
-                atm["y"].cast<double>() * units_to_bohr,
-                atm["z"].cast<double>() * units_to_bohr);
-            ss << buffer;
-    }
-    return ss.str();
-}
 
 
 PYBIND11_PLUGIN(core) {
@@ -642,17 +592,13 @@ PYBIND11_PLUGIN(core) {
         .def("raw_get_energy", &efp_get_energy, "Gets computed energy components")
         .def("cwrapped_get_gradient", cwrapped_efp_get_gradient, "Gets computed EFP energy gradient")
 //        .def("get_atomic_gradient", &efp_get_atomic_gradient, "Gets computed EFP energy gradient on individual atoms and returns it in *arg0*")
-//        .def("get_frag_count", twrapped_efp_get_frag_count, "Gets the number of fragments in this computation")
         .def("cwrapped_get_frag_count", cwrapped_efp_get_frag_count, "Gets the number of fragments in this computation")
         .def("cwrapped_get_frag_name", cwrapped_efp_get_frag_name, "Gets the name of the specified 0-indexed effective fragment *arg0* and returns it in *arg2* of length *arg1*")
 //        .def("get_frag_mass", &efp_get_frag_mass, "Gets total mass on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("get_frag_inertia", &efp_get_frag_inertia, "Gets fragment principal moments of inertia on 0-indexed fragment *arg0* and returns it in *arg1*")
-//        .def("tget_frag_atom_count", twrapped_efp_get_frag_atom_count, "Gets the number of atoms on 0-indexed fragment *arg0*")
         .def("cwrapped_get_frag_atom_count", cwrapped_efp_get_frag_atom_count, "Gets the number of atoms on 0-indexed fragment *arg0*")
         .def("raw_get_frag_atoms", &efp_get_frag_atoms, "Gets atoms comprising the specified 0-indexed fragment *arg0* and returns it in *arg1*")
         .def("cwrapped_get_frag_atoms", cwrapped_efp_get_frag_atoms, "Gets atoms comprising the specified 0-indexed fragment")
-        .def("get_atoms", extend_efp_get_atoms, "docstring")
-        .def("print_geometry", extended_efp_geometry_str, py::arg("units_to_bohr") = 1.0, "docstring")
 //        .def("get_electric_field", &efp_get_electric_field, "Gets electric field for a point on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("torque_to_derivative", &efp_torque_to_derivative, "Convert rigid body torque *arg1* to derivatives *arg2* of energy by Euler angles *arg0*")
 //        .def("result_to_string", &efp_result_to_string, "Result value to be converted to string");
