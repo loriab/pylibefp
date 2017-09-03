@@ -1,4 +1,6 @@
-find_package(pybind11 2.2.0 CONFIG QUIET)
+if(NOT ${CMAKE_DISABLE_FIND_PACKAGE_pybind11})
+    find_package(pybind11 2.2.0 CONFIG QUIET)
+endif()
 
 if(${pybind11_FOUND})
     message(STATUS "${Cyan}Found pybind11${ColourReset}: ${pybind11_INCLUDE_DIR} (found version ${pybind11_VERSION})")
