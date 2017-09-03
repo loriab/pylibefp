@@ -139,7 +139,7 @@ def _pywrapped_add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_o
             if duplicates_ok:
                 pass
             else:
-                raise
+                raise Fatal('Invalid fragment name (probably already added): {}'.format(uniq_pots[ipot]))
 
         print(r"""  EFP fragment {} read from {}""".format(uniq_pots[ipot], pot))
 
@@ -1152,7 +1152,7 @@ def get_atoms(efpobj):
         natom += frat
 
         pyat = efpobj.get_frag_atoms(ifr)
-        full_atoms.append(pyat)
+        full_atoms.extend(pyat)
 
     mol_info = {}
     mol_info["units"] = "Bohr"
@@ -1245,6 +1245,7 @@ yuio = {'libefp': {'full_fragments':
  'input_units_to_au': 1.8897261328856432,
  'name': 'default',
  'units': 'Angstrom'}}
+
 
 # only wrapped to throw Py exceptions
 core.efp.prepare = _pywrapped_efp_prepare

@@ -447,8 +447,8 @@ void clear_field_fn_callback(efp* efp) { field_fn_callback = dummy; }
 
 
 
-PYBIND11_PLUGIN(core) {
-    py::module m("core", "Python wrapping of Parallel implementation of the Effective Fragment Potential (EFP) method");
+PYBIND11_MODULE(core, m) {
+    m.doc() = "Python wrapping of Parallel implementation of the Effective Fragment Potential (EFP) method";
 
     m.attr("__version__") = py::str("1.1");
     py::exception<libefpException>(m, "libefpException");

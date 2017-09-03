@@ -35,6 +35,7 @@ def test_multifrag_fail():
     with pytest.raises(pylibefp.Fatal) as e_info:
         asdf.add_potential('nh3')
 
+
 def test_multifrag_pass():
     asdf = pylibefp.core.efp()
 
