@@ -49,7 +49,7 @@ def _rekey(rawdict, label):
     return newdict
 
 
-def _pywrapped_result_to_error(res, msg=''):
+def _result_to_error(res, msg=''):
 
     if res == core.efp_result.EFP_RESULT_SUCCESS:
         return
@@ -67,18 +67,37 @@ def _pywrapped_result_to_error(res, msg=''):
         raise PolNotConverged(msg)
 
 
-def _pywrapped_efp_prepare(efpobj):
-    res = efpobj.raw_prepare()
-    _pywrapped_result_to_error(res)
+def prepare(efpobj):
+    """Prepare the calculation after all fragments added.
+
+    Returns
+    -------
+    None
+
+    """
+    res = efpobj._efp_prepare()
+    _result_to_error(res)
 
 
-def _pywrapped_efp_compute(efpobj, do_gradient=False):
-    res = efpobj.raw_compute(do_gradient=int(do_gradient))
-    _pywrapped_result_to_error(res)
+def compute(efpobj, do_gradient=False):
+    """Perform the EFP computation.
+
+    Parameters
+    ----------
+    do_gradient : bool, optional
+        If True, compute the gradient in addition to energy.
+
+    Returns
+    -------
+    None
+
+    """
+    res = efpobj._efp_compute(do_gradient)
+    _result_to_error(res)
 
 
-def _pywrapped_add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
-    """Searches for EFP fragments and adds to *efpobj*.
+def add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
+    """Searches for EFP fragments and adds to `efpobj`.
 
     Parameters
     ----------
@@ -132,9 +151,9 @@ def _pywrapped_add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_o
 
     # load the potentials
     for ipot, pot in enumerate(abspath_pots):
-        res = efpobj.raw_add_potential(pot)
+        res = efpobj._efp_add_potential(pot)
         try:
-            _pywrapped_result_to_error(res, uniq_pots[ipot])
+            _result_to_error(res, uniq_pots[ipot])
         except Fatal as e:
             if duplicates_ok:
                 pass
@@ -144,18 +163,27 @@ def _pywrapped_add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_o
         print(r"""  EFP fragment {} read from {}""".format(uniq_pots[ipot], pot))
 
 
-def _pywrapped_add_fragment(efpobj, fragments):
-    """Registers EFP fragments to *efpobj* in order.
+def add_fragment(efpobj, fragments):
+    """Registers EFP fragments to `efpobj` in order.
+
+    Parameters
+    ----------
+    fragments : list of str
+       Names of fragments to define the EFP subsystem.
+
+    Returns
+    -------
+    None
 
     """
     if isinstance(fragments, basestring):
         fragments = [fragments]
     for frag in fragments:
-        res = efpobj.raw_add_fragment(frag)
-        _pywrapped_result_to_error(res, frag)
+        res = efpobj._efp_add_fragment(frag)
+        _result_to_error(res, frag)
 
 
-def _pywrapped_get_opts(efpobj, label='libefp'):
+def get_opts(efpobj, label='libefp'):
     """Returns the options state of *efpobj* as a dictionary.
 
     Parameters
@@ -172,8 +200,8 @@ def _pywrapped_get_opts(efpobj, label='libefp'):
 
     """
     opts = core.efp_opts()
-    res = efpobj.raw_get_opts(opts)
-    _pywrapped_result_to_error(res)
+    res = efpobj._efp_get_opts(opts)
+    _result_to_error(res)
 
     dopts = {}
 
@@ -218,8 +246,8 @@ def _pywrapped_get_opts(efpobj, label='libefp'):
     return _rekey(dopts, label=label)
 
 
-def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
-    """Sets the options state of *efpobj* from dictionary `dopts`.
+def set_opts(efpobj, dopts, label='libefp', append='libefp'):
+    """Sets the options state of `efpobj` from dictionary `dopts`.
 
     Parameters
     ----------
@@ -271,8 +299,8 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
     #    # q-chem and psi4 have different defaults for at least this option
     #    opts.disp_damp = core.EFP_DISP_DAMP_TT
     elif append == 'append':
-        res = efpobj.raw_get_opts(opts)
-        _pywrapped_result_to_error(res)
+        res = efpobj._efp_get_opts(opts)
+        _result_to_error(res)
     else:
         raise PyEFPSyntaxError('Unrecognized opts default set: {}'.format(append))
 
@@ -284,7 +312,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] is False:
             opts.terms &= ~core.efp_term.EFP_TERM_ELEC
         else:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('pol', 'pol')
@@ -294,7 +322,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] is False:
             opts.terms &= ~core.efp_term.EFP_TERM_POL
         else:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('disp', 'disp')
@@ -304,7 +332,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] is False:
             opts.terms &= ~core.efp_term.EFP_TERM_DISP
         else:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('xr', 'xr')
@@ -314,7 +342,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] is False:
             opts.terms &= ~core.efp_term.EFP_TERM_XR
         else:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('chtr', 'chtr')  # may be enabled in a future libefp release
@@ -328,7 +356,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
                     'off': core.EFP_ELEC_DAMP_OFF,
                 }[dopts[topic].lower()]
         except KeyError:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [screen/overlap/off] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('pol_damp', 'pol_damp')
@@ -339,7 +367,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
                     'off': core.EFP_POL_DAMP_OFF,
                 }[dopts[topic].lower()]
         except KeyError:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [tt/off] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('disp_damp', 'disp_damp')
@@ -351,7 +379,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
                     'off': core.EFP_DISP_DAMP_OFF,
                 }[dopts[topic].lower()]
         except KeyError:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [overlap/tt/off] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('enable_pbc', 'enable_pbc')
@@ -361,7 +389,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] is False:
             opts.enable_pbc = 0
         else:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('enable_cutoff', 'enable_cutoff')
@@ -371,7 +399,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] is False:
             opts.enable_cutoff = 0
         else:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('swf_cutoff', 'swf_cutoff')
@@ -386,7 +414,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
                     'direct': core.EFP_POL_DRIVER_DIRECT,
                 }[dopts[topic].lower()]
         except KeyError:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [iterative/direct] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('ai_elec', 'ai_elec')
@@ -396,7 +424,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] is False:
             opts.terms &= ~core.efp_term.EFP_TERM_AI_ELEC
         else:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('ai_pol', 'ai_pol')
@@ -406,7 +434,7 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] is False:
             opts.terms &= ~core.efp_term.EFP_TERM_AI_POL
         else:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('ai_damp', 'ai_damp')  # may be enabled in a future libefp release
@@ -414,8 +442,8 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
     topic = _lbtl[label].get('ai_chtr', 'ai_chtr')  # may be enabled in a future libefp release
 
     # set computed options state
-    res = efpobj.raw_set_opts(opts)
-    _pywrapped_result_to_error(res)
+    res = efpobj._efp_set_opts(opts)
+    _result_to_error(res)
 
     return efpobj.get_opts(label=label)
 
@@ -458,8 +486,8 @@ def _pywrapped_set_opts(efpobj, dopts, label='libefp', append='libefp'):
 #    return text
 
 
-def _pywrapped_get_energy(efpobj, label='libefp'):
-    """Gets the energy components from *efpobj* computation as a dictionary.
+def get_energy(efpobj, label='libefp'):
+    """Gets the energy components from `efpobj` computation as a dictionary.
 
     Parameters
     ----------
@@ -475,8 +503,8 @@ def _pywrapped_get_energy(efpobj, label='libefp'):
 
     """
     ene = core.efp_energy()
-    res = efpobj.raw_get_energy(ene)
-    _pywrapped_result_to_error(res)
+    res = efpobj._efp_get_energy(ene)
+    _result_to_error(res)
 
     energies = {
         'electrostatic':               ene.electrostatic,
@@ -497,8 +525,8 @@ def _pywrapped_get_energy(efpobj, label='libefp'):
     return _rekey(energies, label=label)
 
 
-def _pywrapped_get_frag_count(efpobj):
-    """Gets the number of fragments in *efpobj* computation.
+def get_frag_count(efpobj):
+    """Gets the number of fragments in `efpobj` computation.
 
     Returns
     -------
@@ -506,14 +534,14 @@ def _pywrapped_get_frag_count(efpobj):
         Number of fragments in calculation.
 
     """
-    (res, nfrag) = efpobj.cwrapped_get_frag_count()
-    _pywrapped_result_to_error(res)
+    (res, nfrag) = efpobj._efp_get_frag_count()
+    _result_to_error(res)
 
     return nfrag
 
 
-def _pywrapped_get_multipole_count(efpobj):
-    """Gets the number of multipoles in *efpobj* computation.
+def get_multipole_count(efpobj):
+    """Gets the number of multipoles in `efpobj` computation.
 
     Returns
     -------
@@ -521,13 +549,13 @@ def _pywrapped_get_multipole_count(efpobj):
         Total number of multipoles from electrostatics calculation.
 
     """
-    (res, nmult) = efpobj.cwrapped_get_multipole_count()
-    _pywrapped_result_to_error(res)
+    (res, nmult) = efpobj._efp_get_multipole_count()
+    _result_to_error(res)
 
     return nmult
 
 
-def _pywrapped_get_multipole_coordinates(efpobj, verbose=1):
+def get_multipole_coordinates(efpobj, verbose=1):
     """Gets the coordinates of `efpobj` electrostatics multipoles.
 
     Parameters
@@ -544,14 +572,15 @@ def _pywrapped_get_multipole_coordinates(efpobj, verbose=1):
 
     Examples
     --------
+
     >>> # Use with NumPy
     >>> n_mult = efpobj.get_multipole_count()
     >>> xyz_mult = np.asarray(efpobj.get_multipole_coordinates()).reshape(n_mult, 3)
 
     """
     nmult = efpobj.get_multipole_count()
-    (res, xyz) = efpobj.cwrapped_get_multipole_coordinates(nmult)
-    _pywrapped_result_to_error(res)
+    (res, xyz) = efpobj._efp_get_multipole_coordinates(nmult)
+    _result_to_error(res)
 
     if verbose >= 1:
         xyz3 = list(map(list, zip(*[iter(xyz)] * 3)))
@@ -565,7 +594,7 @@ def _pywrapped_get_multipole_coordinates(efpobj, verbose=1):
     return xyz
 
 
-def _pywrapped_get_multipole_values(efpobj, verbose=1):
+def get_multipole_values(efpobj, verbose=1):
     """Gets the computed per-point multipoles of `efpobj`.
 
     Parameters
@@ -592,8 +621,8 @@ def _pywrapped_get_multipole_values(efpobj, verbose=1):
 
     """
     nmult = efpobj.get_multipole_count()
-    (res, mult) = efpobj.cwrapped_get_multipole_values(nmult)
-    _pywrapped_result_to_error(res)
+    (res, mult) = efpobj._efp_get_multipole_values(nmult)
+    _result_to_error(res)
 
     if verbose >= 1:
         mult20 = list(map(list, zip(*[iter(mult)] * 20)))
@@ -617,7 +646,7 @@ def _pywrapped_get_multipole_values(efpobj, verbose=1):
     return mult
 
 
-def _pywrapped_get_induced_dipole_count(efpobj):
+def get_induced_dipole_count(efpobj):
     """Gets the number of polarization induced dipoles in `efpobj` computation.
 
     Returns
@@ -626,13 +655,13 @@ def _pywrapped_get_induced_dipole_count(efpobj):
         Total number of polarization induced dipoles.
 
     """
-    (res, ndip) = efpobj.cwrapped_get_induced_dipole_count()
-    _pywrapped_result_to_error(res)
+    (res, ndip) = efpobj._efp_get_induced_dipole_count()
+    _result_to_error(res)
 
     return ndip
 
 
-def _pywrapped_get_induced_dipole_coordinates(efpobj, verbose=1):
+def get_induced_dipole_coordinates(efpobj, verbose=1):
     """Gets the coordinates of `efpobj` induced dipoles.
 
     Parameters
@@ -648,8 +677,8 @@ def _pywrapped_get_induced_dipole_coordinates(efpobj, verbose=1):
 
     """
     ndip = efpobj.get_induced_dipole_count()
-    (res, xyz) = efpobj.cwrapped_get_induced_dipole_coordinates(ndip)
-    _pywrapped_result_to_error(res)
+    (res, xyz) = efpobj._efp_get_induced_dipole_coordinates(ndip)
+    _result_to_error(res)
 
     if verbose >= 1:
         xyz3 = list(map(list, zip(*[iter(xyz)] * 3)))
@@ -663,7 +692,7 @@ def _pywrapped_get_induced_dipole_coordinates(efpobj, verbose=1):
     return xyz
 
 
-def _pywrapped_get_induced_dipole_values(efpobj, verbose=1):
+def get_induced_dipole_values(efpobj, verbose=1):
     """Gets the values of polarization induced dipoles of `efpobj`.
 
     Parameters
@@ -675,7 +704,7 @@ def _pywrapped_get_induced_dipole_values(efpobj, verbose=1):
     Returns
     -------
     list
-        ``3 * n_dip`` (flat) array of polarization induced dipole values.
+        ``3*n_dip`` (flat) array of polarization induced dipole values.
 
     Examples
     --------
@@ -685,8 +714,8 @@ def _pywrapped_get_induced_dipole_values(efpobj, verbose=1):
 
     """
     ndip = efpobj.get_induced_dipole_count()
-    (res, vals) = efpobj.cwrapped_get_induced_dipole_values(ndip)
-    _pywrapped_result_to_error(res)
+    (res, vals) = efpobj._efp_get_induced_dipole_values(ndip)
+    _result_to_error(res)
 
     if verbose >= 1:
         vals3 = list(map(list, zip(*[iter(vals)] * 3)))
@@ -700,8 +729,8 @@ def _pywrapped_get_induced_dipole_values(efpobj, verbose=1):
     return vals
 
 
-def _pywrapped_get_induced_dipole_conj_values(efpobj, verbose=1):
-    """Gets the values of polarization conjugated induced dipoles of *efpobj*.
+def get_induced_dipole_conj_values(efpobj, verbose=1):
+    """Gets the values of polarization conjugated induced dipoles of `efpobj`.
 
     Parameters
     ----------
@@ -716,8 +745,8 @@ def _pywrapped_get_induced_dipole_conj_values(efpobj, verbose=1):
 
     """
     ndip = efpobj.get_induced_dipole_count()
-    (res, vals) = efpobj.cwrapped_get_induced_dipole_conj_values(ndip)
-    _pywrapped_result_to_error(res)
+    (res, vals) = efpobj._efp_get_induced_dipole_conj_values(ndip)
+    _result_to_error(res)
 
     if verbose >= 1:
         vals3 = list(map(list, zip(*[iter(vals)] * 3)))
@@ -731,7 +760,7 @@ def _pywrapped_get_induced_dipole_conj_values(efpobj, verbose=1):
     return vals
 
 
-def _pywrapped_get_wavefunction_dependent_energy(efpobj):
+def get_wavefunction_dependent_energy(efpobj):
     """Updates wavefunction-dependent energy terms for SCF.
 
     Returns
@@ -740,13 +769,13 @@ def _pywrapped_get_wavefunction_dependent_energy(efpobj):
         Wavefunction-dependent EFP energy.
 
     """
-    (res, wde) = efpobj.cwrapped_get_wavefunction_dependent_energy()
-    _pywrapped_result_to_error(res)
+    (res, wde) = efpobj._efp_get_wavefunction_dependent_energy()
+    _result_to_error(res)
 
     return wde
 
 
-def _pywrapped_get_gradient(efpobj, verbose=1):
+def get_gradient(efpobj, verbose=1):
     """Gets the computed per-fragment EFP energy gradient of `efpobj`.
 
     Parameters
@@ -762,8 +791,8 @@ def _pywrapped_get_gradient(efpobj, verbose=1):
 
     """
     nfrag = efpobj.get_frag_count()
-    (res, grad) = efpobj.cwrapped_get_gradient(nfrag)
-    _pywrapped_result_to_error(res)
+    (res, grad) = efpobj._efp_get_gradient(nfrag)
+    _result_to_error(res)
 
     if verbose >= 1:
         grad6 = list(map(list, zip(*[iter(grad)] * 6)))
@@ -860,7 +889,7 @@ def geometry_summary(efpobj, units_to_bohr=1.0):
     Parameters
     ----------
     units_to_bohr : float,optional
-        Conversion factor for printing; ~0.529177 for Angstroms.
+        Conversion factor for printing; for Angstroms, approx. 0.529177.
 
     Returns
     -------
@@ -876,7 +905,7 @@ def geometry_summary(efpobj, units_to_bohr=1.0):
 
     mol_info = efpobj.get_atoms()
     terminal_frag = [fr[1] for fr in mol_info['fragments']]
-    
+
     for iat, at in enumerate(mol_info['full_atoms']):
         text += '    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}\n'.format(at['label'], '',
                 at['x'] * units_to_bohr,
@@ -884,7 +913,7 @@ def geometry_summary(efpobj, units_to_bohr=1.0):
                 at['z'] * units_to_bohr)
         if iat in terminal_frag:
             text +=   '    ------------\n'
-    
+
     return text
 
 
@@ -911,7 +940,7 @@ def geometry_summary(efpobj, units_to_bohr=1.0):
 #    if (ifr < 0) or (ifr >= nfr):
 #        raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
-def _pywrapped_set_frag_coordinates(efpobj, ifr, ctype, coord):
+def set_frag_coordinates(efpobj, ifr, ctype, coord):
     """Set fragment orientation on `efpobj` from hint.
 
     Parameters
@@ -935,23 +964,38 @@ def _pywrapped_set_frag_coordinates(efpobj, ifr, ctype, coord):
                      'rotmat': core.EFP_COORD_TYPE_ROTMAT,
                     }[ctype.lower()]
         except KeyError:
-            _pywrapped_result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [xyzabc/points/rotmat] {}: {}'.format('ctype', ctype))
 
-    res = efpobj.cwrapped_set_frag_coordinates(ifr, ctype, coord)
-    _pywrapped_result_to_error(res)
+    res = efpobj._efp_set_frag_coordinates(ifr, ctype, coord)
+    _result_to_error(res)
 
 
-def _pywrapped_set_point_charges(efpobj, ptc, coord):
+def set_point_charges(efpobj, ptc, coord):
+    """Sets arbitrary point charges (often QM atoms) interacting with the
+    EFP subsystem.
 
+    Parameters
+    ----------
+    ptc : list
+        ``n_ptc`` array of charge values, generally QM Z.
+    coord : list
+        ``3 * n_ptc`` array of XYZ coordinates of charge positions,
+        generally QM coordinates.
+
+    Returns
+    -------
+    None
+
+    """
     if (len(ptc) * 3) != len(coord):
-        print('Protest~')
+        raise PyEFPSyntaxError('Invalid periodic box setting: {}'.format(xyz))
 
-    res = efpobj.cwrapped_set_point_charges(len(ptc), ptc, coord)
-    _pywrapped_result_to_error(res)
+    res = efpobj._efp_set_point_charges(len(ptc), ptc, coord)
+    _result_to_error(res)
 
 
-def _pywrapped_get_frag_name(efpobj, ifr=None):
+def get_frag_name(efpobj, ifr=None):
     """Gets system name on fragment(s) of `efpobj`.
 
     Parameters
@@ -971,23 +1015,23 @@ def _pywrapped_get_frag_name(efpobj, ifr=None):
     if ifr is None:
         frags = []
         for fr in range(nfr):
-            (res, fname) = efpobj.cwrapped_get_frag_name(fr)
-            _pywrapped_result_to_error(res)
+            (res, fname) = efpobj._efp_get_frag_name(fr)
+            _result_to_error(res)
             frags.append(fname)
 
         return frags
 
     else:
         if ifr in range(nfr):
-            (res, fname) = efpobj.cwrapped_get_frag_name(ifr)
-            _pywrapped_result_to_error(res)
+            (res, fname) = efpobj._efp_get_frag_name(ifr)
+            _result_to_error(res)
 
             return fname
         else:
             raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
 
-def _pywrapped_get_frag_charge(efpobj, ifr=None, zero=1e-8):
+def get_frag_charge(efpobj, ifr=None, zero=1e-8):
     """Gets total charge on fragment(s) of `efpobj`.
 
     Parameters
@@ -1009,8 +1053,8 @@ def _pywrapped_get_frag_charge(efpobj, ifr=None, zero=1e-8):
     if ifr is None:
         frags = []
         for fr in range(nfr):
-            (res, chg) = efpobj.cwrapped_get_frag_charge(fr)
-            _pywrapped_result_to_error(res)
+            (res, chg) = efpobj._efp_get_frag_charge(fr)
+            _result_to_error(res)
 
             if math.fabs(chg) < zero:
                 frags.append(0.0)
@@ -1020,8 +1064,8 @@ def _pywrapped_get_frag_charge(efpobj, ifr=None, zero=1e-8):
 
     else:
         if ifr in range(nfr):
-            (res, chg) = efpobj.cwrapped_get_frag_charge(ifr)
-            _pywrapped_result_to_error(res)
+            (res, chg) = efpobj._efp_get_frag_charge(ifr)
+            _result_to_error(res)
 
             if math.fabs(chg) < zero:
                 return 0.0
@@ -1031,7 +1075,7 @@ def _pywrapped_get_frag_charge(efpobj, ifr=None, zero=1e-8):
             raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
 
-def _pywrapped_get_frag_multiplicity(efpobj, ifr=None):
+def get_frag_multiplicity(efpobj, ifr=None):
     """Gets spin multiplicity on fragment(s) of `efpobj`.
 
     Parameters
@@ -1051,22 +1095,22 @@ def _pywrapped_get_frag_multiplicity(efpobj, ifr=None):
     if ifr is None:
         frags = []
         for fr in range(nfr):
-            (res, mult) = efpobj.cwrapped_get_frag_multiplicity(fr)
-            _pywrapped_result_to_error(res)
+            (res, mult) = efpobj._efp_get_frag_multiplicity(fr)
+            _result_to_error(res)
             frags.append(mult)
         return frags
 
     else:
         if ifr in range(nfr):
-            (res, mult) = efpobj.cwrapped_get_frag_multiplicity(ifr)
-            _pywrapped_result_to_error(res)
+            (res, mult) = efpobj._efp_get_frag_multiplicity(ifr)
+            _result_to_error(res)
 
             return mult
         else:
             raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
 
-def _pywrapped_get_frag_atom_count(efpobj, ifr=None):
+def get_frag_atom_count(efpobj, ifr=None):
     """Gets atom count on fragment(s) of `efpobj`.
 
     Parameters
@@ -1086,22 +1130,22 @@ def _pywrapped_get_frag_atom_count(efpobj, ifr=None):
     if ifr is None:
         frags = []
         for fr in range(nfr):
-            (res, natom) = efpobj.cwrapped_get_frag_atom_count(fr)
-            _pywrapped_result_to_error(res)
+            (res, natom) = efpobj._efp_get_frag_atom_count(fr)
+            _result_to_error(res)
             frags.append(natom)
         return frags
 
     else:
         if ifr in range(nfr):
-            (res, natom) = efpobj.cwrapped_get_frag_atom_count(ifr)
-            _pywrapped_result_to_error(res)
+            (res, natom) = efpobj._efp_get_frag_atom_count(ifr)
+            _result_to_error(res)
 
             return natom
         else:
             raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
 
-def _pywrapped_get_frag_atoms(efpobj, ifr):
+def get_frag_atoms(efpobj, ifr):
     """Gets geometry information for atoms modeled by fragment in `efpobj`.
 
     Parameters
@@ -1114,21 +1158,21 @@ def _pywrapped_get_frag_atoms(efpobj, ifr):
     list of dict
         Each atom in fragment `ifr` has position, charge, and element
         fields below in a dictionary at list index `ifr`
-        Z : float               nuclear charge.
-        label : str             atom label from EFP file, e.g., A02H2.
-        x : float               X coordinate of atom position.
-        y : float               Y coordinate of atom position.
-        z : float               Z coordinate of atom position.
-        mass : float            atom mass [amu]
-        symbol : str            atomic symbol extracted from label.
+        ``Z`` (*float*)        nuclear charge.
+        ``label`` (*str*)      atom label from EFP file, e.g., A02H2.
+        ``x`` (*float*)        X coordinate of atom position.
+        ``y`` (*float*)        Y coordinate of atom position.
+        ``z`` (*float*)        Z coordinate of atom position.
+        ``mass`` (*float*)     atom mass [amu]
+        ``symbol`` (*str*)     atomic symbol extracted from label.
 
     """
     nfr = efpobj.get_frag_count()
     nat = efpobj.get_frag_atom_count(ifr)
 
     if ifr in range(nfr):
-        (res, atoms) = efpobj.cwrapped_get_frag_atoms(ifr, nat)
-        _pywrapped_result_to_error(res)
+        (res, atoms) = efpobj._efp_get_frag_atoms(ifr, nat)
+        _result_to_error(res)
 
         for at in atoms:
             mobj = re.match(r'\AA\d*(?P<symbol>[A-Z]{1,3})\d*\Z', at['label'])
@@ -1201,8 +1245,8 @@ def to_dict(efpobj):
     pysys['full_fragments'] = []
 
     for fr in range(efpobj.get_frag_count()):
-        (res, xyzabc) = efpobj.cwrapped_get_frag_xyzabc(fr)
-        _pywrapped_result_to_error(res)
+        (res, xyzabc) = efpobj._efp_get_frag_xyzabc(fr)
+        _result_to_error(res)
 
         pysys['full_fragments'].append({
             'coordinates_hint': xyzabc,
@@ -1258,36 +1302,37 @@ yuio = {'libefp': {'full_fragments':
 
 
 # only wrapped to throw Py exceptions
-core.efp.prepare = _pywrapped_efp_prepare
-core.efp.compute = _pywrapped_efp_compute
+core.efp.prepare = prepare
+core.efp.compute = compute
 
-core.efp.add_potential = _pywrapped_add_potential
-core.efp.add_fragment = _pywrapped_add_fragment
-core.efp.get_opts = _pywrapped_get_opts
-core.efp.set_opts = _pywrapped_set_opts
-core.efp.get_frag_count = _pywrapped_get_frag_count
-core.efp.get_energy = _pywrapped_get_energy
-core.efp.get_gradient = _pywrapped_get_gradient
+core.efp.add_potential = add_potential
+core.efp.add_fragment = add_fragment
+core.efp.get_opts = get_opts
+core.efp.set_opts = set_opts
+core.efp.get_frag_count = get_frag_count
+core.efp.get_energy = get_energy
+core.efp.get_gradient = get_gradient
 core.efp.energy_summary = energy_summary
 #core.efp.nuclear_repulsion_energy = nuclear_repulsion_energy
 core.efp.to_viz_dict = to_viz_dict
 core.efp.to_dict = to_dict
-core.efp.get_frag_name = _pywrapped_get_frag_name
-core.efp.get_frag_charge = _pywrapped_get_frag_charge
-core.efp.get_frag_multiplicity = _pywrapped_get_frag_multiplicity
-core.efp.set_frag_coordinates = _pywrapped_set_frag_coordinates
-core.efp.set_point_charges = _pywrapped_set_point_charges
-core.efp.get_multipole_count = _pywrapped_get_multipole_count
-core.efp.get_multipole_coordinates = _pywrapped_get_multipole_coordinates
-core.efp.get_multipole_values = _pywrapped_get_multipole_values
-core.efp.get_induced_dipole_count = _pywrapped_get_induced_dipole_count
-core.efp.get_induced_dipole_coordinates = _pywrapped_get_induced_dipole_coordinates
-core.efp.get_induced_dipole_values = _pywrapped_get_induced_dipole_values
-core.efp.get_induced_dipole_conj_values = _pywrapped_get_induced_dipole_conj_values
-core.efp.get_frag_atom_count = _pywrapped_get_frag_atom_count
-core.efp.get_wavefunction_dependent_energy = _pywrapped_get_wavefunction_dependent_energy
+core.efp.get_frag_name = get_frag_name
+core.efp.get_frag_charge = get_frag_charge
+core.efp.get_frag_multiplicity = get_frag_multiplicity
+core.efp.set_frag_coordinates = set_frag_coordinates
+core.efp.set_point_charges = set_point_charges
+core.efp.get_multipole_count = get_multipole_count
+core.efp.get_multipole_coordinates = get_multipole_coordinates
+core.efp.get_multipole_values = get_multipole_values
+core.efp.get_induced_dipole_count = get_induced_dipole_count
+core.efp.get_induced_dipole_coordinates = get_induced_dipole_coordinates
+core.efp.get_induced_dipole_values = get_induced_dipole_values
+core.efp.get_induced_dipole_conj_values = get_induced_dipole_conj_values
+core.efp.get_frag_atom_count = get_frag_atom_count
+core.efp.get_wavefunction_dependent_energy = get_wavefunction_dependent_energy
+core.efp.set_periodic_box = set_periodic_box
 
-core.efp.get_frag_atoms = _pywrapped_get_frag_atoms
+core.efp.get_frag_atoms = get_frag_atoms
 core.efp.get_atoms = get_atoms
 core.efp.geometry_summary = geometry_summary
 

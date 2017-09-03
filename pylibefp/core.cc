@@ -40,7 +40,7 @@ std::string wrapped_efp_banner(efp* efp) {
     return str;
 }
 
-py::tuple cwrapped_efp_get_frag_name(efp* efp, size_t frag_idx) {
+py::tuple _efp_get_frag_name(efp* efp, size_t frag_idx) {
     enum efp_result res;
     char buffer[80];
 
@@ -52,7 +52,7 @@ py::tuple cwrapped_efp_get_frag_name(efp* efp, size_t frag_idx) {
 }
 
 
-efp_result cwrapped_efp_set_frag_coordinates(efp* efp, size_t frag_idx, efp_coord_type ctype, py::list coord) {
+efp_result _efp_set_frag_coordinates(efp* efp, size_t frag_idx, efp_coord_type ctype, py::list coord) {
     enum efp_result res;
 
     double *ccoords = NULL;
@@ -66,7 +66,7 @@ efp_result cwrapped_efp_set_frag_coordinates(efp* efp, size_t frag_idx, efp_coor
 }
 
 
-efp_result cwrapped_efp_set_point_charges(efp* efp, size_t n_ptc, py::list ptc, py::list xyz) {
+efp_result _efp_set_point_charges(efp* efp, size_t n_ptc, py::list ptc, py::list xyz) {
     enum efp_result res;
 
     double *cptc = NULL;
@@ -86,29 +86,8 @@ efp_result cwrapped_efp_set_point_charges(efp* efp, size_t n_ptc, py::list ptc, 
 }
 
 
-int wrapped_efp_get_frag_multiplicity(efp* efp, size_t frag_idx) {
-    enum efp_result res;
-    int multiplicity=0;
 
-    if ((res = efp_get_frag_multiplicity(efp, frag_idx, &multiplicity))) {
-        std::string sres = "efp_get_frag_multiplicity: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
-    return multiplicity;
-}
-
-double wrapped_efp_get_frag_charge(efp* efp, size_t frag_idx) {
-    enum efp_result res;
-    double charge=0.0;
-
-    if ((res = efp_get_frag_charge(efp, frag_idx, &charge))) {
-        std::string sres = "efp_get_frag_charge: " + rts(res) + "\n";
-        throw libefpException(sres.c_str());
-    }
-    return charge;
-}
-
-py::tuple cwrapped_efp_get_frag_charge(efp* efp, size_t frag_idx) {
+py::tuple _efp_get_frag_charge(efp* efp, size_t frag_idx) {
     enum efp_result res;
     double charge = 0.0;
 
@@ -118,7 +97,7 @@ py::tuple cwrapped_efp_get_frag_charge(efp* efp, size_t frag_idx) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_frag_multiplicity(efp* efp, size_t frag_idx) {
+py::tuple _efp_get_frag_multiplicity(efp* efp, size_t frag_idx) {
     enum efp_result res;
     int multiplicity = 0;
 
@@ -128,7 +107,7 @@ py::tuple cwrapped_efp_get_frag_multiplicity(efp* efp, size_t frag_idx) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_gradient(efp* efp, size_t n_frag) {
+py::tuple _efp_get_gradient(efp* efp, size_t n_frag) {
     enum efp_result res;
     py::list grad;
 
@@ -144,7 +123,7 @@ py::tuple cwrapped_efp_get_gradient(efp* efp, size_t n_frag) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_frag_count(efp* efp) {
+py::tuple _efp_get_frag_count(efp* efp) {
     enum efp_result res;
     size_t n_frag = 0;
 
@@ -154,7 +133,7 @@ py::tuple cwrapped_efp_get_frag_count(efp* efp) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_frag_atom_count(efp* efp, size_t frag_idx) {
+py::tuple _efp_get_frag_atom_count(efp* efp, size_t frag_idx) {
     enum efp_result res;
     size_t n_atom = 0;
 
@@ -164,7 +143,7 @@ py::tuple cwrapped_efp_get_frag_atom_count(efp* efp, size_t frag_idx) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_multipole_count(efp* efp) {
+py::tuple _efp_get_multipole_count(efp* efp) {
     enum efp_result res;
     size_t n_mult = 0;
 
@@ -174,7 +153,7 @@ py::tuple cwrapped_efp_get_multipole_count(efp* efp) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_multipole_coordinates(efp* efp, size_t n_mult) {
+py::tuple _efp_get_multipole_coordinates(efp* efp, size_t n_mult) {
     enum efp_result res;
     py::list xyz;
 
@@ -191,7 +170,7 @@ py::tuple cwrapped_efp_get_multipole_coordinates(efp* efp, size_t n_mult) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_multipole_values(efp* efp, size_t n_mult) {
+py::tuple _efp_get_multipole_values(efp* efp, size_t n_mult) {
     enum efp_result res;
     py::list mult;
 
@@ -208,7 +187,7 @@ py::tuple cwrapped_efp_get_multipole_values(efp* efp, size_t n_mult) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_induced_dipole_count(efp* efp) {
+py::tuple _efp_get_induced_dipole_count(efp* efp) {
     enum efp_result res;
     size_t n_dip = 0;
 
@@ -218,7 +197,7 @@ py::tuple cwrapped_efp_get_induced_dipole_count(efp* efp) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_induced_dipole_coordinates(efp* efp, size_t n_dip) {
+py::tuple _efp_get_induced_dipole_coordinates(efp* efp, size_t n_dip) {
     enum efp_result res;
     py::list xyz;
 
@@ -235,7 +214,7 @@ py::tuple cwrapped_efp_get_induced_dipole_coordinates(efp* efp, size_t n_dip) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_induced_dipole_values(efp* efp, size_t n_dip) {
+py::tuple _efp_get_induced_dipole_values(efp* efp, size_t n_dip) {
     enum efp_result res;
     py::list vals;
 
@@ -252,7 +231,7 @@ py::tuple cwrapped_efp_get_induced_dipole_values(efp* efp, size_t n_dip) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_induced_dipole_conj_values(efp* efp, size_t n_dip) {
+py::tuple _efp_get_induced_dipole_conj_values(efp* efp, size_t n_dip) {
     enum efp_result res;
     py::list vals;
 
@@ -272,7 +251,7 @@ py::tuple cwrapped_efp_get_induced_dipole_conj_values(efp* efp, size_t n_dip) {
 // TODO: probably filling would fail if res not good in a lot of these
 
 
-py::tuple cwrapped_efp_get_frag_atoms(efp* efp, size_t frag_idx, size_t frag_natom) {
+py::tuple _efp_get_frag_atoms(efp* efp, size_t frag_idx, size_t frag_natom) {
     enum efp_result res;
     struct efp_atom atoms[frag_natom];
     py::list ats_info;
@@ -351,7 +330,7 @@ py::tuple cwrapped_efp_get_frag_atoms(efp* efp, size_t frag_idx, size_t frag_nat
 //}
 
 
-py::tuple cwrapped_efp_get_coordinates(efp* efp, size_t n_frag) {
+py::tuple _efp_get_coordinates(efp* efp, size_t n_frag) {
     enum efp_result res;
     py::list xyzabc;
 
@@ -368,7 +347,7 @@ py::tuple cwrapped_efp_get_coordinates(efp* efp, size_t n_frag) {
 }
 
 
-py::tuple cwrapped_efp_get_frag_xyzabc(efp* efp, size_t frag_idx) {
+py::tuple _efp_get_frag_xyzabc(efp* efp, size_t frag_idx) {
     enum efp_result res;
     py::list xyzabc;
 
@@ -384,7 +363,7 @@ py::tuple cwrapped_efp_get_frag_xyzabc(efp* efp, size_t frag_idx) {
     return rets;
 }
 
-py::tuple cwrapped_efp_get_wavefunction_dependent_energy(efp* efp) {
+py::tuple _efp_get_wavefunction_dependent_energy(efp* efp) {
     enum efp_result res;
     double ene;
 
@@ -553,15 +532,15 @@ PYBIND11_MODULE(core, m) {
         .def(py::init(&efp_create), "Creates a new efp object via `efp_create`")
         .def("banner", wrapped_efp_banner, "Gets a human readable banner string with information about the library")
 //        .def("set_error_log", &efp_set_error_log, "Sets the error log callback function")
-        .def("raw_set_opts", &efp_set_opts, "Set computation options to *arg0*")
-        .def("raw_get_opts", &efp_get_opts, "Gets currently set computation options")
-        .def("raw_add_potential", &efp_add_potential, "Adds EFP potential from full file path *arg0*")
-        .def("raw_add_fragment", &efp_add_fragment, "Adds a new fragment to the EFP subsystem")
-        .def("raw_prepare", &efp_prepare, "Prepares the calculation")
+        .def("_efp_set_opts", &efp_set_opts, "Set computation options to *arg0*")
+        .def("_efp_get_opts", &efp_get_opts, "Gets currently set computation options")
+        .def("_efp_add_potential", &efp_add_potential, "Adds EFP potential from full file path *arg0*")
+        .def("_efp_add_fragment", &efp_add_fragment, "Adds a new fragment to the EFP subsystem")
+        .def("_efp_prepare", &efp_prepare, "Prepares the calculation")
 //        .def("skip_fragments", &efp_skip_fragments, "Skip interactions between the fragments *arg0* and *arg1* inclusive if *arg2*")
         .def("set_electron_density_field_fn", set_field_fn_callback, "Sets the callback function which computes electric field from electrons in ab initio subsystem to *arg0*")
         .def("clear_electron_density_field_fn", clear_field_fn_callback, "docstring")
-        .def("cwrapped_set_point_charges", cwrapped_efp_set_point_charges, "Setup *arg0* arbitrary point charges of magnitude *arg1* at locations *arg2* interacting with EFP subsystem")
+        .def("_efp_set_point_charges", _efp_set_point_charges, "Setup *arg0* arbitrary point charges of magnitude *arg1* at locations *arg2* interacting with EFP subsystem")
 //        .def("get_point_charge_count", &efp_get_point_charge_count, "Gets the number of currently set point charges and return it in *arg0*")
 //        .def("get_point_charge_values", &efp_get_point_charge_values, "Gets values of currently set point charges and returns them in *arg1*")
 //        .def("set_point_charge_values", &efp_set_point_charge_values, "Sets values of point charges *arg0*")
@@ -569,41 +548,40 @@ PYBIND11_MODULE(core, m) {
 //        .def("set_point_charge_coordinates", &efp_set_point_charge_coordinates, "Sets coordinates *arg0* of point charges")
 //        .def("get_point_charge_gradient", &efp_get_point_charge_gradient, "Gets gradient on point charges from EFP subsystem and returns them in *arg1*")
 //        .def("set_coordinates", &efp_set_coordinates, "Update positions and orientations of all fragments with types in array *arg0* and returns them in *arg1*")
-        .def("cwrapped_set_frag_coordinates", cwrapped_efp_set_frag_coordinates, "Updates position and orientation of the specified effective 0-indexed fragment *arg0* of type *arg1*")
-        .def("cwrapped_get_coordinates", cwrapped_efp_get_coordinates, "Gets center of mass positions and Euler angles of the effective fragments and returns it in *arg0*")
-        .def("cwrapped_get_frag_xyzabc", cwrapped_efp_get_frag_xyzabc, "Gets center of mass position and Euler angles on 0-indexed fragment *arg0* and returns it in *arg1*")
-//        .def("set_periodic_box", &efp_set_periodic_box, "Sets up periodic box size of *arg0* by *arg1* by *arg2*")
+        .def("_efp_set_frag_coordinates", _efp_set_frag_coordinates, "Updates position and orientation of the specified effective 0-indexed fragment *arg0* of type *arg1*")
+        .def("_efp_get_coordinates", _efp_get_coordinates, "Gets center of mass positions and Euler angles of the effective fragments and returns it in *arg0*")
+        .def("_efp_get_frag_xyzabc", _efp_get_frag_xyzabc, "Gets center of mass position and Euler angles on 0-indexed fragment *arg0* and returns it in *arg1*")
+        .def("_efp_set_periodic_box", &efp_set_periodic_box, "Sets up periodic box size of *arg0* by *arg1* by *arg2*")
+        .def("_efp_get_periodic_box", _efp_get_periodic_box, "Gets periodic box size of *arg0* by *arg1* by *arg2*")
 //        .def("get_stress_tensor", &efp_get_stress_tensor, "Gets the stress tensor and returns it in *arg0*")
 //        .def("get_ai_screen", &efp_get_ai_screen, "Gets the ab initio screening parameters on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("set_orbital_energies", &efp_set_orbital_energies, "Sets ab initio orbital energies to *efp0* number core orbitals, *efp1* number active orbitals, *efp2* number virtual orbitals, *efp3* array of orbital energies")
 //        .def("set_dipole_integrals", &efp_set_dipole_integrals, "Sets ab initio dipole integrals to  *efp0* number core orbitals, *efp1* number active orbitals, *efp2* number virtual orbitals, *efp3* dipole integral matrices")
-        .def("cwrapped_get_wavefunction_dependent_energy", cwrapped_efp_get_wavefunction_dependent_energy, "Updates wavefunction-dependent energy terms returning in *arg0*")
-        .def("raw_compute", &efp_compute, py::arg("do_gradient") = false, "Perform the EFP computation, doing gradient if *arg0*")
-        .def("get_frag_charge", wrapped_efp_get_frag_charge, "Gets total charge on 0-indexed fragment *arg0*")
-        .def("get_frag_multiplicity", wrapped_efp_get_frag_multiplicity, "Gets spin multiplicity on 0-indexed fragment *arg0*")
-        .def("cwrapped_get_frag_charge", cwrapped_efp_get_frag_charge, "Gets total charge on 0-indexed fragment *arg0*")
-        .def("cwrapped_get_frag_multiplicity", cwrapped_efp_get_frag_multiplicity, "Gets spin multiplicity on 0-indexed fragment *arg0*")
+        .def("_efp_get_wavefunction_dependent_energy", _efp_get_wavefunction_dependent_energy, "Updates wavefunction-dependent energy terms returning in *arg0*")
+        .def("_efp_compute", &efp_compute, py::arg("do_gradient") = false, "Perform the EFP computation, doing gradient if *arg0*")
+        .def("_efp_get_frag_charge", _efp_get_frag_charge, "Gets total charge on 0-indexed fragment *arg0*")
+        .def("_efp_get_frag_multiplicity", _efp_get_frag_multiplicity, "Gets spin multiplicity on 0-indexed fragment *arg0*")
 //        .def("get_frag_multipole_count", &efp_get_frag_multipole_count, "Gets number of electrostatic multipole points on 0-indexed fragment *arg0* and returns it in *arg1*")
-        .def("cwrapped_get_multipole_count", cwrapped_efp_get_multipole_count, "Gets total number of multipoles from EFP electrostatics and returns it in *arg0*")
-        .def("cwrapped_get_multipole_coordinates", cwrapped_efp_get_multipole_coordinates, "Gets coordinates of electrostatics multipoles and returns it in *arg0*")
-        .def("cwrapped_get_multipole_values", cwrapped_efp_get_multipole_values, "Gets electrostatics multipoles from EFP fragments and returns it in *arg0*")
-        .def("cwrapped_get_induced_dipole_count", cwrapped_efp_get_induced_dipole_count, "Gets the number of polarization induced dipoles and returns it in *arg0*")
-        .def("cwrapped_get_induced_dipole_coordinates", cwrapped_efp_get_induced_dipole_coordinates, "Gets coordinates of induced dipoles and returns it in *arg0*")
-        .def("cwrapped_get_induced_dipole_values", cwrapped_efp_get_induced_dipole_values, "Gets values of polarization induced dipoles and returns it in *arg0*")
-        .def("cwrapped_get_induced_dipole_conj_values", cwrapped_efp_get_induced_dipole_conj_values, "Gets values of polarization conjugated induced dipoles and returns it in *arg0*")
+        .def("_efp_get_multipole_count", _efp_get_multipole_count, "Gets total number of multipoles from EFP electrostatics and returns it in *arg0*")
+        .def("_efp_get_multipole_coordinates", _efp_get_multipole_coordinates, "Gets coordinates of electrostatics multipoles and returns it in *arg0*")
+        .def("_efp_get_multipole_values", _efp_get_multipole_values, "Gets electrostatics multipoles from EFP fragments and returns it in *arg0*")
+        .def("_efp_get_induced_dipole_count", _efp_get_induced_dipole_count, "Gets the number of polarization induced dipoles and returns it in *arg0*")
+        .def("_efp_get_induced_dipole_coordinates", _efp_get_induced_dipole_coordinates, "Gets coordinates of induced dipoles and returns it in *arg0*")
+        .def("_efp_get_induced_dipole_values", _efp_get_induced_dipole_values, "Gets values of polarization induced dipoles and returns it in *arg0*")
+        .def("_efp_get_induced_dipole_conj_values", _efp_get_induced_dipole_conj_values, "Gets values of polarization conjugated induced dipoles and returns it in *arg0*")
 //        .def("get_lmo_count", &efp_get_lmo_count, "Gets the number of LMOs in a fragment and returns it in *arg0*")
 //        .def("get_lmo_coordinates", &efp_get_lmo_coordinates, "Gets coordinates of LMO centroids on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("get_xrfit", &efp_get_xrfit, "Gets parameters of fitted exchange-repulsion on 0-indexed fragment *arg0* and returns it in *arg1*")
-        .def("raw_get_energy", &efp_get_energy, "Gets computed energy components")
-        .def("cwrapped_get_gradient", cwrapped_efp_get_gradient, "Gets computed EFP energy gradient")
+        .def("_efp_get_energy", &efp_get_energy, "Gets computed energy components")
+        .def("_efp_get_gradient", _efp_get_gradient, "Gets computed EFP energy gradient")
 //        .def("get_atomic_gradient", &efp_get_atomic_gradient, "Gets computed EFP energy gradient on individual atoms and returns it in *arg0*")
-        .def("cwrapped_get_frag_count", cwrapped_efp_get_frag_count, "Gets the number of fragments in this computation")
-        .def("cwrapped_get_frag_name", cwrapped_efp_get_frag_name, "Gets the name of the specified 0-indexed effective fragment *arg0* and returns it in *arg2* of length *arg1*")
+        .def("_efp_get_frag_count", _efp_get_frag_count, "Gets the number of fragments in this computation")
+        .def("_efp_get_frag_name", _efp_get_frag_name, "Gets the name of the specified 0-indexed effective fragment *arg0* and returns it in *arg2* of length *arg1*")
 //        .def("get_frag_mass", &efp_get_frag_mass, "Gets total mass on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("get_frag_inertia", &efp_get_frag_inertia, "Gets fragment principal moments of inertia on 0-indexed fragment *arg0* and returns it in *arg1*")
-        .def("cwrapped_get_frag_atom_count", cwrapped_efp_get_frag_atom_count, "Gets the number of atoms on 0-indexed fragment *arg0*")
-        .def("raw_get_frag_atoms", &efp_get_frag_atoms, "Gets atoms comprising the specified 0-indexed fragment *arg0* and returns it in *arg1*")
-        .def("cwrapped_get_frag_atoms", cwrapped_efp_get_frag_atoms, "Gets atoms comprising the specified 0-indexed fragment")
+        .def("_efp_get_frag_atom_count", _efp_get_frag_atom_count, "Gets the number of atoms on 0-indexed fragment *arg0*")
+        .def("_efp_get_frag_atoms", &efp_get_frag_atoms, "Gets atoms comprising the specified 0-indexed fragment *arg0* and returns it in *arg1*")
+        .def("_efp_get_frag_atoms", _efp_get_frag_atoms, "Gets atoms comprising the specified 0-indexed fragment")
 //        .def("get_electric_field", &efp_get_electric_field, "Gets electric field for a point on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("torque_to_derivative", &efp_torque_to_derivative, "Convert rigid body torque *arg1* to derivatives *arg2* of energy by Euler angles *arg0*")
 //        .def("result_to_string", &efp_result_to_string, "Result value to be converted to string");
