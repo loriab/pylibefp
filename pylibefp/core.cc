@@ -642,7 +642,6 @@ PYBIND11_MODULE(core, m) {
         .def("_efp_get_frag_atoms", _efp_get_frag_atoms, "Gets atoms comprising the specified 0-indexed fragment")
 //        .def("get_electric_field", &efp_get_electric_field, "Gets electric field for a point on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("torque_to_derivative", &efp_torque_to_derivative, "Convert rigid body torque *arg1* to derivatives *arg2* of energy by Euler angles *arg0*")
-//        .def("result_to_string", &efp_result_to_string, "Result value to be converted to string");
         .def("clean", &_clean, "Preferred destructor combining libefp::efp_shutdown and field_fn release")
         .def("shutdown", &efp_shutdown, "Release all resources used by this EFP");
 }
@@ -650,5 +649,6 @@ PYBIND11_MODULE(core, m) {
 // Unwrapped
 // * efp_print_banner
 // * efp_set_electron_density_field_user_data  # what is this?
+// * result_to_string
 
 

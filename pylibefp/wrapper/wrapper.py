@@ -1011,25 +1011,45 @@ def geometry_summary(efpobj, units_to_bohr=1.0):
     Returns
     -------
     str
-        Summary of EFP geometry suitable for printing.
+        Summary of EFP geometry & point charges (QM atoms) suitable for printing.
 
     """
     text = ''
     text += '\n  ==>  EFP Geometry  <==\n\n'
     text +=   '    Geometry (in {} * {:12.8f}):\n\n'.format('Bohr', units_to_bohr)
-    text +=   '       Center              X                  Y                   Z       \n'
-    text +=   '    ------------   -----------------  -----------------  -----------------\n'
+    text +=   '       Center              X                  Y                   Z             QM/EFP\n'
+    text +=   '    ------------   -----------------  -----------------  -----------------   ------------\n'
 
     mol_info = efpobj.get_atoms()
-    terminal_frag = [fr[1] for fr in mol_info['fragments']]
+    terminal_frag = [fr[0] for fr in mol_info['fragments'][1:]]
+    frag_names = efpobj.get_frag_name()
 
+    ifr = 0
     for iat, at in enumerate(mol_info['full_atoms']):
-        text += '    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}\n'.format(at['label'], '',
+        if iat in terminal_frag:
+            text += '    ------------\n'
+            ifr += 1
+        text += '    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}   {}\n'.format(at['symbol'], '',
                 at['x'] * units_to_bohr,
                 at['y'] * units_to_bohr,
-                at['z'] * units_to_bohr)
-        if iat in terminal_frag:
-            text +=   '    ------------\n'
+                at['z'] * units_to_bohr,
+                frag_names[ifr].lower())
+
+    # TODO move into dict?
+    ptc_info = {'n': efpobj.get_point_charge_count(),
+                'xyz': efpobj.get_point_charge_coordinates(),
+                'val': efpobj.get_point_charge_values()}
+
+    if ptc_info['n'] > 0:
+        print(ptc_info)
+        mult3 = list(map(list, zip(*[iter(ptc_info['xyz'])] * 3)))
+        text += '    ------------\n'
+        for ptc in range(ptc_info['n']):
+            text += '    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}   {}\n'.format(ptc_info['val'][ptc], '',
+                    mult3[ptc][0] * units_to_bohr,
+                    mult3[ptc][1] * units_to_bohr,
+                    mult3[ptc][2] * units_to_bohr,
+                    'point_charge')
 
     return text
 
