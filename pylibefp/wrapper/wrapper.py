@@ -448,6 +448,43 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
     return efpobj.get_opts(label=label)
 
 
+def set_periodic_box(efpobj, xyz):
+    """Set periodic box size.
+
+    Parameters
+    ----------
+    xyz : list
+        Box sizes in three dimensions [x, y, z] in Bohr.
+
+    Returns
+    -------
+    None
+
+    """
+    if len(xyz) != 3:
+        raise PyEFPSyntaxError('Invalid periodic box setting: {}'.format(xyz))
+
+    res = efpobj._efp_set_periodic_box(xyz[0], xyz[1], xyz[2])
+    _result_to_error(res)
+    (res, xyz2) = efpobj._efp_get_periodic_box()
+    _result_to_error(res)
+    print('xyz2', xyz2)
+
+
+def get_periodic_box(efpobj):
+    """Get periodic box size.
+
+    Returns
+    -------
+    list
+        Box sizes in three dimensions [x, y, z] in Bohr.
+
+    """
+    (res, xyz) = efpobj._efp_get_periodic_box()
+    _result_to_error(res)
+
+    return xyz
+
 
 #def opts_summary(efpobj, labels='libefp'):
 #
@@ -699,7 +736,7 @@ def get_induced_dipole_values(efpobj, verbose=1):
     ----------
     verbose : int, optional
         Whether to print out the induced dipole arrays. 0: no
-        printing. 1: print induced dipole coordinates.
+        printing. 1: print induced dipole values.
 
     Returns
     -------
@@ -736,7 +773,7 @@ def get_induced_dipole_conj_values(efpobj, verbose=1):
     ----------
     verbose : int, optional
         Whether to print out the induced dipole conj arrays.
-        0: no printing. 1: print induced dipole coordinates.
+        0: no printing. 1: print induced dipole values.
 
     Returns
     -------
@@ -755,6 +792,86 @@ def get_induced_dipole_conj_values(efpobj, verbose=1):
         for mu in range(ndip):
             text += '{:6d}   {:14.8f} {:14.8f} {:14.8f}\n'.format(
                 mu, *vals3[mu])
+        print(text)
+
+    return vals
+
+
+def get_point_charge_count(efpobj):
+    """Gets the number of set point charges `efpobj`.
+
+    Returns
+    -------
+    int
+        Total number of set point charges.
+
+    """
+    (res, nptc) = efpobj._efp_get_point_charge_count()
+    _result_to_error(res)
+
+    return nptc
+
+
+def get_point_charge_coordinates(efpobj, verbose=1):
+    """Gets the coordinates of set point charges on `efpobj`.
+
+    Parameters
+    ----------
+    verbose : int, optional
+        Whether to print out the point charge arrays. 0: no printing.
+        1: print point charge coordinates.
+
+    Returns
+    -------
+    list
+        3 x n_ptc (flat) array of point charge locations.
+
+    """
+    nptc = efpobj.get_point_charge_count()
+    (res, xyz) = efpobj._efp_get_point_charge_coordinates(nptc)
+    _result_to_error(res)
+
+    if verbose >= 1:
+        xyz3 = list(map(list, zip(*[iter(xyz)] * 3)))
+
+        text = '\n  ==>  EFP Point Charge Coordinates  <==\n\n'
+        for mu in range(nptc):
+            text += '{:6d}   {:14.8f} {:14.8f} {:14.8f}\n'.format(
+                mu, *xyz3[mu])
+        print(text)
+
+    return xyz
+
+
+def get_point_charge_values(efpobj, verbose=1):
+    """Gets the values of set point charges on `efpobj`.
+
+    Parameters
+    ----------
+    verbose : int, optional
+        Whether to print out the point charge arrays. 0: no
+        printing. 1: print point charge values.
+
+    Returns
+    -------
+    list
+        ``n_ptc`` array of point charge values.
+
+    Examples
+    --------
+    >>> # Use with NumPy
+    >>> val_ptc = np.asarray(efpobj.get_point_charge_values())
+
+    """
+    nptc = efpobj.get_point_charge_count()
+    (res, vals) = efpobj._efp_get_point_charge_values(nptc)
+    _result_to_error(res)
+
+    if verbose >= 1:
+        text = '\n  ==>  EFP Point Charges  <==\n\n'
+        for mu in range(nptc):
+            text += '{:6d}   {:14.8f}\n'.format(
+                mu, vals[mu])
         print(text)
 
     return vals
@@ -1321,6 +1438,9 @@ core.efp.get_frag_charge = get_frag_charge
 core.efp.get_frag_multiplicity = get_frag_multiplicity
 core.efp.set_frag_coordinates = set_frag_coordinates
 core.efp.set_point_charges = set_point_charges
+core.efp.get_point_charge_count = get_point_charge_count
+core.efp.get_point_charge_coordinates = get_point_charge_coordinates
+core.efp.get_point_charge_values = get_point_charge_values
 core.efp.get_multipole_count = get_multipole_count
 core.efp.get_multipole_coordinates = get_multipole_coordinates
 core.efp.get_multipole_values = get_multipole_values
@@ -1331,6 +1451,7 @@ core.efp.get_induced_dipole_conj_values = get_induced_dipole_conj_values
 core.efp.get_frag_atom_count = get_frag_atom_count
 core.efp.get_wavefunction_dependent_energy = get_wavefunction_dependent_energy
 core.efp.set_periodic_box = set_periodic_box
+core.efp.get_periodic_box = get_periodic_box
 
 core.efp.get_frag_atoms = get_frag_atoms
 core.efp.get_atoms = get_atoms
