@@ -82,10 +82,6 @@ def test_qm_1b():
 
     asdf.compute()
     ene = asdf.get_energy()
-    ptc_info = {'n': asdf.get_point_charge_count(),
-                'xyz': asdf.get_point_charge_coordinates(),
-                'val': asdf.get_point_charge_values()}
-    assert(compare_dicts({'n': 4, 'xyz': coords, 'val': ptc}, ptc_info, 6, sys._getframe().f_code.co_name + ': ptc'))
     assert(compare_values(-0.0787829370, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
 
 
