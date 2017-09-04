@@ -4,10 +4,10 @@ import pylibefp
 from utils import *
 from systems import *
 
-#try:
-#    long(1)
-#except NameError:
-#    long = int
+try:
+    long(1)
+except NameError:
+    long = int
 
 
 def test_elec_1c():
