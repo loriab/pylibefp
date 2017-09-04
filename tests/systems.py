@@ -112,3 +112,64 @@ def system_4():
 
     sys.prepare()
     return sys
+
+
+def system_5():
+    sys = pylibefp.core.efp()
+
+    frags = ['h2o', 'nh3']
+    sys.add_potential(frags)
+    sys.add_fragment(frags)
+    sys.set_frag_coordinates(0, 'xyzabc', [   0.0 * a2b,   0.0 * a2b,   0.0 * a2b,   3.0,   0.0,   7.0])
+    sys.set_frag_coordinates(1, 'xyzabc', [  18.0 * a2b,  18.0 * a2b,  18.0 * a2b,   5.0,   4.0,   6.0])
+
+    sys.prepare()
+    return sys
+
+
+def system_6():
+    sys = pylibefp.core.efp()
+
+    frags = ['h2o', 'ch3oh', 'h2o', 'ch3oh', 'nh3']
+    sys.add_potential(frags)
+    sys.add_fragment(frags)
+    sys.set_frag_coordinates(0, 'xyzabc', [   0.0 * a2b,   0.0 * a2b,   0.0 * a2b,   0.0,   0.0,   0.0])
+    sys.set_frag_coordinates(1, 'xyzabc', [  19.0 * a2b,   0.0 * a2b,   0.0 * a2b,   0.0,   0.0,   0.0])
+    sys.set_frag_coordinates(2, 'xyzabc', [   0.0 * a2b,  19.0 * a2b,   0.0 * a2b,   0.0,   0.0,   0.0])
+    sys.set_frag_coordinates(3, 'xyzabc', [   0.0 * a2b,   0.0 * a2b,  19.0 * a2b,   0.0,   0.0,   0.0])
+    sys.set_frag_coordinates(4, 'xyzabc', [  18.0 * a2b,  18.0 * a2b,  18.0 * a2b,   0.0,   0.0,   0.0])
+
+    sys.prepare()
+    return sys
+
+
+def system_qm1():
+    sys = pylibefp.core.efp()
+
+    frags = ['h2o', 'c6h6', 'nh3']
+    sys.add_potential(frags)
+    sys.add_fragment(frags)
+    sys.set_frag_coordinates(0, 'xyzabc', [  -1.6 * a2b,   4.7 * a2b,   1.4 * a2b,  -1.3,   0.1,   7.0])
+    sys.set_frag_coordinates(1, 'xyzabc', [   0.4 * a2b,  -0.9 * a2b,  -0.7 * a2b,   2.3,   1.6,  -2.3])
+    sys.set_frag_coordinates(2, 'xyzabc', [  -3.5 * a2b,  -2.0 * a2b,  -0.7 * a2b,   0.0,   2.2,   2.7])
+
+    sys.prepare()
+    return sys
+
+
+def system_qm2():
+    sys = pylibefp.core.efp()
+
+    frags = ['ch3oh', 'dmso', 'dmso', 'acetone', 'dcm', 'acetone', 'acetone']
+    sys.add_potential(frags)
+    sys.add_fragment(frags)
+    sys.set_frag_coordinates(0, 'xyzabc', [   0.0 * a2b,  -1.0 * a2b,   0.0 * a2b,   0.0,   1.1,   2.0])
+    sys.set_frag_coordinates(1, 'xyzabc', [  -5.0 * a2b,  12.0 * a2b,   0.0 * a2b,   3.0,   0.2,   5.0])
+    sys.set_frag_coordinates(2, 'xyzabc', [   0.0 * a2b,  -3.0 * a2b,   5.0 * a2b,   6.0,   2.3,   8.0])
+    sys.set_frag_coordinates(3, 'xyzabc', [  -5.0 * a2b,  -4.0 * a2b,  -5.0 * a2b,   9.0,   0.4,   1.0])
+    sys.set_frag_coordinates(4, 'xyzabc', [  -9.0 * a2b,  -5.0 * a2b,   1.0 * a2b,   2.0,   1.5,   4.0])
+    sys.set_frag_coordinates(5, 'xyzabc', [   7.0 * a2b,  -2.0 * a2b,  11.0 * a2b,   5.0,   0.6,   7.0])
+    sys.set_frag_coordinates(6, 'xyzabc', [  -9.0 * a2b,  -7.0 * a2b,  -9.0 * a2b,   8.0,   2.7,   0.0])
+
+    sys.prepare()
+    return sys

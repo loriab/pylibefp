@@ -1,0 +1,230 @@
+import sys
+#import pytest
+import pylibefp
+from utils import *
+from systems import *
+
+#try:
+#    long(1)
+#except NameError:
+#    long = int
+
+
+def test_elec_1c():
+    asdf = system_1()
+
+    opts = asdf.set_opts({'elec': True, 'elec_damp': 'off', 'enable_pbc': True, 'enable_cutoff': True, 'swf_cutoff': 6.0 * a2b})
+    pprint.pprint(opts)
+    asdf.set_periodic_box([20.0 * a2b, 20.0 * a2b, 20.0 * a2b])
+    box = asdf.get_periodic_box()
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    pprint.pprint(ene)
+    print(asdf.energy_summary())
+    assert(compare_values(20.0 * a2b, box[2], 6, sys._getframe().f_code.co_name + ': pbc'))
+    assert(compare_values(0.0002839577, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_disp_1c():
+    asdf = system_1()
+
+    opts = asdf.set_opts({'disp': True, 'disp_damp': 'off', 'enable_pbc': True, 'enable_cutoff': True, 'swf_cutoff': 6.0 * a2b})
+    asdf.set_periodic_box([20.0 * a2b, 20.0 * a2b, 20.0 * a2b])
+    box = asdf._efp_get_periodic_box()
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    assert(compare_values(-0.0000980020, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_qm_1a():
+    asdf = system_qm1()
+
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'overlap', 'disp_damp': 'tt',
+                          'ai_elec': True, 'ai_pol': True})
+    ptc = [1., 8., 2., 1.]
+    coords = [ 3.2,   1.8,  -2.3,
+              -2.9,  -6.2,  -2.5,
+               5.0,   4.3,   0.2,
+               4.9,   0.0,   4.7 ]
+    coords = [c * a2b for c in coords]
+    asdf.set_point_charges(ptc, coords)
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    ptc_info = {'n': asdf.get_point_charge_count(),
+                'xyz': asdf.get_point_charge_coordinates(),
+                'val': asdf.get_point_charge_values()}
+    assert(compare_dicts({'n': 4, 'xyz': coords, 'val': ptc}, ptc_info, 6, sys._getframe().f_code.co_name + ': ptc'))
+    assert(compare_values(-0.0787829370, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_qm_1b():
+    asdf = system_qm1()
+
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'overlap', 'disp_damp': 'tt',
+                          'ai_elec': True, 'ai_pol': True,
+                          'pol_driver': 'direct'})
+    ptc = [1., 8., 2., 1.]
+    coords = [ 3.2,   1.8,  -2.3,
+              -2.9,  -6.2,  -2.5,
+               5.0,   4.3,   0.2,
+               4.9,   0.0,   4.7 ]
+    coords = [c * a2b for c in coords]
+    asdf.set_point_charges(ptc, coords)
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    ptc_info = {'n': asdf.get_point_charge_count(),
+                'xyz': asdf.get_point_charge_coordinates(),
+                'val': asdf.get_point_charge_values()}
+    assert(compare_dicts({'n': 4, 'xyz': coords, 'val': ptc}, ptc_info, 6, sys._getframe().f_code.co_name + ': ptc'))
+    assert(compare_values(-0.0787829370, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_qm_2a():
+    asdf = system_qm2()
+
+    ptc = [7., 10., 1., 2., 2.]
+    coords = [  4.0,   5.0,   5.0,
+                8.0,   5.0,   6.0,
+                5.0,   8.0,   5.0,
+                8.0,   9.0,   8.0,
+                5.0,   8.0,   8.0 ]
+    asdf.set_point_charges(ptc, [c * a2b for c in coords])
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'screen', 'disp_damp': 'overlap',
+                          'ai_elec': True, 'ai_pol': True})
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    assert(compare_values(-0.2314262632, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_qm_2b():
+    asdf = system_qm2()
+
+    ptc = [7., 10., 1., 2., 2.]
+    coords = [  4.0,   5.0,   5.0,
+                8.0,   5.0,   6.0,
+                5.0,   8.0,   5.0,
+                8.0,   9.0,   8.0,
+                5.0,   8.0,   8.0 ]
+    asdf.set_point_charges(ptc, [c * a2b for c in coords])
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'screen', 'disp_damp': 'overlap',
+                          'ai_elec': True, 'ai_pol': True,
+                          'pol_driver': 'direct'})
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    print(asdf.geometry_summary(units_to_bohr=0.529177))
+    assert(compare_values(-0.2314262632, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_total_5a():
+    asdf = system_5()
+
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'off', 'disp_damp': 'off', 'pol_damp': 'off',
+                          'enable_pbc': True, 'enable_cutoff': True, 'swf_cutoff': 6.0 * a2b})
+    asdf.set_periodic_box([15.0 * a2b, 15.0 * a2b, 15.0 * a2b])
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    assert(compare_values(0.0001206197, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_total_5b():
+    asdf = system_5()
+
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'screen', 'disp_damp': 'tt', 'pol_damp': 'tt',
+                          'enable_pbc': True, 'enable_cutoff': True, 'swf_cutoff': 6.0 * a2b})
+    asdf.set_periodic_box([15.0 * a2b, 15.0 * a2b, 15.0 * a2b])
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    assert(compare_values(0.0001206296, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_total_5c():
+    asdf = system_5()
+
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'overlap', 'disp_damp': 'overlap', 'pol_damp': 'tt',
+                          'enable_pbc': True, 'enable_cutoff': True, 'swf_cutoff': 6.0 * a2b})
+    asdf.set_periodic_box([15.0 * a2b, 15.0 * a2b, 15.0 * a2b])
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    assert(compare_values(0.0001205050, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_total_5d():
+    asdf = system_5()
+
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'overlap', 'disp_damp': 'overlap', 'pol_damp': 'tt',
+                          'pol_driver': 'direct',
+                          'enable_pbc': True, 'enable_cutoff': True, 'swf_cutoff': 6.0 * a2b})
+    asdf.set_periodic_box([15.0 * a2b, 15.0 * a2b, 15.0 * a2b])
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    assert(compare_values(0.0001205050, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_total_6a():
+    asdf = system_6()
+
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'off', 'disp_damp': 'off', 'pol_damp': 'off',
+                          'enable_pbc': True, 'enable_cutoff': True, 'swf_cutoff': 5.0 * a2b})
+    asdf.set_periodic_box([15.0 * a2b, 15.0 * a2b, 15.0 * a2b])
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    assert(compare_values(-0.0054950567, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_total_6b():
+    asdf = system_6()
+
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'overlap', 'disp_damp': 'tt', 'pol_damp': 'tt',
+                          'enable_pbc': True, 'enable_cutoff': True, 'swf_cutoff': 5.0 * a2b})
+    asdf.set_periodic_box([15.0 * a2b, 15.0 * a2b, 15.0 * a2b])
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    assert(compare_values(-0.0051253344, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_total_6c():
+    asdf = system_6()
+
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'screen', 'disp_damp': 'overlap', 'pol_damp': 'off',
+                          'enable_pbc': True, 'enable_cutoff': True, 'swf_cutoff': 5.0 * a2b})
+    asdf.set_periodic_box([15.0 * a2b, 15.0 * a2b, 15.0 * a2b])
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    assert(compare_values(-0.0064013486, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+
+
+def test_total_6d():
+    asdf = system_6()
+
+    opts = asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True,
+                          'elec_damp': 'overlap', 'disp_damp': 'tt', 'pol_damp': 'tt',
+                          'enable_pbc': True, 'enable_cutoff': True, 'swf_cutoff': 5.0 * a2b})
+    asdf.set_periodic_box([15.0 * a2b, 15.0 * a2b, 15.0 * a2b])
+
+    asdf.compute()
+    ene = asdf.get_energy()
+    assert(compare_values(-0.0051253344, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
