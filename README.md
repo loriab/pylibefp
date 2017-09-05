@@ -14,5 +14,5 @@
 <!--<img src="https://github.com/psi4/psi4media/blob/master/logos/psi4banner_half_tight.png" alt="Psi4 banner logo" height=200> <br>-->
 </p>
 
-# pylibefp
+# PylibEFP
 python wrapper to I. Kaliman's libefp for effective fragment potentials

@@ -1,18 +1,22 @@
 """
-Reference implementation of RHF/EFP using libefp through pylibefp.
+Reference implementation of RHF/EFP using libefp through PylibEFP.
 
 Requirements:
-NumPy, pylibefp
+NumPy
+PylibEFP >=0.6
+Psi4 >=1.2a1.dev507 (c. late Aug 2017)
 
-References: 
-Algorithm modified from Rob Parrish's most excellent Psi4 plugin example
-Bottom of the page: http://www.psicode.org/developers.php
+References:
+SCF in Python from @dgasmith's most excellent Self-Consistent-Field/RHF.py .
+SCF/EFP in Psi4 by @andysim, @edeprince3, @ilyak, @loriab
+libefp from [Kaliman:2013:2284]
+
 """
 from __future__ import division
 from __future__ import print_function
 
 __authors__   = "Lori A. Burns"
-__credits__   = ["Andrew C. Simmonett", "A. Eugene DePrince III", "Ilya A. Kaliman", "Lori A. Burns"]
+__credits__   = ["Andrew C. Simmonett", "A. Eugene DePrince III", "Ilya A. Kaliman", "Lori A. Burns", "Daniel G. A. Smith"]
 
 __copyright__ = "(c) 2014-2017, The Psi4NumPy Developers"
 __license__   = "BSD-3-Clause"
@@ -32,20 +36,20 @@ print('Psi4  loc:', os.path.abspath(psi4.__file__))
 print('PyLibEFP  loc:', os.path.abspath(pylibefp.__file__))
 
 
-@using_psi4_goodnuff
+@using_psi4_efpmints
 def test_qmefp():
 
     # Memory for Psi4 in GB
     psi4.set_memory('500 MB')
     psi4.core.set_output_file("output.dat", False)
-    
+
     # Memory for numpy in GB
     numpy_memory = 2
-    
+
     def set_qm_atoms(mol, efpobj):
         """Provides list of coordinates of quantum mechanical atoms from
         psi4.core.Molecule `mol` to pylibefp.core.efp() `efpobj`.
-    
+
         """
         ptc = []
         coords = []
@@ -54,67 +58,67 @@ def test_qmefp():
             coords.append(mol.x(iat))
             coords.append(mol.y(iat))
             coords.append(mol.z(iat))
-    
+
         efpobj.set_point_charges(ptc, coords)
-    
-    
+
+
     def modify_Fock_permanent(mol, nbf, efpobj):
         """Computes array of the EFP contribution to the potential felt by
         QM atoms, due to permanent EFP moments, for a SCF procedure.
-    
+
         Requires psi4.core.Molecule `mol`, number of basis functions `nbf`,
         and pylibefp.core.efp() `efpobj`.
-    
+
         """
         # get composition counts from libefp
         n_fr = efpobj.get_frag_count()
         natoms = efpobj.get_frag_atom_count()
-    
+
         # get multipoles count, pos'n, values from libefp
         #   charge + dipoles + quadrupoles + octupoles = 20
         n_mp = efpobj.get_multipole_count()
         xyz_mp = np.asarray(efpobj.get_multipole_coordinates()).reshape(n_mp, 3)
         val_mp = np.asarray(efpobj.get_multipole_values()).reshape(n_mp, 20)
-    
+
         #                    0  X  Y  Z  XX   YY   ZZ   XY   XZ   YZ
         prefacs = np.array([ 1, 1, 1, 1, 1/3, 1/3, 1/3, 2/3, 2/3, 2/3,
             1/15, 1/15, 1/15, 3/15, 3/15, 3/15, 3/15, 3/15, 3/15, 6/15])
         #   XXX   YYY   ZZZ   XXY   XXZ   XYY   YYZ   XZZ   YZZ   XYZ
-    
+
         # EFP permanent moment contribution to the Fock Matrix
         V2 = np.zeros((nbf, nbf))
-    
+
         # Cartesian basis one-electron EFP perturbation
         efp_ints = np.zeros((20, nbf, nbf))
-    
+
         for imp in range(n_mp):
             origin = xyz_mp[imp]
-    
+
             # get EFP multipole integrals from Psi4
             p4_efp_ints = mints.ao_efp_multipole_potential(origin=origin)
             for pole in range(20):
                 efp_ints[pole] = np.asarray(p4_efp_ints[pole])
-    
-            # add atom Z into multipole charge (when pos'n of atom matches mp)
+
+            # add frag atom Z into multipole charge (when pos'n of atom matches mp)
             for ifr in range(n_fr):
                 atoms = efpobj.get_frag_atoms(ifr)
                 for iat in range(natoms[ifr]):
                     xyz_atom = [atoms[iat]['x'], atoms[iat]['y'], atoms[iat]['z']]
                     if np.allclose(xyz_atom, origin, atol=1e-10):
                         val_mp[imp, 0] += atoms[iat]['Z']
-    
+
             # scale multipole integrals by multipole magnitudes. result goes into V
             for pole in range(20):
                 efp_ints[pole] *= -prefacs[pole] * val_mp[imp, pole]
                 V2 += efp_ints[pole]
-    
+
         return V2
-    
-    
+
+
     def modify_Fock_induced(nbf, efpobj, verbose=1):
         """Returns shared matrix containing the EFP contribution to the potential
         felt by QM atoms, due to EFP induced dipoles, in a SCF procedure.
-    
+
         """
         # get induced dipoles count, pos'n, values from libefp
         #   dipoles = 3
@@ -122,65 +126,65 @@ def test_qmefp():
         xyz_id = np.asarray(efpobj.get_induced_dipole_coordinates(verbose=verbose)).reshape(n_id, 3)
         val_id = np.asarray(efpobj.get_induced_dipole_values(verbose=verbose)).reshape(n_id, 3)
         val_idt = np.asarray(efpobj.get_induced_dipole_conj_values(verbose=verbose)).reshape(n_id, 3)
-    
+
         # take average of induced dipole and conjugate
         val_id = (val_id + val_idt) * 0.5
-    
+
         # EFP induced dipole contribution to the Fock Matrix
         V2 = np.zeros((nbf, nbf))
-    
+
         # Cartesian basis one-electron EFP perturbation
         field_ints = np.zeros((3, nbf, nbf))
-    
+
         for iid in range(n_id):
             origin = xyz_id[iid]
-    
+
             # get electric field integrals from Psi4
             p4_field_ints = mints.electric_field(origin=origin)
             for pole in range(3):
                 field_ints[pole] = np.asarray(p4_field_ints[pole])
-    
+
             # scale field integrals by induced dipole magnitudes. result goes into V
             for pole in range(3):
                 field_ints[pole] *= -val_id[iid, pole]
                 V2 += field_ints[pole]
-    
+
         return V2
-    
-    
+
+
     def field_fn(xyz):
         """Compute electric field from electrons in ab initio part for libefp polarization calculation.
-    
+
         Parameters
         ----------
         xyz : list
             3 * n_pt (flat) array of points at which to compute electric field
-    
+
         Returns
         -------
         list
             3 * n_pt (flat) array of electric field at points in `xyz1.
-    
+
         """
         points = np.array(xyz).reshape(-1, 3)
         n_pt = len(points)
-    
+
         # Cartesian basis one-electron EFP perturbation
         field_ints = np.zeros((3, nbf, nbf))
-    
+
         # Electric field at points
         field = np.zeros((n_pt, 3))
-    
+
         for ipt in range(n_pt):
             # get electric field integrals from Psi4
             p4_field_ints = mints.electric_field(origin=points[ipt])
-     
+
             field[ipt] = [np.vdot(density, np.asarray(p4_field_ints[0])) * 2.0,  # Ex
                           np.vdot(density, np.asarray(p4_field_ints[1])) * 2.0,  # Ey
                           np.vdot(density, np.asarray(p4_field_ints[2])) * 2.0]  # Ez
-    
+
         field = np.reshape(field, 3 * n_pt)
-        
+
         return field
 
 
@@ -205,9 +209,7 @@ def test_qmefp():
  [ -0.00093995668834,    -0.00663585147245,    -0.00592518334643,    -0.00084629056834,     0.00477138911517,  -0.01115822875565,    -0.01154437574140,    -0.00153039204428,     0.00944135089382,    -0.01046477748444,     -0.00068224645268,     0.00491320446628,    -0.00454371602298,     0.00066686324895,    -0.00845374029895,    -0.00144863365096,    -0.00600898660138,    -0.02521907195360,    -0.01660151455045],
  [ -0.00186166418149,    -0.01026009701560,    -0.00307008036331,    -0.00203426014685,     0.00250189743578,  -0.01834575971991,    -0.00936638912773,    -0.00622386437502,     0.00814913589233,    -0.01146456481073,     -0.00032923928756,     0.00097904308284,    -0.01120759511573,     0.00079498664458,    -0.01156033431781,    -0.00543904115350,    -0.01416862694275,    -0.01660151455045,    -0.02521511777687]])
 
-    
-    
-    
+
     mol = psi4.geometry("""
     units bohr
     0 1
@@ -218,11 +220,12 @@ def test_qmefp():
     no_com
     no_reorient
     """)
-    
+
     # <-- efp
+    # [Kaliman:2013:2284] Fig. 4 -- Initialize EFP
     efpmol = pylibefp.core.efp()
+    # [Kaliman:2013:2284] Fig. 4 -- Set fragment coordinates
     frags = ['h2o', 'nh3', 'nh3']
-    #frags = ['h2o', 'h2']
     efpmol.add_potential(frags)
     efpmol.add_fragment(frags)
     efpmol.set_frag_coordinates(0, 'xyzabc', [-4.014110144291,  2.316749370493, -1.801514729931, -2.902133, 1.734999, -1.953647])
@@ -232,149 +235,150 @@ def test_qmefp():
     efpmol.set_opts({}, append='psi')
     efpmol.set_electron_density_field_fn(field_fn)
     # --> efp
-    
-    
-    
+
     psi4.set_options({'basis': '6-31g*',
-                      #'basis': 'sto-3g',
                       'scf_type': 'pk',
                       'e_convergence': 1e-8})
-    
+
     # Set defaults
     maxiter = 40
     E_conv = 1.0E-6
     D_conv = 1.0E-3
-    
+
     # Integral generation from Psi4's MintsHelper
     wfn = psi4.core.Wavefunction.build(mol, psi4.core.get_global_option('BASIS'))
     t = time.time()
     mints = psi4.core.MintsHelper(wfn.basisset())
     S = np.asarray(mints.ao_overlap())
-    
+
     # Get nbf and ndocc for closed shell molecules
     nbf = S.shape[0]
     ndocc = wfn.nalpha()
-    
+
     print('\nNumber of occupied orbitals: %d' % ndocc)
     print('Number of basis functions: %d' % nbf)
-    
+
     # Run a quick check to make sure everything will fit into memory
     I_Size = (nbf ** 4) * 8.e-9
     print("\nSize of the ERI tensor will be %4.2f GB." % I_Size)
-    
+
     # Estimate memory usage
     memory_footprint = I_Size * 1.5
     if I_Size > numpy_memory:
         psi4.core.clean()
         raise Exception("Estimated memory utilization (%4.2f GB) exceeds numpy_memory \
                         limit of %4.2f GB." % (memory_footprint, numpy_memory))
-    
+
     # Compute required quantities for SCF
     V = np.asarray(mints.ao_potential())
     T = np.asarray(mints.ao_kinetic())
     I = np.asarray(mints.ao_eri())
-    
+
     print('\nTotal time taken for integrals: %.3f seconds.' % (time.time() - t))
-    
+
     t = time.time()
-    
+
     # Build H_core
     H = T + V
 
     # <-- efp: add in permanent moment contribution and cache
-    Vefp = modify_Fock_permanent(mol, nbf, efpmol)
+    Vefp = modify_Fock_permanent(mol, nbf, efpmol, verbose=2)
     assert(compare_integers(1, np.allclose(Vefp, ref_V2), 'EFP permanent Fock contrib'))
     H = H + Vefp
     Horig = H.copy()
     set_qm_atoms(mol, efpmol)
     # --> efp
-    
+
     # Orthogonalizer A = S^(-1/2) using Psi4's matrix power.
     A = mints.ao_overlap()
     A.power(-0.5, 1.e-16)
     A = np.asarray(A)
-    
+
     # Calculate initial core guess
     Hp = A.dot(H).dot(A)
     e, C2 = np.linalg.eigh(Hp)
     C = A.dot(C2)
     Cocc = C[:, :ndocc]
     D = np.einsum('pi,qi->pq', Cocc, Cocc)
-    
+
     print('\nTotal time taken for setup: %.3f seconds' % (time.time() - t))
-    
+
     print('QM/EFP: iterating Total Energy including QM/EFP Induction')
     t = time.time()
     E = 0.0
     Enuc = mol.nuclear_repulsion_energy()
     Eold = 0.0
     Dold = np.zeros_like(D)
-    
+
     for SCF_ITER in range(1, maxiter + 1):
-    
+
         # <-- efp: add contribution to Fock matrix
         H = Horig
         verbose_dipoles = 1 if (SCF_ITER == 1) else 0
+        # [Kaliman:2013:2284] Fig. 4 -- Compute electric field from wavefunction
+        # [Kaliman:2013:2284] Fig. 4 -- Compute electric field from induced dipoles
         Vefp = modify_Fock_induced(nbf, efpmol, verbose=verbose_dipoles)
         H = H + Vefp
         # --> efp
-    
+
         # Build fock matrix
         J = np.einsum('pqrs,rs->pq', I, D)
         K = np.einsum('prqs,rs->pq', I, D)
         F = H + J * 2 - K
-    
+
         diis_e = np.einsum('ij,jk,kl->il', F, D, S) - np.einsum('ij,jk,kl->il', S, D, F)
         diis_e = A.dot(diis_e).dot(A)
-    
+
         # SCF energy and update
+        # [Kaliman:2013:2284] Fig. 4 -- Compute QM wavefunction
         SCF_E = np.einsum('pq,pq->', F + H, D) + Enuc
         dRMS = np.mean(diis_e**2)**0.5
-    
+
         # <-- efp: add contribution to energy
         density = D
+        # [Kaliman:2013:2284] Fig. 4 -- Compute EFP induced dipoles
         efp_wfn_dependent_energy = efpmol.get_wavefunction_dependent_energy()
         SCF_E += efp_wfn_dependent_energy
         # --> efp
-    
+
         print('SCF Iteration %3d: Energy = %4.16f   dE = % 1.5E   dRMS = %1.5E   dEFP = %12.8f'
               % (SCF_ITER, SCF_E, (SCF_E - Eold), dRMS, efp_wfn_dependent_energy))
         if (abs(SCF_E - Eold) < E_conv) and (dRMS < D_conv):
             break
-    
+
         Eold = SCF_E
         Dold = D
-    
+
         # Diagonalize Fock matrix
         Fp = A.dot(F).dot(A)
         e, C2 = np.linalg.eigh(Fp)
         C = A.dot(C2)
         Cocc = C[:, :ndocc]
         D = np.einsum('pi,qi->pq', Cocc, Cocc)
-    
+
         if SCF_ITER == maxiter:
             clean()
             raise Exception("Maximum number of SCF cycles exceeded.")
-    
+
+
     # <-- efp
     efpmol.compute()
     efpene = efpmol.get_energy(label='psi')
+    # [Kaliman:2013:2284] Fig. 4 -- Compute one electron EFP contributions to Hamiltonian
     efp_wfn_independent_energy = efpene['total'] - efpene['ind']
     SCF_E += efp_wfn_independent_energy
     print(efpmol.energy_summary(scfefp=SCF_E, label='psi'))
     # --> efp
-    
+
     print('Total time for SCF iterations: %.3f seconds \n' % (time.time() - t))
-    
-    # references confirmed against Q-Chem & Psi4    
+
+    # references confirmed against Q-Chem & Psi4
     assert(compare_values( 0.2622598847, efpene['total'] - efpene['ind'], 6, 'EFP corr to SCF'))
     assert(compare_values(-0.0117694790, efpene['ind'], 6, 'QM-EFP Indc'))
     assert(compare_values(-0.0021985285, efpene['disp'], 6, 'EFP-EFP Disp'))
     assert(compare_values( 0.0056859871, efpene['exch'], 6, 'EFP-EFP Exch'))
     assert(compare_values( 0.2504904057, efpene['total'], 6, 'EFP-EFP Totl'))
     assert(compare_values(-76.0139362744, SCF_E, 6, 'SCF'))
-#    efpmol.clear_electron_density_field_fn()
-#    efpmol.shutdown()
     efpmol.clean()
 
 if __name__ == '__main__':

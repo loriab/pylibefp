@@ -29,6 +29,6 @@ using_molparse = pytest.mark.skipif(_plugin_import('molparse') is False,
 using_psi4 = pytest.mark.skipif(_plugin_import('psi4') is False,
                                 reason='Not detecting package psi4. Install package if necessary and and to envvar PYTHONPATH')
 
-using_psi4_goodnuff = pytest.mark.skipif(is_psi4_new_enough("1.2a1.dev507") is False,
+using_psi4_efpmints = pytest.mark.skipif(is_psi4_new_enough("1.2a1.dev507") is False,
                                     reason="Psi4 does not include EFP integrals in mints. Update to developement head")
 
