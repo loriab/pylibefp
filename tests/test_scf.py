@@ -78,7 +78,7 @@ def test_qmefp():
         #   charge + dipoles + quadrupoles + octupoles = 20
         n_mp = efpobj.get_multipole_count()
         xyz_mp = np.asarray(efpobj.get_multipole_coordinates()).reshape(n_mp, 3)
-        val_mp = np.asarray(efpobj.get_multipole_values()).reshape(n_mp, 20)
+        val_mp = np.asarray(efpobj.get_multipole_values(verbose=2)).reshape(n_mp, 20)
 
         #                    0  X  Y  Z  XX   YY   ZZ   XY   XZ   YZ
         prefacs = np.array([ 1, 1, 1, 1, 1/3, 1/3, 1/3, 2/3, 2/3, 2/3,
@@ -282,7 +282,7 @@ def test_qmefp():
     H = T + V
 
     # <-- efp: add in permanent moment contribution and cache
-    Vefp = modify_Fock_permanent(mol, nbf, efpmol, verbose=2)
+    Vefp = modify_Fock_permanent(mol, nbf, efpmol)
     assert(compare_integers(1, np.allclose(Vefp, ref_V2), 'EFP permanent Fock contrib'))
     H = H + Vefp
     Horig = H.copy()
