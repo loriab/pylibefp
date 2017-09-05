@@ -39,14 +39,6 @@
    :maxdepth: 2
    
    introduction
-
-===================
-Programmers' Manual
-===================
-
-.. toctree::
-   :maxdepth: 2
-
    api
 
 * Indices

@@ -7,7 +7,7 @@
 <!--<a href="http://forum.psicode.org/"> <img src="https://img.shields.io/badge/chat-on_forum-5077AB.svg" /></a>-->
 <br>
 <!--<a href="http://www.psicode.org"> <img src="https://img.shields.io/badge/home-Psi4-5077AB.svg" /></a>-->
-<!--<a href="http://psicode.org/psi4manual/master/index.html"> <img src="https://img.shields.io/badge/docs-latest-5077AB.svg" /></a>-->
+<a href="http://psicode.org/pylibefpmanual/master/index.html"> <img src="https://img.shields.io/badge/docs-latest-5077AB.svg" /></a>
 <!--<a href="https://anaconda.org/psi4/pylibefp"> <img src="https://anaconda.org/psi4/pylibefp/badges/installer/conda.svg" /></a>-->
 <a href="https://opensource.org/licenses/BSD-3-Clause"> <img src="https://img.shields.io/github/license/loriab/pylibefp.svg" /></a>
 <br><br>
@@ -15,4 +15,4 @@
 </p>
 
 # PylibEFP
-python wrapper to I. Kaliman's libefp for effective fragment potentials
+python wrapper to I. Kaliman's [libefp](https://libefp.github.io/) for effective fragment potentials

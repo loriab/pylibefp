@@ -5,15 +5,17 @@ if(NOT SPHINX_FOUND)
 endif()
 
 execute_process(COMMAND ${PYTHON_EXECUTABLE} -c
-    "import sphinx-psi4-theme cloud_sptheme; import astropy_helpers; import python-graphviz"
+    "import sphinx_psi4_theme; import cloud_sptheme; import astropy_helpers; import graphviz"
     OUTPUT_QUIET ERROR_QUIET RESULT_VARIABLE _exec_python_err)
 if(_exec_python_err)
     message(STATUS "No theme, no docs (try: conda install sphinx-psi4-theme cloud_sptheme astropy-helpers graphviz python-graphviz -c conda-forge -c astropy -c psi4)")
-    set(_sphinx_stuffs "ON")
+    set(SPHINX_STUFF_FOUND "OFF")
+else()
+    set(SPHINX_STUFF_FOUND "ON")
 endif()
 
 # Setup and build Sphinx documentation
-if(SPHINX_FOUND AND _sphinx_stuffs)
+if(SPHINX_FOUND AND SPHINX_STUFF_FOUND)
     set(CCSD "${CMAKE_CURRENT_SOURCE_DIR}")
     set(CCBD "${CMAKE_CURRENT_BINARY_DIR}")
 
