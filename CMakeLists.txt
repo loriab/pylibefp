@@ -77,7 +77,7 @@ ExternalProject_Add(pylibefp-core
    INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install
                    DESTDIR=${CMAKE_BINARY_DIR}/stage)
 
-#add_subdirectory(doc)
+add_subdirectory(doc)
 add_subdirectory(tests)
 
 # <<<  Install  >>>
