@@ -447,6 +447,7 @@ py::tuple _efp_get_frag_xyzabc(efp* efp, size_t frag_idx) {
     return rets;
 }
 
+
 py::tuple _efp_get_wavefunction_dependent_energy(efp* efp) {
     enum efp_result res;
     double ene;

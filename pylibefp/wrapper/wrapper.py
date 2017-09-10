@@ -1457,16 +1457,51 @@ def to_viz_dict(efpobj):
     return pyat
 
 
+def get_frag_xyzabc(efpobj, ifr=None):
+    """Get the XYZABC coordinates hint on fragment(s) from `efpobj`.
+
+    Parameters
+    ----------
+    ifr : int, optional
+        Index of fragment (0-indexed) if not all.
+
+    Returns
+    -------
+    list, list of list
+        If `ifr`, hint for fragment `ifr`. Otherwise, hints of all
+        fragments in list. Note that fragments inputted through POINTS
+        will still be returned as XYZABC. Also, fragments inputted
+        through XYZABC will have the angles standardized to (-pi, pi].
+
+    """
+    nfr = efpobj.get_frag_count()
+
+    if ifr is None:
+        frags = []
+        for fr in range(nfr):
+            (res, hint) = efpobj._efp_get_frag_xyzabc(fr)
+            _result_to_error(res)
+
+            frags.append(hint)
+        return frags
+
+    else:
+        if ifr in range(nfr):
+            (res, hint) = efpobj._efp_get_frag_xyzabc(ifr)
+            _result_to_error(res)
+
+            return hint
+        else:
+            raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
+
+
 def to_dict(efpobj):
     pysys = {}
     pysys['full_fragments'] = []
 
     for fr in range(efpobj.get_frag_count()):
-        (res, xyzabc) = efpobj._efp_get_frag_xyzabc(fr)
-        _result_to_error(res)
-
         pysys['full_fragments'].append({
-            'coordinates_hint': xyzabc,
+            'coordinates_hint': efpobj.get_frag_xyzabc(fr),
             'efp_type': 'xyzabc',
             'fragment_file': efpobj.get_frag_name(fr).lower(),
                    })
@@ -1523,6 +1558,7 @@ core.efp.get_frag_atom_count = get_frag_atom_count
 core.efp.get_wavefunction_dependent_energy = get_wavefunction_dependent_energy
 core.efp.set_periodic_box = set_periodic_box
 core.efp.get_periodic_box = get_periodic_box
+core.efp.get_frag_xyzabc = get_frag_xyzabc
 
 core.efp.get_frag_atoms = get_frag_atoms
 core.efp.get_atoms = get_atoms
