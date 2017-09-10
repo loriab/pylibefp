@@ -1054,22 +1054,22 @@ def geometry_summary(efpobj, units_to_bohr=1.0):
     return text
 
 
-#def nuclear_repulsion_energy(efpobj):
-#    """Computes nuclear repulsion energy."""
-#
-#    pyat = efpobj.get_atoms()
-#    nre = 0.0
-#    for iat1, at1 in enumerate(pyat['full_atoms']):
-#        for iat2, at2 in enumerate(pyat['full_atoms']):
-#            if iat2 < iat1:
-#                ZZ = at1['Z'] * at2['Z']
-#                dx = at1['x'] - at2['x']
-#                dy = at1['y'] - at2['y']
-#                dz = at1['z'] - at2['z']
-#                dist = math.sqrt(dx * dx + dy * dy + dz * dz)
-#                nre += ZZ / dist
-#
-#    return nre
+def nuclear_repulsion_energy(efpobj):
+    """Computes nuclear repulsion energy."""
+
+    pyat = efpobj.get_atoms()
+    nre = 0.0
+    for iat1, at1 in enumerate(pyat['full_atoms']):
+        for iat2, at2 in enumerate(pyat['full_atoms']):
+            if iat2 < iat1:
+                ZZ = at1['Z'] * at2['Z']
+                dx = at1['x'] - at2['x']
+                dy = at1['y'] - at2['y']
+                dz = at1['z'] - at2['z']
+                dist = math.sqrt(dx * dx + dy * dy + dz * dz)
+                nre += ZZ / dist
+
+    return nre
 
 
 #def _frag_idx_validation(efpobj, ifr):
@@ -1407,37 +1407,6 @@ def to_dict(efpobj):
     return pysys
 
 
-yuio = {'libefp': {'full_fragments':
- [{'coordinates_hint': [-0.5753870821672306,
-                       -4.23695594520049,
-                       -0.5552607051670226,
-                       -0.642499,
-                       1.534222,
-                       -0.568147],
-  'efp_type': 'xyzabc',
-  'fragment_file': 'C6H6'},
- {'coordinates_hint': [-1.1352612324342508,
-                       2.578405376972965,
-                       1.4862284641766452,
-                       3.137879,
-                       1.557344,
-                       -2.56855],
-  'efp_type': 'xyzabc',
-  'fragment_file': 'C6H6'}]},
- 'molecule': {
- 'fix_com': True,
- 'fix_orientation': True,
- 'fix_symmetry': 'c1',
- 'fragment_charges': [],
- 'fragment_multiplicities': [],
- 'fragment_types': [],
- 'fragments': [],
- 'full_atoms': [],
- 'input_units_to_au': 1.8897261328856432,
- 'name': 'default',
- 'units': 'Angstrom'}}
-
-
 # only wrapped to throw Py exceptions
 core.efp.prepare = prepare
 core.efp.compute = compute
@@ -1450,7 +1419,7 @@ core.efp.get_frag_count = get_frag_count
 core.efp.get_energy = get_energy
 core.efp.get_gradient = get_gradient
 core.efp.energy_summary = energy_summary
-#core.efp.nuclear_repulsion_energy = nuclear_repulsion_energy
+core.efp.nuclear_repulsion_energy = nuclear_repulsion_energy
 core.efp.to_viz_dict = to_viz_dict
 core.efp.to_dict = to_dict
 core.efp.get_frag_name = get_frag_name

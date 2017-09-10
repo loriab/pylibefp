@@ -584,7 +584,8 @@ PYBIND11_MODULE(core, m) {
         .def_readwrite("mass", &efp_atom::mass)                               /* Atom mass. */
         .def_readwrite("znuc", &efp_atom::znuc);                              /* Nuclear charge. */
 
-    py::class_<efp, std::unique_ptr<efp, py::nodelete>>(m, "efp", "Main libefp opaque structure")
+    py::class_<efp, std::unique_ptr<efp, py::nodelete>>(m, "efp", py::dynamic_attr(), "Main libefp opaque structure")
+        // dynamic_attr for stashing input_units_to_au
         .def(py::init(&efp_create), "Creates a new efp object via `efp_create`")
         .def("banner", _efp_banner, "Gets a human readable banner string with information about the library")
 //        .def("set_error_log", &efp_set_error_log, "Sets the error log callback function")
@@ -638,8 +639,7 @@ PYBIND11_MODULE(core, m) {
 //        .def("get_frag_mass", &efp_get_frag_mass, "Gets total mass on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("get_frag_inertia", &efp_get_frag_inertia, "Gets fragment principal moments of inertia on 0-indexed fragment *arg0* and returns it in *arg1*")
         .def("_efp_get_frag_atom_count", _efp_get_frag_atom_count, "Gets the number of atoms on fragment")
-        .def("_efp_get_frag_atoms", &efp_get_frag_atoms, "Wrapped get atoms comprising the specified 0-indexed fragment")
-        .def("_efp_get_frag_atoms", _efp_get_frag_atoms, "Gets atoms comprising the specified 0-indexed fragment")
+        .def("_efp_get_frag_atoms", _efp_get_frag_atoms, "Wrapped get atoms comprising the specified 0-indexed fragment")
 //        .def("get_electric_field", &efp_get_electric_field, "Gets electric field for a point on 0-indexed fragment *arg0* and returns it in *arg1*")
 //        .def("torque_to_derivative", &efp_torque_to_derivative, "Convert rigid body torque *arg1* to derivatives *arg2* of energy by Euler angles *arg0*")
         .def("clean", &_clean, "Preferred destructor combining libefp::efp_shutdown and field_fn release")
