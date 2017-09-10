@@ -92,6 +92,10 @@ def test_qm_1b():
     ene = asdf.get_energy()
     assert(compare_values(-0.0787829370, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
 
+    assert(compare_values(382.798972923, asdf.nuclear_repulsion_energy(use_efp_frags=True, use_point_charges=True), 4, sys._getframe().f_code.co_name + ': NRE qmefp'))
+    assert(compare_values(1.90431498139, asdf.nuclear_repulsion_energy(use_efp_frags=False, use_point_charges=True), 4, sys._getframe().f_code.co_name + ': NRE qm'))
+    assert(compare_values(321.754522402, asdf.nuclear_repulsion_energy(use_efp_frags=True, use_point_charges=False), 4, sys._getframe().f_code.co_name + ': NRE efp'))
+
 
 def test_qm_2a():
     asdf = system_qm2()
