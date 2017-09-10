@@ -1037,11 +1037,10 @@ def geometry_summary(efpobj, units_to_bohr=1.0):
 
     # TODO move into dict?
     ptc_info = {'n': efpobj.get_point_charge_count(),
-                'xyz': efpobj.get_point_charge_coordinates(),
-                'val': efpobj.get_point_charge_values()}
+                'xyz': efpobj.get_point_charge_coordinates(verbose=0),
+                'val': efpobj.get_point_charge_values(verbose=0)}
 
     if ptc_info['n'] > 0:
-        print(ptc_info)
         mult3 = list(map(list, zip(*[iter(ptc_info['xyz'])] * 3)))
         text += '    ------------\n'
         for ptc in range(ptc_info['n']):
@@ -1054,13 +1053,39 @@ def geometry_summary(efpobj, units_to_bohr=1.0):
     return text
 
 
-def nuclear_repulsion_energy(efpobj):
-    """Computes nuclear repulsion energy."""
+def nuclear_repulsion_energy(efpobj, use_efp_frags=True, use_point_charges=False):
+    """Computes nuclear repulsion energy for `efpobj`.
 
-    pyat = efpobj.get_atoms()
+    Parameters
+    ----------
+    use_efp_frags : bool, optional
+        If True (default), compute NRE using the efp fragment subsystem.
+    use_point_charges : bool, optional
+        If True (not default), include point charges (generally QM atoms)
+        in NRE computation.
+
+    Returns
+    -------
+    float
+        Nuclear repulsion energy [E_h] for specified geometry subsystem
+
+    """
     nre = 0.0
-    for iat1, at1 in enumerate(pyat['full_atoms']):
-        for iat2, at2 in enumerate(pyat['full_atoms']):
+    loc = []
+
+    if use_efp_frags:
+        loc.extend(efpobj.get_atoms()['full_atoms'])
+    if use_point_charges:
+        ptc_xyz = efpobj.get_point_charge_coordinates(verbose=0)
+        ptc_val = efpobj.get_point_charge_values(verbose=0)
+        for ptc in range(efpobj.get_point_charge_count()):
+            loc.append({'Z': ptc_val[ptc],
+                        'x': ptc_xyz[ptc * 3],
+                        'y': ptc_xyz[ptc * 3 + 1],
+                        'z': ptc_xyz[ptc * 3 + 2]})
+
+    for iat1, at1 in enumerate(loc):
+        for iat2, at2 in enumerate(loc):
             if iat2 < iat1:
                 ZZ = at1['Z'] * at2['Z']
                 dx = at1['x'] - at2['x']
@@ -1104,7 +1129,59 @@ def set_frag_coordinates(efpobj, ifr, ctype, coord):
             _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
                                        'invalid value for [xyzabc/points/rotmat] {}: {}'.format('ctype', ctype))
 
+    efpobj.input_units_to_au = 1.0
     res = efpobj._efp_set_frag_coordinates(ifr, ctype, coord)
+    _result_to_error(res)
+
+
+def set_point_charge_coordinates(efpobj, xyz):
+    """Reset arbitrary point charge locations (often QM atoms)
+    interacting with the EFP subsystem. Must have been initially set
+    with set_point_charges.
+
+    Parameters
+    ----------
+    xyz : list
+        ``3 * n_ptc`` array of XYZ coordinates of charge positions,
+        generally QM coordinates.
+
+    Returns
+    -------
+    None
+
+    """
+    n_ptc = efpobj.get_point_charge_count()
+    if n_ptc == 0:
+        raise PyEFPSyntaxError('Must initialize point charges with set_point_charges')
+    if len(xyz) != (3 * n_ptc):
+        raise PyEFPSyntaxError('Invalid point charge length: {}'.format(xyz))
+
+    res = efpobj._efp_set_point_charge_coordinates(len(xyz), xyz)
+    _result_to_error(res)
+
+
+def set_point_charge_values(efpobj, ptc):
+    """Reset arbitrary point charge values (often QM atoms)
+    interacting with the EFP subsystem. Must have been initially set
+    with set_point_charges.
+
+    Parameters
+    ----------
+    ptc : list
+        array of charge values, generally QM nuclear charges.
+
+    Returns
+    -------
+    None
+
+    """
+    n_ptc = efpobj.get_point_charge_count()
+    if n_ptc == 0:
+        raise PyEFPSyntaxError('Must initialize point charges with set_point_charges')
+    if len(ptc) != n_ptc:
+        raise PyEFPSyntaxError('Invalid point charge length: {}'.format(ptc))
+
+    res = efpobj._efp_set_point_charge_values(len(ptc), ptc)
     _result_to_error(res)
 
 
@@ -1117,16 +1194,19 @@ def set_point_charges(efpobj, ptc, coord):
     ptc : list
         ``n_ptc`` array of charge values, generally QM Z.
     coord : list
-        ``3 * n_ptc`` array of XYZ coordinates of charge positions,
-        generally QM coordinates.
+        ``3 * n_ptc`` array (flat) or ``n_ptc, 3`` array (nested)
+        of XYZ coordinates of charge positions, generally QM coordinates.
 
     Returns
     -------
     None
 
     """
+    if len(ptc) == len(coord):
+        coord = sum(coord, [])
+
     if (len(ptc) * 3) != len(coord):
-        raise PyEFPSyntaxError('Invalid periodic box setting: {}'.format(xyz))
+        raise PyEFPSyntaxError('Invalid point charges setting: {}'.format(coord))
 
     res = efpobj._efp_set_point_charges(len(ptc), ptc, coord)
     _result_to_error(res)
@@ -1427,6 +1507,8 @@ core.efp.get_frag_charge = get_frag_charge
 core.efp.get_frag_multiplicity = get_frag_multiplicity
 core.efp.set_frag_coordinates = set_frag_coordinates
 core.efp.set_point_charges = set_point_charges
+core.efp.set_point_charge_coordinates = set_point_charge_coordinates
+core.efp.set_point_charge_values = set_point_charge_values
 core.efp.get_point_charge_count = get_point_charge_count
 core.efp.get_point_charge_coordinates = get_point_charge_coordinates
 core.efp.get_point_charge_values = get_point_charge_values
@@ -1448,7 +1530,20 @@ core.efp.geometry_summary = geometry_summary
 
 
 def from_dict(efp_init):
+    """Instantiate an EFP object from `efp_init`.
 
+    Parameters
+    ----------
+    efp_init : nested dict
+        Dictionary of prescribed format to specify EFP fragments (no QM hints).
+
+    Returns
+    -------
+    :py:class:`pylibefp.core.efp`
+        New EFP instance with fragments defined and finished off through
+        :py:func:`pylibefp.core.efp.prepare`.
+
+    """
     sys = core.efp()
 
     for ifr, fr in enumerate(efp_init['full_fragments']):
@@ -1456,5 +1551,6 @@ def from_dict(efp_init):
         sys.add_fragment(fr['fragment_file'])
         sys.set_frag_coordinates(ifr, fr['efp_type'], fr['coordinates_hint'])
 
+    sys.input_units_to_au = efp_init['molecule']['input_units_to_au']
     sys.prepare()
     return sys

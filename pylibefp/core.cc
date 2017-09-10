@@ -61,6 +61,34 @@ efp_result _efp_set_frag_coordinates(efp* efp, size_t frag_idx, efp_coord_type c
 }
 
 
+efp_result _efp_set_point_charge_values(efp* efp, size_t n_ptc, py::list ptc) {
+    enum efp_result res;
+
+    double *cptc = NULL;
+    cptc = new double[n_ptc];
+    double *pptc = cptc;
+    for (auto itm : ptc)
+        *pptc++ = itm.cast<double>();
+
+    res = efp_set_point_charge_values(efp, cptc);
+    return res;
+}
+
+
+efp_result _efp_set_point_charge_coordinates(efp* efp, size_t n_ptc, py::list xyz) {
+    enum efp_result res;
+
+    double *cxyz = NULL;
+    cxyz = new double[3 * n_ptc];
+    double *pxyz = cxyz;
+    for (auto itm : xyz)
+        *pxyz++ = itm.cast<double>();
+
+    res = efp_set_point_charge_coordinates(efp, cxyz);
+    return res;
+}
+
+
 efp_result _efp_set_point_charges(efp* efp, size_t n_ptc, py::list ptc, py::list xyz) {
     enum efp_result res;
 
@@ -598,8 +626,8 @@ PYBIND11_MODULE(core, m) {
         .def("set_electron_density_field_fn", _efp_set_electron_density_field_fn, "Sets the callback function which computes electric field from electrons in ab initio subsystem")
         .def("clear_electron_density_field_fn", _clear_electron_density_field_fn, "Detaches callback function from EFP instance (necessary for destruction. Called by clean or call alongside shutdown")
         .def("_efp_set_point_charges", _efp_set_point_charges, "Wrapped setup arbitrary point charges of magnitude at locations interacting with EFP subsystem")
-//        .def("set_point_charge_coordinates", &efp_set_point_charge_coordinates, "Sets coordinates *arg0* of point charges")
-//        .def("set_point_charge_values", &efp_set_point_charge_values, "Sets values of point charges *arg0*")
+        .def("_efp_set_point_charge_coordinates", _efp_set_point_charge_coordinates, "Wrapped sets coordinates of arbitrary point charges interacting with EFP subsystem")
+        .def("_efp_set_point_charge_values", _efp_set_point_charge_values, "Wrapped sets magnitudes of arbitrary point charges interacting with EFP subsystem")
         .def("_efp_get_point_charge_count", _efp_get_point_charge_count, "Gets the number of currently set point charges")
         .def("_efp_get_point_charge_coordinates", _efp_get_point_charge_coordinates, "Wrapped gets coordinates of currently set point charges")
         .def("_efp_get_point_charge_values", _efp_get_point_charge_values, "Wrapped gets values of currently set point charges")

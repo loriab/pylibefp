@@ -63,6 +63,14 @@ def test_qm_1a():
         nptc = 4
     assert(compare_dicts({'n': nptc, 'xyz': coords, 'val': ptc}, ptc_info, 6, sys._getframe().f_code.co_name + ': ptc'))
     assert(compare_values(-0.0787829370, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    ptc_x2 = [c * 2 for c in ptc]
+    coords_x2 = [c * 2 for c in coords]
+    asdf.set_point_charge_values(ptc_x2)
+    asdf.set_point_charge_coordinates(coords_x2)
+    ptc_info_x2 = {'n': asdf.get_point_charge_count(),
+                   'xyz': asdf.get_point_charge_coordinates(),
+                   'val': asdf.get_point_charge_values()}
+    assert(compare_dicts({'n': nptc, 'xyz': coords_x2, 'val': ptc_x2}, ptc_info_x2, 6, sys._getframe().f_code.co_name + ': ptc reset'))
 
 
 def test_qm_1b():
