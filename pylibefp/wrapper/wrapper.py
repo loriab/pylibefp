@@ -1426,7 +1426,7 @@ def get_atoms(efpobj):
         full_atoms.extend(pyat)
 
     mol_info = {}
-    mol_info["units"] = "Bohr"
+#    mol_info["units"] = "Bohr"
     mol_info["input_units_to_au"] = 1.0
     mol_info["fix_com"] = True
     mol_info["fix_orientation"] = True
@@ -1506,18 +1506,21 @@ def to_dict(efpobj):
             'fragment_file': efpobj.get_frag_name(fr).lower(),
                    })
 
+    #pysys['molecule'] = {
+    #    'fix_com': True,
+    #    'fix_orientation': True,
+    #    'fix_symmetry': 'c1',
+    #    'fragment_charges': [],
+    #    'fragment_multiplicities': [],
+    #    'fragment_types': [],
+    #    'fragments': [],
+    #    'full_atoms': [],
+    #    #'input_units_to_au': 1.8897261328856432,
+    #    'name': 'default',
+    #    'input_units_to_au': 1.0}
+    #    #'units': 'Bohr'}
     pysys['molecule'] = {
-        'fix_com': True,
-        'fix_orientation': True,
-        'fix_symmetry': 'c1',
-        'fragment_charges': [],
-        'fragment_multiplicities': [],
-        'fragment_types': [],
-        'fragments': [],
-        'full_atoms': [],
-        'input_units_to_au': 1.8897261328856432,
-        'name': 'default',
-        'units': 'Bohr'}
+        'input_units_to_au': efpobj.input_units_to_au }
 
     return pysys
 
