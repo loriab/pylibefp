@@ -28,16 +28,16 @@ from addons import *
 import time
 import numpy as np
 np.set_printoptions(precision=5, linewidth=200, suppress=True)
-import psi4
 import pylibefp
 
 import os
-print('Psi4  loc:', os.path.abspath(psi4.__file__))
 print('PyLibEFP  loc:', os.path.abspath(pylibefp.__file__))
 
 
 @using_psi4_efpmints
 def test_qmefp():
+    import psi4
+    print('Psi4  loc:', os.path.abspath(psi4.__file__))
 
     # Memory for Psi4 in GB
     psi4.set_memory('500 MB')
