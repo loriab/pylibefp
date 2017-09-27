@@ -1,7 +1,7 @@
 .. #
 .. # @BEGIN LICENSE
 .. #
-.. #   docs/source/introduction.rst:
+.. #   docs/source/introduction.rst: Sphinx docs intro
 .. #
 .. #   Copyright (c) 2017 The Psi4 Developers
 .. #
