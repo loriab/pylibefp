@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)  # 3.3: EP_add(DEPENDS interfacelib
-# project_VERSION* variables populated from project(... VERSION x.x.x) string
-cmake_policy(SET CMP0048 NEW)
+# project_VERSION* variables undefined, handled in primary EP
 
 project(pylibefp
-        VERSION 0.1.0
         LANGUAGES C CXX)
 set(pylibefp_AUTHORS      "Lori A. Burns")
 set(pylibefp_DESCRIPTION  "Python binding to I. Kaliman's libefp for Effective Fragment Potentials")

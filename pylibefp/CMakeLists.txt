@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 project(pylibefp-core 
-        VERSION 0.1.0
         LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH ${PYLIBEFP_ROOT}/cmake)
@@ -61,6 +60,10 @@ set_target_properties(core PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"  # for py
 
 add_custom_target(update_version ALL
                   COMMAND ${PYTHON_EXECUTABLE} versioner.py --metaout ${CMAKE_CURRENT_BINARY_DIR}/metadata.py
+                                                            --cmakeout ${CMAKE_CURRENT_BINARY_DIR}/metadata.cmake
+                  COMMAND cmake -DWTO="${CMAKE_CURRENT_BINARY_DIR}/${CMAKECONFIG_INSTALL_DIR}"
+                                -DPN="pylibefp"
+                                -P ${CMAKE_CURRENT_BINARY_DIR}/metadata.cmake
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                   COMMENT "Generating version info")
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metadata.py
@@ -101,10 +104,6 @@ configure_package_config_file(
         ${PN}Config.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/${CMAKECONFIG_INSTALL_DIR}/${PN}Config.cmake
         INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
-write_basic_package_version_file(
-        ${CMAKE_CURRENT_BINARY_DIR}/${CMAKECONFIG_INSTALL_DIR}/${PN}ConfigVersion.cmake
-        VERSION ${${PN}_VERSION}
-        COMPATIBILITY SameMajorVersion)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CMAKECONFIG_INSTALL_DIR}/${PN}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${CMAKECONFIG_INSTALL_DIR}/${PN}ConfigVersion.cmake
         DESTINATION ${CMAKECONFIG_INSTALL_DIR})
