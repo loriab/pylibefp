@@ -73,7 +73,7 @@ print("__init__ core    {}".format(core.__file__))
 print("__init__ wrapper {}".format(wrapper.__file__))
 #from .driver import *
 #from .header import print_header
-#from .metadata import __version__, version_formatter
+from .metadata import __version__, version_formatter
 
 # A few extraneous functions
 #from .extras import get_input_directory, addons, test
