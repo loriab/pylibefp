@@ -21,7 +21,7 @@ from distutils.core import setup
 def version_func():
     import subprocess
 
-    command = 'python psi4/versioner.py --formatonly --format={versionlong}'
+    command = 'python pylibefp/versioner.py --formatonly --format={versionlong}'
     process = subprocess.Popen(command.split(), shell=False, stdout=subprocess.PIPE)
     (out, err) = process.communicate()
     if sys.version_info >= (3, 0):
