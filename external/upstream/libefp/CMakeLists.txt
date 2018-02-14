@@ -9,9 +9,10 @@ else()
     message(STATUS "Suitable libefp could not be located, ${Magenta}Building libefp${ColourReset} instead.")
     ExternalProject_Add(libefp_external
         #DEPENDS lapack_external
-        GIT_REPOSITORY https://github.com/psi4/libefp
-        GIT_TAG devhead2
-#        GIT_REPOSITORY https://github.com/ilyak/libefp
+#        GIT_REPOSITORY https://github.com/psi4/libefp
+#        GIT_TAG devhead2
+        GIT_REPOSITORY https://github.com/ilyak/libefp
+        GIT_TAG 1c686aa
 #        GIT_TAG 1.4.2
 #        DOWNLOAD_COMMAND ""
 #        SOURCE_DIR "/home/psilocaluser/gits/libefp"
