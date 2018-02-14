@@ -64,3 +64,15 @@ def test_dict_4a():
     assert(compare_integers(12, sys1p.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag'))
     assert(compare_values(-0.0095597483, ene['total'], 5, sys._getframe().f_code.co_name))
 
+
+def test_dict_5():
+    dsys = {'units': 'Angstrom',
+            'fragment_files': [],
+            'hint_types': [],
+            'geom_hints': []}
+
+    sys = pylibefp.from_dict(dsys)
+
+    with pytest.raises(pylibefp.PolNotConverged) as e_info:
+        sys.compute()
+    assert sys.get_frag_count() == 0

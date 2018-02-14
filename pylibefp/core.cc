@@ -519,7 +519,7 @@ void _clean(efp* efp) {
 PYBIND11_MODULE(core, m) {
     m.doc() = "Python wrapping of Parallel implementation of the Effective Fragment Potential (EFP) method";
 
-    m.attr("__version__") = py::str("1.1");
+    m.attr("__version__") = py::str("0.1");
     py::exception<libefpException>(m, "libefpException");
 
     py::enum_<efp_result>(m, "efp_result", "Result of a libefp operation")

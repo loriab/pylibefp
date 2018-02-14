@@ -6,7 +6,7 @@ from systems import *
 
 def test_efpefptorque():
     asdf = system_3()
-    asdf.set_opts({'disp': False, 'exch': False, 'elst_damp': 'screen', 'ind_damp': 'off'}, label='psi', append='psi')  # V equiv
+    asdf.set_opts({'disp': False, 'exch': False, 'elst_damping': 'screen', 'ind_damping': 'off'}, label='psi', append='psi')  # V equiv
     #asdf.set_opts({'elec': True, 'pol': True, 'elec_damp': 'screen', 'pol_damp': 'off', 'dertype': 'first'})            # ^ equiv
     asdf.compute(do_gradient=True)
     ene = asdf.get_energy()
