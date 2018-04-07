@@ -1,4 +1,4 @@
-find_package(libefp 1.4.2 CONFIG QUIET COMPONENTS shallow)
+find_package(libefp 1.5.0 CONFIG QUIET COMPONENTS shallow)
 
 if(${libefp_FOUND})
     get_property(_loc TARGET libefp::efp PROPERTY LOCATION)
@@ -9,11 +9,8 @@ else()
     message(STATUS "Suitable libefp could not be located, ${Magenta}Building libefp${ColourReset} instead.")
     ExternalProject_Add(libefp_external
         #DEPENDS lapack_external
-#        GIT_REPOSITORY https://github.com/psi4/libefp
-#        GIT_TAG devhead2
         GIT_REPOSITORY https://github.com/ilyak/libefp
-        GIT_TAG 1c686aa
-#        GIT_TAG 1.4.2
+        GIT_TAG 1.5.0  # 4cbc84c
 #        DOWNLOAD_COMMAND ""
 #        SOURCE_DIR "/home/psilocaluser/gits/libefp"
         UPDATE_COMMAND ""

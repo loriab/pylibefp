@@ -27,7 +27,7 @@ message(STATUS "${Cyan}Using Python ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MIN
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 find_package(Threads REQUIRED)
 
-find_package(libefp 1.4.2 CONFIG REQUIRED COMPONENTS shallow)
+find_package(libefp 1.5.0 CONFIG REQUIRED COMPONENTS shallow)
 get_property(_loc TARGET libefp::efp PROPERTY LOCATION)
 list(APPEND _addons ${_loc})
 message(STATUS "${Cyan}Using libefp${ColourReset}: ${_loc} (version ${libefp_VERSION})")
