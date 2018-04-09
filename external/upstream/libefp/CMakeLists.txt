@@ -30,6 +30,7 @@ else()
                    -DFRAGLIB_UNDERSCORE_L=${FRAGLIB_UNDERSCORE_L}
                    -DFRAGLIB_DEEP=${FRAGLIB_DEEP}
                    -DINSTALL_DEVEL_HEADERS=ON
+                   -DLAPACK_LIBRARIES=${LAPACK_LIBRARIES}
                    #-DTargetLAPACK_DIR=${STAGED_INSTALL_PREFIX}/share/cmake/TargetLAPACK
         CMAKE_CACHE_ARGS -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
         INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install
