@@ -37,9 +37,11 @@ _lbtl = {
         'pol_damp': 'ind_damping',
         'disp_damp': 'disp_damping',
         'pol_driver': 'ind_driver',
-        'ai_elec': 'ai_elst',
-        'ai_pol': 'ai_ind',
-        'ai_xr': 'ai_exch',
+        'ai_elec': 'qm_elst',
+        'ai_pol': 'qm_ind',
+        'ai_disp': 'qm_disp',
+        'ai_xr': 'qm_exch',
+        'ai_chtr': 'qm_chtr',
     },
 }
 
