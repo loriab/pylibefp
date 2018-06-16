@@ -75,10 +75,9 @@ install:
   - conda info -a
 
 # Build out environment
-  - conda create -n tenv python=$PYTHON_VER cmake numpy ci-psi4 psi4 -c psi4/label/dev -c psi4
+  - conda create -n tenv python=$PYTHON_VER cmake numpy ci-psi4 psi4 -c psi4/label/dev
   - source activate tenv
   - conda install pytest pytest-cov codecov -c conda-forge
-  - pip install deepdiff
   - conda list
 
 before_script:
@@ -99,10 +98,16 @@ before_script:
   - make -j2
 
 script:
-  - make pytest VERBOSE=1
-  #- PYTHONPATH=stage/usr/local/pylibefp/lib/ pytest -v --cov --ignore=external ../tests/
-  #- cd ../tests && PYTHONPATH=../build/stage/usr/local/pylibefp/lib/ python -m pytest -v --ignore=../build/external --cov
-  - cd ${TRAVIS_BUILD_DIR}/build/tests && PYTHONPATH=${TRAVIS_BUILD_DIR}/build/stage/${TRAVIS_BUILD_DIR}/Install/lib/ /home/travis/miniconda/envs/tenv/bin/python -m pytest -rws -v --capture=sys ${TRAVIS_BUILD_DIR}/tests --ignore=${TRAVIS_BUILD_DIR}/build/external --cov
+#  - make pytest VERBOSE=1
+#  #- PYTHONPATH=stage/usr/local/pylibefp/lib/ pytest -v --cov --ignore=external ../tests/
+#  #- cd ../tests && PYTHONPATH=../build/stage/usr/local/pylibefp/lib/ python -m pytest -v --ignore=../build/external --cov
+#  - cd ${TRAVIS_BUILD_DIR}/build/tests && PYTHONPATH=${TRAVIS_BUILD_DIR}/build/stage/${TRAVIS_BUILD_DIR}/Install/lib/ /home/travis/miniconda/envs/tenv/bin/python -m pytest -rws -v --capture=sys ${TRAVIS_BUILD_DIR}/tests --ignore=${TRAVIS_BUILD_DIR}/build/external --cov
+
+  - pwd
+  - PYTHONPATH=stage/${TRAVIS_BUILD_DIR}/Install/lib/:$PYTHONPATH python -c "import pylibefp; print(pylibefp.__version__); pylibefp.test(extras=['--cov'])"
+  
+
+#PYTHONPATH=stage/usr/local/pylibefp/lib/:/home/psilocaluser/gits/hrw-release/objdir-intel-1718/stage/usr/local/psi4/lib/ python -c "import pylibefp; print(pylibefp.__version__); pylibefp.test()"
 
 notifications:
     email: false
