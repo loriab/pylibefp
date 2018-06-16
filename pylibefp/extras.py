@@ -12,30 +12,8 @@
 #
 
 import os
-import atexit
-import subprocess
 
 from . import core
-
-###   # Numpy place holder for files and cleanup
-###   numpy_files = []
-###   def register_numpy_file(filename):
-###       if filename not in numpy_files:
-###           numpy_files.append(filename)
-###   
-###   def clean_numpy_files():
-###       for nfile in numpy_files:
-###           os.unlink(nfile)
-###   
-###   atexit.register(clean_numpy_files)
-###   
-###   # Exit printing
-###   def exit_printing():
-###       if _success_flag_:
-###           core.print_out( "\n*** Psi4 exiting successfully. Buy a developer a beer!\n")
-###       else:
-###           core.print_out( "\n*** Psi4 encountered an error. Buy a developer more coffee!\n")
-###           core.print_out( "*** Resources and help at github.com/psi4/psi4.\n")
 
 _success_flag_ = False
 
@@ -46,14 +24,43 @@ _success_flag_ = False
 ###   def get_input_directory():
 ###       return _input_dir_
 
-
 # Testing
-def test():
-    """Runs a smoke test suite through pytest."""
+def test(extent='full', extras=None):
+    """Runs a test suite through pytest.
 
+    Parameters
+    ----------
+    extent : {'smoke', 'quick', 'full', 'long'}
+        All choices are defined, but choices may be redundant in some projects.
+        _smoke_ will be minimal "is-working?" test(s).
+        _quick_ will be as much coverage as can be got quickly, approx. 1/3 tests.
+        _full_ will be the whole test suite, less some exceedingly long outliers.
+        _long_ will be the whole test suite.
+    extras : list
+        Additional arguments to pass to `pytest`.
+
+    Returns
+    -------
+    int
+        Return code from `pytest.main()`. 0 for pass, 1 for fail.
+
+    """
     try:
         import pytest
     except ImportError:
         raise RuntimeError('Testing module `pytest` is not installed. Run `conda install pytest`')
     abs_test_dir = os.path.sep.join([os.path.abspath(os.path.dirname(__file__)), "tests"])
-    pytest.main(['-rws', '-v', '--capture=sys', abs_test_dir])
+
+    command = ['-rws', '-v']
+    if extent.lower() in ['smoke', 'quick']:
+        command.extend(['-m', 'quick'])
+    elif extent.lower() == 'full':
+        command.extend(['-m', 'not long'])
+    elif extent.lower() == 'long':
+        pass
+    if extras is not None:
+        command.extend(extras)
+    command.extend(['--capture=sys', abs_test_dir])
+
+    retcode = pytest.main(command)
+    return retcode
