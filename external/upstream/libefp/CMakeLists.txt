@@ -5,6 +5,10 @@ if(${libefp_FOUND})
     message(STATUS "${Cyan}Found libefp${ColourReset}: ${_loc} (found version ${libefp_VERSION})")
     add_library(libefp_external INTERFACE)  # dummy
 else()
+    if(${CMAKE_INSIST_FIND_PACKAGE_libefp})
+        message(FATAL_ERROR "Suitable libefp could not be externally located as user insists")
+    endif()
+
     include(ExternalProject)
     message(STATUS "Suitable libefp could not be located, ${Magenta}Building libefp${ColourReset} instead.")
     ExternalProject_Add(libefp_external
