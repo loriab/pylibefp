@@ -38,7 +38,6 @@ set(STAGED_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/stage${CMAKE_INSTALL_PREFIX})
 add_subdirectory(external/upstream)
 
 # external projects manage their own OpenMP and c++YY flags, so only add to CXX_FLAGS for pylibefp-core
-include(autocmake_omp)
 include(custom_cxxstandard)
 include(custom_static_library)
 

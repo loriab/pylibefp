@@ -10,7 +10,7 @@ else()
     ExternalProject_Add(libefp_external
         #DEPENDS lapack_external
         GIT_REPOSITORY https://github.com/ilyak/libefp
-        GIT_TAG 1.5.0  # 4cbc84c
+        GIT_TAG 15cd7ce  # v1.5.0 + 10 (docs and a cmake lapack patch)
 #        DOWNLOAD_COMMAND ""
 #        SOURCE_DIR "/home/psilocaluser/gits/libefp"
         UPDATE_COMMAND ""
