@@ -3,7 +3,7 @@
 #
 #   pylibefp/wrapper/wrapper.py:
 #
-#   Copyright (c) 2017 The Psi4 Developers
+#   Copyright (c) 2017-2018 The Psi4 Developers
 #
 #   All rights reserved. Use of this source code is governed by a
 #   BSD-style license that can be found in the LICENSE file.
@@ -193,7 +193,7 @@ def get_opts(efpobj, label='libefp'):
 
     Parameters
     ----------
-    label : str, optional
+    label : {'libefp', 'psi'}, optional
         Returned dictionary keys are identical to libefp efp_opts struct
         names unless custom renaming requested via `label`.
 
@@ -260,10 +260,10 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         Input dict with keys from libefp efp_opts (see `label`) and
         values bools, strings, floats, and ints, as appropriate, rather
         than libefp custom datatypes.
-    label : str, optional
+    label : {'libefp', 'psi'}, optional
         Input `dopts` keys are read as libefp efp_opts struct names or
         by the custom translation set defined for `label`.
-    append : str, optional
+    append : {'libefp', 'psi', 'append'}, optional
         When 'libefp', input `dopts` keys are applied to the default
         (generally OFF) efp_opts state. When 'psi', input `dopts`
         keys are applied to the default (generally ON) Psi efp_opts
@@ -462,7 +462,7 @@ def set_periodic_box(efpobj, xyz):
     Parameters
     ----------
     xyz : list
-        Box sizes in three dimensions [x, y, z] in Bohr.
+        (3,) Box sizes in three dimensions [x, y, z] in Bohr.
 
     Returns
     -------
