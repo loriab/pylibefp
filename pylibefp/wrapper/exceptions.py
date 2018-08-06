@@ -3,18 +3,15 @@
 #
 #   pylibefp/wrapper/exceptions.py:
 #
-#   Copyright (c) 2017 The Psi4 Developers
+#   Copyright (c) 2017-2018 The Psi4 Developers
 #
 #   All rights reserved. Use of this source code is governed by a
 #   BSD-style license that can be found in the LICENSE file.
 #
 # @END LICENSE
 #
-
-
 """Module with non-generic exceptions classes."""
 from __future__ import absolute_import
-#from psi4 import core
 from pylibefp import extras
 
 
@@ -26,6 +23,7 @@ class EFPException(Exception):
 
 class Fatal(EFPException):
     """Fatal error has occurred."""
+
     def __init__(self, msg):
         EFPException.__init__(self, msg)
         self.message = r"""\nEFPException: Fatal error has occurred. {}\n\n""".format(repr(msg))
@@ -33,6 +31,7 @@ class Fatal(EFPException):
 
 class NoMemory(EFPException):
     """Insufficient memory."""
+
     def __init__(self, msg):
         EFPException.__init__(self, msg)
         self.message = r"""\nEFPException: Insufficient memory. {}\n\n""".format(repr(msg))
@@ -40,6 +39,7 @@ class NoMemory(EFPException):
 
 class FileNotFound(EFPException):
     """File not found."""
+
     def __init__(self, msg):
         EFPException.__init__(self, msg)
         self.message = r"""\nEFPException: File not found. {}\n\n""".format(repr(msg))
@@ -47,6 +47,7 @@ class FileNotFound(EFPException):
 
 class EFPSyntaxError(EFPException):
     """Syntax error."""
+
     def __init__(self, msg):
         EFPException.__init__(self, msg)
         self.message = r"""\nEFPException: Libefp syntax error. {}\n\n""".format(repr(msg))
@@ -54,6 +55,7 @@ class EFPSyntaxError(EFPException):
 
 class UnknownFragment(EFPException):
     """Unknown EFP fragment."""
+
     def __init__(self, msg):
         EFPException.__init__(self, msg)
         self.message = r"""\nEFPException: Unknown EFP fragment. {}\n\n""".format(repr(msg))
@@ -61,6 +63,7 @@ class UnknownFragment(EFPException):
 
 class PolNotConverged(EFPException):
     """Polarization SCF procedure did not converge."""
+
     def __init__(self, msg):
         EFPException.__init__(self, msg)
         self.message = r"""\nEFPException: Polarization SCF procedure did not converge. {}\n\n""".format(repr(msg))
@@ -68,6 +71,7 @@ class PolNotConverged(EFPException):
 
 class PyEFPSyntaxError(EFPException):
     """Syntax error."""
+
     def __init__(self, msg):
         EFPException.__init__(self, msg)
         self.message = r"""\nEFPException: Pylibefp syntax error. {}\n\n""".format(repr(msg))
