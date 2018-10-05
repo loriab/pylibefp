@@ -713,7 +713,7 @@ def get_induced_dipole_coordinates(efpobj, verbose=1):
     Returns
     -------
     list
-        3 x n_dip (flat) array of induced dipole locations.
+        (3 * n_dip, ) (flat) array of induced dipole locations.
 
     """
     ndip = efpobj.get_induced_dipole_count()
