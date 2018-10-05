@@ -19,7 +19,8 @@ from functools import reduce
 
 from pylibefp import core
 from . import psiutil
-from .exceptions import *
+from .exceptions import Fatal, NoMemory, FileNotFound, EFPSyntaxError, UnknownFragment, PolNotConverged, PyEFPSyntaxError
+
 
 try:
     basestring

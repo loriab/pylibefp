@@ -18,7 +18,6 @@ from pylibefp import extras
 class EFPException(Exception):
     """Error class for pylibefp."""
     extras._success_flag_ = False
-    pass
 
 
 class Fatal(EFPException):
