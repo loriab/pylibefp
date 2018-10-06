@@ -1180,7 +1180,7 @@ def set_point_charge_values(efpobj, ptc):
 
     Parameters
     ----------
-    ptc : list
+    ptc : list of float
         array of charge values, generally QM nuclear charges.
 
     Returns

@@ -612,8 +612,8 @@ PYBIND11_MODULE(core, m) {
              "Wrapped updates position and orientation of the specified effective fragment with type")
         .def("_efp_get_coordinates", &_efp_get_coordinates,
              "Wrapped gets center of mass positions and Euler angles of the effective fragments")
-        .def("_efp_get_frag_xyzabc", &_efp_get_frag_xyzabc,
-             "Wrapped gets center of mass position and Euler angles on fragment")
+        .def("_efp_get_frag_xyzabc", &_efp_get_frag_xyzabc, py::arg("frag_idx"),
+             "Wrapped gets center of mass position and Euler angles on fragment ``frag_idx``")
         .def("_efp_set_periodic_box", &efp_set_periodic_box, "Wrapped sets up periodic box size")
         .def("_efp_get_periodic_box", &_efp_get_periodic_box, "Wrapped gets periodic box size")
         .def("_efp_get_wavefunction_dependent_energy", &_efp_get_wavefunction_dependent_energy,
