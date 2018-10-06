@@ -11,8 +11,7 @@
 # @END LICENSE
 #
 """Module with non-generic exceptions classes."""
-from __future__ import absolute_import
-from pylibefp import extras
+from .. import extras
 
 
 class EFPException(Exception):

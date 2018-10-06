@@ -10,22 +10,17 @@
 #
 # @END LICENSE
 #
-from __future__ import print_function
 
 import os
 import re
 import math
 from functools import reduce
 
-from pylibefp import core
+from .. import core
 from . import psiutil
 from .exceptions import Fatal, NoMemory, FileNotFound, EFPSyntaxError, UnknownFragment, PolNotConverged, PyEFPSyntaxError
 
 
-try:
-    basestring
-except NameError:
-    basestring = str
 
 _lbtl = {
     'libefp': {},
@@ -147,7 +142,7 @@ def add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
 
     # locate efpfrags full path name
     abspath_pots = []
-    if isinstance(potential, basestring):
+    if isinstance(potential, str):
         potential = [potential]
     uniq_pots = list(set(potential))
     for pot in uniq_pots:
@@ -182,7 +177,7 @@ def add_fragment(efpobj, fragments):
     None
 
     """
-    if isinstance(fragments, basestring):
+    if isinstance(fragments, str):
         fragments = [fragments]
     for frag in fragments:
         res = efpobj._efp_add_fragment(frag)
@@ -1131,7 +1126,7 @@ def set_frag_coordinates(efpobj, ifr, ctype, coord):
     None
 
     """
-    if isinstance(ctype, basestring):
+    if isinstance(ctype, str):
         try:
             ctype = {
                 'xyzabc': core.EFP_COORD_TYPE_XYZABC,

@@ -605,7 +605,8 @@ PYBIND11_MODULE(core, m) {
         .def("_efp_get_point_charge_count", &_efp_get_point_charge_count,
              "Gets the number of currently set point charges")
         .def("_efp_get_point_charge_coordinates", &_efp_get_point_charge_coordinates,
-             "Wrapped gets coordinates of currently set point charges")
+             "Wrapped gets coordinates of currently set point charges",
+             py::arg("n_ptc"))
         .def("_efp_get_point_charge_values", &_efp_get_point_charge_values,
              "Wrapped gets values of currently set point charges")
         .def("get_point_charge_gradient", &efp_get_point_charge_gradient,

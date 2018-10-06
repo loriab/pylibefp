@@ -11,4 +11,4 @@
 # @END LICENSE
 #
 
-from pylibefp.wrapper.wrapper import *
+from .wrapper import *
