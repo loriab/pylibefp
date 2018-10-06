@@ -81,7 +81,7 @@ before_install:
   - df -h
   - ulimit -a
 
-  - source .scripts/travis-ci_get_miniconda.sh
+  - source devtools/travis-ci/before_install.sh
   - conda info -a
 
 install:
