@@ -595,7 +595,8 @@ PYBIND11_MODULE(core, m) {
              "Detaches callback function from EFP instance (necessary for destruction. Called by clean or call "
              "alongside shutdown")
         .def("_efp_set_point_charges", &_efp_set_point_charges,
-             "Wrapped setup arbitrary point charges of magnitude at locations interacting with EFP subsystem")
+             "Wrapped setup arbitrary point charges of magnitude at locations interacting with EFP subsystem",
+             py::arg("n_ptc"), py::arg("ptc"), py::arg("xyz"))
         .def("_efp_set_point_charge_coordinates", &_efp_set_point_charge_coordinates,
              "Wrapped sets coordinates of arbitrary point charges interacting with EFP subsystem",
              py::arg("n_ptc"), py::arg("xyz"))
