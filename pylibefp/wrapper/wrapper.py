@@ -1121,8 +1121,8 @@ def set_frag_coordinates(efpobj, ifr, ctype, coord):
     ----------
     ifr : int
         Index of fragment (0-indexed).
-    ctype : core.efp_coord_type or str
-        Type of coodinates hint among `xyzabc`, `points`, & `rotmat`.
+    ctype : core.efp_coord_type or str {'xyzabc', 'points', 'rotmat'}
+        Type of coodinates hint among ``xyzabc``, `points`, & `rotmat`.
     coord : list of floats
         6-, 9-, or 12-element hint of coordinates.
 
