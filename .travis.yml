@@ -22,7 +22,6 @@ matrix:
         packages:
         - liblapack-dev
         - clang-3.6
-        - lcov
     env:
       - CXX_COMPILER='clang++-3.6'
       - PYTHON_VER='3.6'
@@ -39,7 +38,6 @@ matrix:
         - liblapack-dev
         - g++-4.9
         - gcc-4.9
-        - lcov
     env:
       - CXX_COMPILER='g++-4.9'
       - PYTHON_VER='2.7'
@@ -56,7 +54,6 @@ matrix:
         - liblapack-dev
         - g++-6
         - gcc-6
-        - lcov
     env:
       - CXX_COMPILER='g++-6'
       - PYTHON_VER='3.5'
@@ -73,7 +70,6 @@ matrix:
         - liblapack-dev
         - g++-6
         - gcc-6
-        - lcov
     env:
       - CXX_COMPILER='g++-6'
       - PYTHON_VER='3.7'
@@ -118,7 +114,8 @@ script:
   - make install && cd .. && rm -rf pylibefp
   - export PYTHONPATH=${TRAVIS_BUILD_DIR}/Install/lib/:$PYTHONPATH
   - python -c "import pylibefp; print(pylibefp.__version__)"
-  - python -c "import sys, pylibefp; sys.exit(pylibefp.test(extras=['--cov']))"
+  - python -c "import sys, pylibefp; sys.exit(pylibefp.test())"
+  #- python -c "import sys, pylibefp; sys.exit(pylibefp.test(extras=['--cov']))"
   #- python -c "import sys, pylibefp; sys.exit(pylibefp.test(extras=['-k', 'not qmefp', '--cov']))"
 
   # works but overcomplicated

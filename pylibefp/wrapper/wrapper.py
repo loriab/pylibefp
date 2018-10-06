@@ -1207,7 +1207,7 @@ def set_point_charges(efpobj, ptc, coord):
     ptc : list
         ``n_ptc`` array of charge values, generally QM Z.
     coord : list
-        (3 * n_ptc, ) array (flat) or (n_ptc, 3) array (nested)
+        (3 * n_ptc, ) or (n_ptc, 3) array (that is, flat or nested)
         of XYZ coordinates [a0] of charge positions, generally QM coordinates.
 
     Returns
