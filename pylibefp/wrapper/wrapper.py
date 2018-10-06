@@ -265,10 +265,10 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         Input `dopts` keys are read as libefp efp_opts struct names or
         by the custom translation set defined for `label`.
     append : {'libefp', 'psi', 'append'}, optional
-        When 'libefp', input `dopts` keys are applied to the default
-        (generally OFF) efp_opts state. When 'psi', input `dopts`
+        When ``libefp``, input `dopts` keys are applied to the default
+        (generally OFF) efp_opts state. When ``psi``, input `dopts`
         keys are applied to the default (generally ON) Psi efp_opts
-        state. When 'append', input `dopts` keys are applied to the
+        state. When ``append``, input `dopts` keys are applied to the
         current *efpobj* opt_opts state.
 
     Returns
