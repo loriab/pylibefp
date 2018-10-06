@@ -595,9 +595,11 @@ PYBIND11_MODULE(core, m) {
              "Detaches callback function from EFP instance (necessary for destruction. Called by clean or call "
              "alongside shutdown")
         .def("_efp_set_point_charges", &_efp_set_point_charges,
-             "Wrapped setup arbitrary point charges of magnitude at locations interacting with EFP subsystem")
+             "Wrapped setup arbitrary point charges of magnitude at locations interacting with EFP subsystem",
+             py::arg("n_ptc"), py::arg("ptc"), py::arg("xyz"))
         .def("_efp_set_point_charge_coordinates", &_efp_set_point_charge_coordinates,
-             "Wrapped sets coordinates of arbitrary point charges interacting with EFP subsystem")
+             "Wrapped sets coordinates of arbitrary point charges interacting with EFP subsystem",
+             py::arg("n_ptc"), py::arg("xyz"))
         .def("_efp_set_point_charge_values", &_efp_set_point_charge_values,
              "Wrapped sets magnitudes of arbitrary point charges interacting with EFP subsystem")
         .def("_efp_get_point_charge_count", &_efp_get_point_charge_count,
@@ -612,8 +614,8 @@ PYBIND11_MODULE(core, m) {
              "Wrapped updates position and orientation of the specified effective fragment with type")
         .def("_efp_get_coordinates", &_efp_get_coordinates,
              "Wrapped gets center of mass positions and Euler angles of the effective fragments")
-        .def("_efp_get_frag_xyzabc", &_efp_get_frag_xyzabc,
-             "Wrapped gets center of mass position and Euler angles on fragment")
+        .def("_efp_get_frag_xyzabc", &_efp_get_frag_xyzabc, py::arg("frag_idx"),
+             "Wrapped gets center of mass position and Euler angles on fragment ``frag_idx``")
         .def("_efp_set_periodic_box", &efp_set_periodic_box, "Wrapped sets up periodic box size")
         .def("_efp_get_periodic_box", &_efp_get_periodic_box, "Wrapped gets periodic box size")
         .def("_efp_get_wavefunction_dependent_energy", &_efp_get_wavefunction_dependent_energy,

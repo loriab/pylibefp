@@ -1,7 +1,7 @@
 # We require C++11 support from the compiler and standard library.
 
 if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8.5)
         message(FATAL_ERROR "GCC version must be at least 4.9!")
     endif()
 

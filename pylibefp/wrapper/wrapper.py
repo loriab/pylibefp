@@ -19,7 +19,8 @@ from functools import reduce
 
 from pylibefp import core
 from . import psiutil
-from .exceptions import *
+from .exceptions import Fatal, NoMemory, FileNotFound, EFPSyntaxError, UnknownFragment, PolNotConverged, PyEFPSyntaxError
+
 
 try:
     basestring
@@ -264,10 +265,10 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         Input `dopts` keys are read as libefp efp_opts struct names or
         by the custom translation set defined for `label`.
     append : {'libefp', 'psi', 'append'}, optional
-        When 'libefp', input `dopts` keys are applied to the default
-        (generally OFF) efp_opts state. When 'psi', input `dopts`
+        When ``libefp``, input `dopts` keys are applied to the default
+        (generally OFF) efp_opts state. When ``psi``, input `dopts`
         keys are applied to the default (generally ON) Psi efp_opts
-        state. When 'append', input `dopts` keys are applied to the
+        state. When ``append``, input `dopts` keys are applied to the
         current *efpobj* opt_opts state.
 
     Returns
@@ -712,7 +713,7 @@ def get_induced_dipole_coordinates(efpobj, verbose=1):
     Returns
     -------
     list
-        3 x n_dip (flat) array of induced dipole locations.
+        (3 * n_dip, ) (flat) array of induced dipole locations.
 
     """
     ndip = efpobj.get_induced_dipole_count()
@@ -1120,8 +1121,8 @@ def set_frag_coordinates(efpobj, ifr, ctype, coord):
     ----------
     ifr : int
         Index of fragment (0-indexed).
-    ctype : core.efp_coord_type or str
-        Type of coodinates hint among `xyzabc`, `points`, & `rotmat`.
+    ctype : core.efp_coord_type or str {'xyzabc', 'points', 'rotmat'}
+        Type of coodinates hint among ``xyzabc``, `points`, & `rotmat`.
     coord : list of floats
         6-, 9-, or 12-element hint of coordinates.
 
@@ -1179,7 +1180,7 @@ def set_point_charge_values(efpobj, ptc):
 
     Parameters
     ----------
-    ptc : list
+    ptc : list of float
         array of charge values, generally QM nuclear charges.
 
     Returns
@@ -1204,9 +1205,9 @@ def set_point_charges(efpobj, ptc, coord):
     Parameters
     ----------
     ptc : list
-        ``n_ptc`` array of charge values, generally QM Z.
+        (n_ptc, ) array of charge values, generally QM Z.
     coord : list
-        (3 * n_ptc, ) array (flat) or (n_ptc, 3) array (nested)
+        (3 * n_ptc, ) or (n_ptc, 3) array (that is, flat or nested)
         of XYZ coordinates [a0] of charge positions, generally QM coordinates.
 
     Returns

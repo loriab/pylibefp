@@ -3,7 +3,7 @@
 #
 #   conda/_conda_vers.py: dummy setup.py
 #
-#   Copyright (c) 2017 The Psi4 Developers
+#   Copyright (c) 2017-2018 The Psi4 Developers
 #
 #   All rights reserved. Use of this source code is governed by a
 #   BSD-style license that can be found in the LICENSE file.
