@@ -325,3 +325,5 @@ def test_total_4d():
     ene = asdf.get_energy()
     assert(compare_values(-0.0095597483, ene['total'], 5, sys._getframe().f_code.co_name))
 
+if __name__ == '__main__':
+    test_total_4d()

@@ -482,7 +482,7 @@ void _clean(efp* efp) {
 //              coord.append(ccoords[ic]);
 
 PYBIND11_MODULE(core, m) {
-    m.doc() = "Python wrapping of Parallel implementation of the Effective Fragment Potential (EFP) method";
+    m.doc() = "Python wrapping of parallel implementation of the Effective Fragment Potential (EFP) method";
 
     m.attr("__copyright__") = py::str("Copyright (c) 2017-2018 The Psi4 Developers");
     py::exception<libefpException>(m, "libefpException");
