@@ -1,11 +1,14 @@
 clone_depth: 1
 platform: x64
- image:
+
+image:
   - Visual Studio 2015
   - Visual Studio 2017
- configuration:
+
+configuration:
   - Debug
- before_build:
+
+before_build:
   - mkdir build && cd build
   - cmake -A %PLATFORM%
           -DCMAKE_BUILD_TYPE=%CONFIGURATION%
@@ -13,10 +16,12 @@ platform: x64
           -DCMAKE_C_FLAGS="/wd4101 /wd4996"
           -DCMAKE_CXX_FLAGS="/wd4101 /wd4996"
           ..
- build_script:
+
+build_script:
   - cmake --build .
           --config %CONFIGURATION%
- after_build:
+
+after_build:
   - cmake --build .
           --config %CONFIGURATION%
           --target install
