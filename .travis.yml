@@ -40,7 +40,7 @@ matrix:
         - gcc-4.9
     env:
       - CXX_COMPILER='g++-4.9'
-      - PYTHON_VER='2.7'
+      - PYTHON_VER='3.7'
       - C_COMPILER='gcc-4.9'
 
   - os: linux
