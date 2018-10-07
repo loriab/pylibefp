@@ -86,7 +86,6 @@ before_install:
 
 install:
   # Build out environment
-  #- conda create -n tenv python=$PYTHON_VER cmake numpy ci-psi4 psi4 -c psi4/label/dev
   - conda create -n tenv python=$PYTHON_VER cmake numpy deepdiff -c psi4
   - source activate tenv
   - conda install pytest pytest-cov codecov -c defaults -c conda-forge
@@ -105,8 +104,6 @@ before_script:
       -DPYTHON_EXECUTABLE="${CONDA_PREFIX}/bin/python"
       -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/Install
       -DCMAKE_DISABLE_FIND_PACKAGE_libefp=ON
-      -DCMAKE_DISABLE_FIND_PACKAGE_TargetLAPACK=ON
-      #-DPYTHON_EXECUTABLE="${HOME}/miniconda/envs/tenv/bin/python"
   - cd build
   - make -j2
 
@@ -114,8 +111,8 @@ script:
   - make install && cd .. && rm -rf pylibefp
   - export PYTHONPATH=${TRAVIS_BUILD_DIR}/Install/lib/:$PYTHONPATH
   - python -c "import pylibefp; print(pylibefp.__version__)"
+  - conda install ci-psi4 psi4 -c psi4/label/dev  # interferes with build if earlier
   - python -c "import sys, pylibefp; sys.exit(pylibefp.test())"
-  #- python -c "import sys, pylibefp; sys.exit(pylibefp.test(extras=['--cov']))"
   #- python -c "import sys, pylibefp; sys.exit(pylibefp.test(extras=['-k', 'not qmefp', '--cov']))"
 
   # works but overcomplicated
