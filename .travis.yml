@@ -86,8 +86,8 @@ before_install:
 
 install:
   # Build out environment
-  #- conda create -n tenv python=$PYTHON_VER cmake numpy ci-psi4 psi4 -c psi4/label/dev
-  - conda create -n tenv python=$PYTHON_VER cmake numpy deepdiff -c psi4
+  - conda create -n tenv python=$PYTHON_VER cmake numpy ci-psi4 psi4 -c psi4/label/dev
+  #- conda create -n tenv python=$PYTHON_VER cmake numpy deepdiff -c psi4
   - source activate tenv
   - conda install pytest pytest-cov codecov -c defaults -c conda-forge
   - conda list
