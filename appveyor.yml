@@ -10,7 +10,16 @@ configuration:
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - C:\Miniconda36-x64\Scripts\activate base
-  - conda install --yes cmake python=3.6 numpy deepdiff pytest pytest-cov codecov -c defaults -c conda-forge
+  - conda install --yes
+                    cmake
+                    python=3.6
+                    numpy
+                    mkl-devel=2018.0.3
+                    deepdiff pytest
+                    pytest-cov
+                    codecov
+                   -c defaults
+                   -c conda-forge
   - conda list
 
 before_build:

@@ -313,11 +313,7 @@ py::tuple _efp_get_point_charge_values(efp* efp, size_t n_ptc) {
 
 py::tuple _efp_get_frag_atoms(efp* efp, size_t frag_idx, size_t frag_natom) {
     enum efp_result res;
-    //struct efp_atom atoms[frag_natom];
     struct efp_atom * atoms = new struct efp_atom[frag_natom];
-// char ansString[sizeOfRetNum]; 
-// char* ansString = new char[sizeOfRetNum];
-// delete [] ansString;
     py::list ats_info;
 
     if ((res = efp_get_frag_atoms(efp, frag_idx, frag_natom, atoms))) {
