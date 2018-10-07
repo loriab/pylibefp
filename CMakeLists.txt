@@ -34,7 +34,7 @@ set(Python_ADDITIONAL_VERSIONS 3.7 3.6 3.5)  # adjust with CMake minimum FindPyt
 find_package(PythonLibsNew 2.7 REQUIRED)
 message(STATUS "${Cyan}Found Python ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}${ColourReset}: ${PYTHON_EXECUTABLE} (found version ${PYTHON_VERSION_STRING})")
 
-set(STAGED_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/stage${CMAKE_INSTALL_PREFIX})
+set(STAGED_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/stage)
 add_subdirectory(external/upstream)
 
 # external projects manage their own OpenMP and c++YY flags, so only add to CXX_FLAGS for pylibefp-core
