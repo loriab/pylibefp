@@ -11,7 +11,7 @@
 # @END LICENSE
 #
 """Module with non-generic exceptions classes."""
-from .. import extras
+from . import extras
 
 
 class EFPException(Exception):

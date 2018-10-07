@@ -74,7 +74,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metadata.py
     # <<<  install lib/  >>>
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
 
-install(FILES __init__.py extras.py
+install(FILES __init__.py extras.py exceptions.py psiutil.py
         DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
 
 install(FILES ../tests/utils.py
@@ -90,13 +90,9 @@ install(FILES ../tests/utils.py
               ../tests/test_libefp.py
         DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp/tests/)
 
-install(DIRECTORY wrapper
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp
-        FILES_MATCHING PATTERN "*.py")
-
-configure_file(wrapper/wrapper.py wrapper/wrapper.py @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/wrapper/wrapper.py
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp/wrapper)
+configure_file(wrapper.py wrapper.py @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/wrapper.py
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
 
 # <<<  Export Config  >>>
 

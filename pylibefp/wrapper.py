@@ -16,7 +16,7 @@ import re
 import math
 from functools import reduce
 
-from .. import core
+from . import core
 from . import psiutil
 from .exceptions import Fatal, NoMemory, FileNotFound, EFPSyntaxError, UnknownFragment, PolNotConverged, PyEFPSyntaxError
 
