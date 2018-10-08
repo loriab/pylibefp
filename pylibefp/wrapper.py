@@ -638,7 +638,7 @@ def get_multipole_values(efpobj, verbose=1):
     ----------
     verbose : int, optional
         Whether to print out the multipole arrays. 0: no printing. 1:
-        print charges and dipoles. 2: additionally print quadrupoles
+        print charges and dipoles. ``2``: additionally print quadrupoles
         and octupoles.
 
     Returns

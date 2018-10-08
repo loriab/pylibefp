@@ -613,7 +613,8 @@ PYBIND11_MODULE(core, m) {
         .def("get_point_charge_gradient", &efp_get_point_charge_gradient,
              "Gets gradient on point charges from EFP subsystem and returns them in *arg1*")
         .def("_efp_set_frag_coordinates", &_efp_set_frag_coordinates,
-             "Wrapped updates position and orientation of the specified effective fragment with type")
+             "Wrapped updates position and orientation of the specified effective fragment with type",
+             py::arg("frag_idx"), py::arg("ctype"), py::arg("coord"))
         .def("_efp_get_coordinates", &_efp_get_coordinates,
              py::arg("n_frag"),
              "Wrapped gets center of mass positions and Euler angles of the effective fragments")
