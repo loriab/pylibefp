@@ -51,8 +51,7 @@ install(EXPORT "${PN}Targets"
 set_target_properties(core PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"  # for python module
                            OUTPUT_NAME core
                            EXPORT_NAME core
-                           SUFFIX ".so"  # for python module
-                           #SUFFIX "${PYTHON_MODULE_EXTENSION}" # for python module
+                           SUFFIX "${PYTHON_MODULE_EXTENSION}" # for python module
                            INSTALL_RPATH "${psi4_RPATH}"
                            BUILD_WITH_INSTALL_RPATH ON)
 
@@ -72,7 +71,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metadata.py
 # <<<  Install  >>>
 
     # <<<  install lib/  >>>
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
+#file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
 
 install(FILES __init__.py extras.py exceptions.py psiutil.py
         DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
