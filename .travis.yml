@@ -90,9 +90,10 @@ before_install:
 
 install:
   # Build out environment
-  - conda create -n tenv python=$PYTHON_VER cmake numpy deepdiff -c psi4
+  - python devtools/scripts/conda_env.py -n=tenv -p=$PYTHON_VER devtools/conda-envs/base.yaml
+  #- conda create -n tenv python=$PYTHON_VER cmake numpy deepdiff -c psi4
   - source activate tenv
-  - conda install pytest pytest-cov codecov -c defaults -c conda-forge
+  #- conda install pytest pytest-cov codecov -c defaults -c conda-forge
   - conda list
 
 before_script:
