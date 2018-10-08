@@ -119,10 +119,9 @@ before_script:
 
 script:
   # test and codecov build
-  - which gcov
   - conda install ci-psi4 psi4 -c psi4/label/dev  # interferes with build if earlier
   - PYTHONPATH=stage/lib/ pytest -rws --cov-report term-missing --cov=stage/lib/ ../tests/
-  - test "${GCOV}" != "" && bash <(curl -s https://codecov.io/bash) -x ${GCOV}
+  - test "${GCOV}" = "" || bash <(curl -s https://codecov.io/bash) -x ${GCOV} || echo 'Codecov failed to upload'
   # test install
   - make install && cd .. && rm -rf pylibefp
   - export PYTHONPATH=${TRAVIS_BUILD_DIR}/Install/lib/:$PYTHONPATH
