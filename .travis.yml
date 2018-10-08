@@ -91,9 +91,7 @@ before_install:
 install:
   # Build out environment
   - python devtools/scripts/conda_env.py -n=tenv -p=$PYTHON_VER devtools/conda-envs/base.yaml
-  #- conda create -n tenv python=$PYTHON_VER cmake numpy deepdiff -c psi4
   - source activate tenv
-  #- conda install pytest pytest-cov codecov -c defaults -c conda-forge
   - conda list
 
 before_script:
@@ -113,6 +111,7 @@ before_script:
       -DCMAKE_DISABLE_FIND_PACKAGE_libefp=ON
   - cd build
   - make -j2
+  - make install
 
 script:
   # test and codecov build
@@ -120,7 +119,7 @@ script:
   - PYTHONPATH=stage/lib/ pytest -rws --cov-report term-missing --cov=stage/lib/ ../tests/
   - test "${GCOV}" = "" || bash <(curl -s https://codecov.io/bash) -x ${GCOV} || echo 'Codecov failed to upload'
   # test install
-  - make install && cd .. && rm -rf pylibefp
+  - cd .. && rm -rf pylibefp
   - export PYTHONPATH=${TRAVIS_BUILD_DIR}/Install/lib/:$PYTHONPATH
   - python -c "import pylibefp; print(pylibefp.__version__)"
   #- python -c "import sys, pylibefp; sys.exit(pylibefp.test(extras=['-k', 'not qmefp', '--cov']))"
