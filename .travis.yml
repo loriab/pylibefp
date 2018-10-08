@@ -114,6 +114,7 @@ before_script:
 
 script:
   # test and codecov build
+  - which gcov
   - conda install ci-psi4 psi4 -c psi4/label/dev  # interferes with build if earlier
   - PYTHONPATH=stage/lib/ pytest -rws --cov-report term-missing --cov=stage/lib/ ../tests/
   - bash <(curl -s https://codecov.io/bash)
@@ -121,7 +122,7 @@ script:
   - make install && cd .. && rm -rf pylibefp
   - export PYTHONPATH=${TRAVIS_BUILD_DIR}/Install/lib/:$PYTHONPATH
   - python -c "import pylibefp; print(pylibefp.__version__)"
-  - python -c "import sys, pylibefp; sys.exit(pylibefp.test())"
+  #- python -c "import sys, pylibefp; sys.exit(pylibefp.test())"
   #- python -c "import sys, pylibefp; sys.exit(pylibefp.test(extras=['-k', 'not qmefp', '--cov']))"
 
   # works but overcomplicated
