@@ -1,7 +1,7 @@
 <p align="center">
 <br>
 <!-- Commit -->
-<a href="https://travis-ci.org/loriab/pylibefp"><img src="https://travis-ci.org/loriab/pylibefp.svg?branch=master"></a>
+<a href="https://travis-ci.org/loriab/pylibefp"> <img src="https://img.shields.io/travis/loriab/pylibefp/master.svg?logo=travis"></a>
 <a href="https://ci.appveyor.com/project/loriab/pylibefp"> <img src="https://ci.appveyor.com/api/projects/status/github/loriab/pylibefp?branch=master&svg=true" /></a>
 <a href="https://codecov.io/gh/loriab/pylibefp"> <img src="https://codecov.io/gh/loriab/pylibefp/branch/master/graph/badge.svg" /></a>
 <a href="https://lgtm.com/projects/g/loriab/pylibefp/context:python"> <img src="https://img.shields.io/lgtm/grade/python/g/loriab/pylibefp.svg?logo=lgtm&logoWidth=18" /></a>
