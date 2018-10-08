@@ -1,0 +1,55 @@
+clone_depth: 1
+platform: x64
+
+image:
+  - Visual Studio 2017
+
+configuration:
+  - Debug
+
+install:
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+  - C:\Miniconda36-x64\Scripts\activate base
+  - conda install --yes
+                    cmake
+                    python=3.6
+                    numpy
+                    mkl-devel=2018.0.3
+                    deepdiff pytest
+                   -c defaults
+                   -c conda-forge
+  - conda list
+
+before_build:
+  - set SOURCE_FOLDER=%APPVEYOR_BUILD_FOLDER%
+  - set BUILD_FOLDER=%SOURCE_FOLDER%\build
+  - set INSTALL_FOLDER=%SOURCE_FOLDER%\install
+  - mkdir %BUILD_FOLDER% & cd %BUILD_FOLDER%
+  - cmake -A %PLATFORM%
+          -DCMAKE_BUILD_TYPE=%CONFIGURATION%
+          -DCMAKE_INSTALL_PREFIX=%INSTALL_FOLDER%
+          -DENABLE_XHOST=OFF
+          -DCMAKE_C_FLAGS="/wd4101 /wd4996"
+          -DCMAKE_CXX_FLAGS="/wd4101 /wd4996"
+          %SOURCE_FOLDER%
+
+build_script:
+  - cmake --build .
+          --config %CONFIGURATION%
+
+after_build:
+  - cmake --build .
+          --config %CONFIGURATION%
+          --target install
+
+before_test:
+  - set PYTHONPATH=%INSTALL_FOLDER%\lib
+  - python -c "import sys, pylibefp; print(sys.path); print(pylibefp.__version__)"
+  - dir %BUILD_FOLDER%\stage\lib
+  - dir %INSTALL_FOLDER%\lib
+
+test_script:
+  - python -c "import pylibefp; print(pylibefp.__version__)"
+#  - conda install ci-psi4 psi4 -c psi4/label/dev  # interferes with build if earlier
+  - python -c "import sys, pylibefp; sys.exit(pylibefp.test())"
+
