@@ -42,15 +42,6 @@ after_build:
           --config %CONFIGURATION%
           --target install
 
-#########
-
-#before_build:
-#          -DCMAKE_C_FLAGS="/wd4018 /wd4101 /wd4996"
-#          -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=true
-#          -DINSTALL_PYMOD=ON
-#          ..
-
-
 before_test:
   - set PYTHONPATH=%INSTALL_FOLDER%\lib
   - python -c "import sys, pylibefp; print(sys.path); print(pylibefp.__version__)"
