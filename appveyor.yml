@@ -16,20 +16,22 @@ install:
                     numpy
                     mkl-devel=2018.0.3
                     deepdiff pytest
-                    pytest-cov
-                    codecov
                    -c defaults
                    -c conda-forge
   - conda list
 
 before_build:
-  - mkdir build && cd build
+  - set SOURCE_FOLDER=%APPVEYOR_BUILD_FOLDER%
+  - set BUILD_FOLDER=%SOURCE_FOLDER%\build
+  - set INSTALL_FOLDER=%SOURCE_FOLDER%\install
+  - mkdir %BUILD_FOLDER% & cd %BUILD_FOLDER%
   - cmake -A %PLATFORM%
           -DCMAKE_BUILD_TYPE=%CONFIGURATION%
+          -DCMAKE_INSTALL_PREFIX=%INSTALL_FOLDER%
           -DENABLE_XHOST=OFF
           -DCMAKE_C_FLAGS="/wd4101 /wd4996"
           -DCMAKE_CXX_FLAGS="/wd4101 /wd4996"
-          ..
+          %SOURCE_FOLDER%
 
 build_script:
   - cmake --build .
@@ -50,11 +52,13 @@ after_build:
 
 
 before_test:
-  - cd ..
-  # Copy the library manualy as the installation is broken
-  - copy build\Debug\gg.dll gau2grid\libgg.dll
+  - set PYTHONPATH=%INSTALL_FOLDER%\lib
+  - python -c "import sys, pylibefp; print(sys.path); print(pylibefp.__version__)"
+  - dir %BUILD_FOLDER%\stage\lib
+  - dir %INSTALL_FOLDER%\lib
 
 test_script:
-  - pytest
-
+  - python -c "import pylibefp; print(pylibefp.__version__)"
+#  - conda install ci-psi4 psi4 -c psi4/label/dev  # interferes with build if earlier
+  - python -c "import sys, pylibefp; sys.exit(pylibefp.test())"
 

@@ -70,9 +70,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metadata.py
 
 # <<<  Install  >>>
 
-    # <<<  install lib/  >>>
-#file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
-
 install(FILES __init__.py extras.py exceptions.py psiutil.py
         DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
 
