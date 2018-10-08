@@ -613,8 +613,10 @@ PYBIND11_MODULE(core, m) {
         .def("get_point_charge_gradient", &efp_get_point_charge_gradient,
              "Gets gradient on point charges from EFP subsystem and returns them in *arg1*")
         .def("_efp_set_frag_coordinates", &_efp_set_frag_coordinates,
-             "Wrapped updates position and orientation of the specified effective fragment with type")
+             "Wrapped updates position and orientation of the specified effective fragment with type",
+             py::arg("frag_idx"), py::arg("ctype"), py::arg("coord"))
         .def("_efp_get_coordinates", &_efp_get_coordinates,
+             py::arg("n_frag"),
              "Wrapped gets center of mass positions and Euler angles of the effective fragments")
         .def("_efp_get_frag_xyzabc", &_efp_get_frag_xyzabc, py::arg("frag_idx"),
              "Wrapped gets center of mass position and Euler angles on fragment ``frag_idx``")
@@ -624,7 +626,7 @@ PYBIND11_MODULE(core, m) {
              "Wrapped updates wavefunction-dependent energy terms")
         .def("_efp_compute", &efp_compute, py::arg("do_gradient") = false,
              "Perform the EFP computation, optionally doing gradient")
-        .def("_efp_get_frag_charge", &_efp_get_frag_charge, "Gets total charge on fragment")
+        .def("_efp_get_frag_charge", &_efp_get_frag_charge, "Gets total charge on fragment", py::arg("frag_idx"))
         .def("_efp_get_frag_multiplicity", &_efp_get_frag_multiplicity, "Gets spin multiplicity on fragment")
         // Multipoles & Induced Dipoles
         .def("_efp_get_multipole_count", &_efp_get_multipole_count,
@@ -647,7 +649,8 @@ PYBIND11_MODULE(core, m) {
         .def("_efp_get_frag_name", &_efp_get_frag_name, "Gets the name of the specified effective fragment")
         .def("_efp_get_frag_atom_count", &_efp_get_frag_atom_count, "Gets the number of atoms on fragment")
         .def("_efp_get_frag_atoms", &_efp_get_frag_atoms,
-             "Wrapped get atoms comprising the specified 0-indexed fragment")
+             "Wrapped get atoms comprising the specified 0-indexed fragment, ``frag_idx``",
+             py::arg("frag_idx"), py::arg("frag_natom"))
         .def("get_electric_field", &efp_get_electric_field,
              "Gets electric field for a point on 0-indexed fragment *arg0* and returns it in *arg1*")
         .def("torque_to_derivative", &efp_torque_to_derivative,

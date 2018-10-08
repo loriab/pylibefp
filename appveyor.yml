@@ -12,10 +12,12 @@ install:
   - C:\Miniconda36-x64\Scripts\activate base
   - conda install --yes
                     cmake
-                    python=3.6
-                    numpy
+                    deepdiff
                     mkl-devel=2018.0.3
-                    deepdiff pytest
+                    numpy
+                    pybind11
+                    pytest
+                    python=3.6
                    -c defaults
                    -c conda-forge
   - conda list

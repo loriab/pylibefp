@@ -14,7 +14,7 @@
 import os
 import re
 import math
-from functools import reduce
+import functools
 
 from . import core
 from . import psiutil
@@ -638,7 +638,7 @@ def get_multipole_values(efpobj, verbose=1):
     ----------
     verbose : int, optional
         Whether to print out the multipole arrays. 0: no printing. 1:
-        print charges and dipoles. 2: additionally print quadrupoles
+        print charges and dipoles. ``2``: additionally print quadrupoles
         and octupoles.
 
     Returns
@@ -1504,7 +1504,7 @@ def to_dict(efpobj):
 
     nfr = efpobj.get_frag_count()
     fnat = efpobj.get_frag_atom_count()
-    frs = reduce(lambda c, x: c + [c[-1] + x], fnat, [0])[1:]  # np.cumsum(fnat)  https://stackoverflow.com/a/33034961
+    frs = functools.reduce(lambda c, x: c + [c[-1] + x], fnat, [0])[1:]  # np.cumsum(fnat)  https://stackoverflow.com/a/33034961
     nat = frs[-1]
 
     molrec['units'] = 'Bohr'
