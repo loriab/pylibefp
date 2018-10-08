@@ -16,6 +16,8 @@ import re
 import math
 import functools
 
+import qcelemental as qcel
+
 from . import core
 from . import psiutil
 from .exceptions import Fatal, NoMemory, FileNotFound, EFPSyntaxError, UnknownFragment, PolNotConverged, PyEFPSyntaxError
@@ -1621,7 +1623,7 @@ def process_units(molrec):
     units = molrec.get('units', None)
     input_units_to_au = molrec.get('input_units_to_au', None)
 
-    b2a = 0.52917720859  # psi_bohr2angstroms
+    b2a = qcel.constants.bohr2angstroms
     a2b = 1. / b2a
 
     def perturb_check(candidate, reference):

@@ -15,6 +15,7 @@ install:
                     deepdiff
                     mkl-devel=2018.0.3
                     numpy
+                    pint
                     pybind11
                     pytest
                     python=3.6

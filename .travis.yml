@@ -39,7 +39,6 @@ matrix:
         - liblapack-dev
         - g++-4.9
         - gcc-4.9
-        - lcov
     env:
       - CXX_COMPILER='g++-4.9'
       - PYTHON_VER='3.7'
@@ -57,7 +56,6 @@ matrix:
         - liblapack-dev
         - g++-6
         - gcc-6
-        - lcov
     env:
       - CXX_COMPILER='g++-6'
       - PYTHON_VER='3.5'
@@ -75,7 +73,6 @@ matrix:
         - liblapack-dev
         - g++-6
         - gcc-6
-        - lcov
     env:
       - CXX_COMPILER='g++-6'
       - PYTHON_VER='3.7'
@@ -93,9 +90,8 @@ before_install:
 
 install:
   # Build out environment
-  - conda create -n tenv python=$PYTHON_VER cmake numpy deepdiff -c psi4
+  - python devtools/scripts/conda_env.py -n=tenv -p=$PYTHON_VER devtools/conda-envs/base.yaml
   - source activate tenv
-  - conda install pytest pytest-cov codecov -c defaults -c conda-forge
   - conda list
 
 before_script:
@@ -114,8 +110,8 @@ before_script:
       -DCMAKE_INSTALL_PREFIX=${TRAVIS_BUILD_DIR}/Install
       -DCMAKE_DISABLE_FIND_PACKAGE_libefp=ON
   - cd build
-  #- make -j2
-  - make VERBOSE=1
+  - make -j2
+  - make install
 
 script:
   # test and codecov build
@@ -123,10 +119,9 @@ script:
   - PYTHONPATH=stage/lib/ pytest -rws --cov-report term-missing --cov=stage/lib/ ../tests/
   - test "${GCOV}" = "" || bash <(curl -s https://codecov.io/bash) -x ${GCOV} || echo 'Codecov failed to upload'
   # test install
-  - make install && cd .. && rm -rf pylibefp
+  - cd .. && rm -rf pylibefp
   - export PYTHONPATH=${TRAVIS_BUILD_DIR}/Install/lib/:$PYTHONPATH
   - python -c "import pylibefp; print(pylibefp.__version__)"
-  #- python -c "import sys, pylibefp; sys.exit(pylibefp.test())"
   #- python -c "import sys, pylibefp; sys.exit(pylibefp.test(extras=['-k', 'not qmefp', '--cov']))"
 
   # works but overcomplicated
