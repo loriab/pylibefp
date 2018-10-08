@@ -48,7 +48,7 @@ ExternalProject_Add(pylibefp-core
            libefp_external
            pybind11_external
    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pylibefp
-   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
               -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
               -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
               -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
@@ -70,11 +70,8 @@ ExternalProject_Add(pylibefp-core
               -Dlibefp_DIR=${libefp_DIR}
               -Dpybind11_DIR=${pybind11_DIR}
               -DLIBC_INTERJECT=${LIBC_INTERJECT}
-              -DDESTDIR=${CMAKE_BINARY_DIR}/stage
    CMAKE_CACHE_ARGS -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
-   BUILD_ALWAYS 1
-   INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install
-                   DESTDIR=${CMAKE_BINARY_DIR}/stage)
+   BUILD_ALWAYS 1)
 
 add_subdirectory(doc)
 add_subdirectory(tests)
@@ -85,4 +82,3 @@ install(DIRECTORY ${STAGED_INSTALL_PREFIX}/
         DESTINATION ${CMAKE_INSTALL_PREFIX}
         USE_SOURCE_PERMISSIONS
         PATTERN "*.pyc" EXCLUDE)
-
