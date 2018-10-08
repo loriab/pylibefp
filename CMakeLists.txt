@@ -10,6 +10,30 @@ set(pylibefp_LICENSE      "BSD 3-clause")
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+################  Options: Overview and Not Otherwise Mentioned  ###############
+
+#  <<<  CMake build overview  >>>
+#
+#    >>> ls
+#    external/  LICENSE  pylibefp/  tests/  ...
+#    >>> cmake -H. -Bobjdir -DCMAKE_INSTALL_PREFIX=/path/to/install-pylibefp ...
+#    ...
+#    -- Generating done
+#    -- Build files have been written to: /current/dir/objdir
+#    >>> cd objdir && make -j`getconf _NPROCESSORS_ONLN`
+#    >>> make install
+
+#  <<<  Required build dependencies that PylibEFP can't build itself  >>>
+#
+#    - CMake (e.g., `conda install cmake`)
+#    - C++ and C compilers (C++11 compliant)
+#    - BLAS/LAPACK (also runtime; e.g., `conda install mkl-devel`; for libefp)
+#    - Python (also runtime; interpreter and headers; e.g., `conda install python`)
+#    - through qcelemental
+#      - NumPy (runtime only; e.g., `conda install numpy`)
+#      - pint (runtime only; e.g., `conda install pint -c conda-forge` or `pip install pint`)
+#    - deepdiff (testing only; e.g., `conda install deepdiff -c conda-forge` or `pip install deepdiff`)
+
 ############################  Options: Build How?  #############################
 include(psi4OptionsTools)
 option_with_flags(ENABLE_XHOST "Enables processor-specific optimization" ON
