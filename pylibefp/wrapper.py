@@ -16,6 +16,8 @@ import re
 import math
 import functools
 
+import qcelemental as qcel
+
 from . import core
 from . import psiutil
 from .exceptions import Fatal, NoMemory, FileNotFound, EFPSyntaxError, UnknownFragment, PolNotConverged, PyEFPSyntaxError
