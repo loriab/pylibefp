@@ -61,9 +61,9 @@ set_target_properties(core PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"  # for py
 add_custom_target(update_version ALL
                   COMMAND ${PYTHON_EXECUTABLE} versioner.py --metaout ${CMAKE_CURRENT_BINARY_DIR}/metadata.py
                                                             --cmakeout ${CMAKE_CURRENT_BINARY_DIR}/metadata.cmake
-                  COMMAND cmake -DWTO="${CMAKE_CURRENT_BINARY_DIR}/${CMAKECONFIG_INSTALL_DIR}"
-                                -DPN="pylibefp"
-                                -P ${CMAKE_CURRENT_BINARY_DIR}/metadata.cmake
+                  COMMAND ${CMAKE_COMMAND} -DWTO="${CMAKE_CURRENT_BINARY_DIR}/${CMAKECONFIG_INSTALL_DIR}"
+                                           -DPN="pylibefp"
+                                           -P ${CMAKE_CURRENT_BINARY_DIR}/metadata.cmake
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                   COMMENT "Generating version info")
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metadata.py
