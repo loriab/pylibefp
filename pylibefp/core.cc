@@ -647,7 +647,8 @@ PYBIND11_MODULE(core, m) {
         .def("_efp_get_frag_name", &_efp_get_frag_name, "Gets the name of the specified effective fragment")
         .def("_efp_get_frag_atom_count", &_efp_get_frag_atom_count, "Gets the number of atoms on fragment")
         .def("_efp_get_frag_atoms", &_efp_get_frag_atoms,
-             "Wrapped get atoms comprising the specified 0-indexed fragment")
+             "Wrapped get atoms comprising the specified 0-indexed fragment, ``frag_idx``",
+             py::arg("frag_idx"), py::arg("frag_natom"))
         .def("get_electric_field", &efp_get_electric_field,
              "Gets electric field for a point on 0-indexed fragment *arg0* and returns it in *arg1*")
         .def("torque_to_derivative", &efp_torque_to_derivative,
