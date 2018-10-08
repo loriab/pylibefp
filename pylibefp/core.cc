@@ -625,7 +625,7 @@ PYBIND11_MODULE(core, m) {
              "Wrapped updates wavefunction-dependent energy terms")
         .def("_efp_compute", &efp_compute, py::arg("do_gradient") = false,
              "Perform the EFP computation, optionally doing gradient")
-        .def("_efp_get_frag_charge", &_efp_get_frag_charge, "Gets total charge on fragment")
+        .def("_efp_get_frag_charge", &_efp_get_frag_charge, "Gets total charge on fragment", py::arg("frag_idx"))
         .def("_efp_get_frag_multiplicity", &_efp_get_frag_multiplicity, "Gets spin multiplicity on fragment")
         // Multipoles & Induced Dipoles
         .def("_efp_get_multipole_count", &_efp_get_multipole_count,
