@@ -13,8 +13,6 @@
 
 import os
 
-from . import core
-
 _success_flag_ = False
 
 

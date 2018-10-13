@@ -351,7 +351,8 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
             _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR, 'invalid value for [T/F] {}: {}'.format(
                 topic, dopts[topic]))
 
-    topic = _lbtl[label].get('chtr', 'chtr')  # may be enabled in a future libefp release
+    # may be enabled in a future libefp release
+    # topic = _lbtl[label].get('chtr', 'chtr')
 
     topic = _lbtl[label].get('elec_damp', 'elec_damp')
     if topic in dopts:
@@ -443,9 +444,10 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
             _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR, 'invalid value for [T/F] {}: {}'.format(
                 topic, dopts[topic]))
 
-    topic = _lbtl[label].get('ai_disp', 'ai_disp')  # may be enabled in a future libefp release
-    topic = _lbtl[label].get('ai_xr', 'ai_xr')  # may be enabled in a future libefp release
-    topic = _lbtl[label].get('ai_chtr', 'ai_chtr')  # may be enabled in a future libefp release
+    # may be enabled in a future libefp release
+    # topic = _lbtl[label].get('ai_disp', 'ai_disp')
+    # topic = _lbtl[label].get('ai_xr', 'ai_xr')
+    # topic = _lbtl[label].get('ai_chtr', 'ai_chtr')
 
     # set computed options state
     res = efpobj._efp_set_opts(opts)
@@ -1237,23 +1239,35 @@ def get_frag_name(efpobj, ifr=None):
         fragments in list.
 
     """
+    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic='name')
+
+
+def _get_frag_common(efpobj, ifr, topic):
     nfr = efpobj.get_frag_count()
+
+    fn_mapper = {
+        'name': efpobj._efp_get_frag_name,
+        'charge': efpobj._efp_get_frag_charge,
+        'xyzabc': efpobj._efp_get_frag_xyzabc,
+        'atom_count': efpobj._efp_get_frag_atom_count,
+        'multiplicity': efpobj._efp_get_frag_multiplicity,
+    }
 
     if ifr is None:
         frags = []
         for fr in range(nfr):
-            (res, fname) = efpobj._efp_get_frag_name(fr)
+            (res, ftopic) = fn_mapper[topic](fr)
             _result_to_error(res)
-            frags.append(fname)
+            frags.append(ftopic)
 
         return frags
 
     else:
         if ifr in range(nfr):
-            (res, fname) = efpobj._efp_get_frag_name(ifr)
+            (res, ftopic) = fn_mapper[topic](ifr)
             _result_to_error(res)
 
-            return fname
+            return ftopic
         else:
             raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
 
@@ -1275,31 +1289,14 @@ def get_frag_charge(efpobj, ifr=None, zero=1e-8):
         fragments in list.
 
     """
-    nfr = efpobj.get_frag_count()
-
+    chg = _get_frag_common(efpobj=efpobj, ifr=ifr, topic='charge')
     if ifr is None:
-        frags = []
-        for fr in range(nfr):
-            (res, chg) = efpobj._efp_get_frag_charge(fr)
-            _result_to_error(res)
-
-            if math.fabs(chg) < zero:
-                frags.append(0.0)
-            else:
-                frags.append(chg)
-        return frags
-
+        return [(0.0 if math.fabs(c) < zero else c) for c in chg]
     else:
-        if ifr in range(nfr):
-            (res, chg) = efpobj._efp_get_frag_charge(ifr)
-            _result_to_error(res)
-
-            if math.fabs(chg) < zero:
-                return 0.0
-            else:
-                return chg
+        if math.fabs(chg) < zero:
+            return 0.0
         else:
-            raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
+            return chg
 
 
 def get_frag_multiplicity(efpobj, ifr=None):
@@ -1317,24 +1314,7 @@ def get_frag_multiplicity(efpobj, ifr=None):
         of all fragments in list.
 
     """
-    nfr = efpobj.get_frag_count()
-
-    if ifr is None:
-        frags = []
-        for fr in range(nfr):
-            (res, mult) = efpobj._efp_get_frag_multiplicity(fr)
-            _result_to_error(res)
-            frags.append(mult)
-        return frags
-
-    else:
-        if ifr in range(nfr):
-            (res, mult) = efpobj._efp_get_frag_multiplicity(ifr)
-            _result_to_error(res)
-
-            return mult
-        else:
-            raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
+    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic='multiplicity')
 
 
 def get_frag_atom_count(efpobj, ifr=None):
@@ -1352,24 +1332,7 @@ def get_frag_atom_count(efpobj, ifr=None):
         of all fragments in list.
 
     """
-    nfr = efpobj.get_frag_count()
-
-    if ifr is None:
-        frags = []
-        for fr in range(nfr):
-            (res, natom) = efpobj._efp_get_frag_atom_count(fr)
-            _result_to_error(res)
-            frags.append(natom)
-        return frags
-
-    else:
-        if ifr in range(nfr):
-            (res, natom) = efpobj._efp_get_frag_atom_count(ifr)
-            _result_to_error(res)
-
-            return natom
-        else:
-            raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
+    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic='atom_count')
 
 
 def get_frag_atoms(efpobj, ifr):
@@ -1480,25 +1443,7 @@ def get_frag_xyzabc(efpobj, ifr=None):
         through XYZABC will have the angles standardized to (-pi, pi].
 
     """
-    nfr = efpobj.get_frag_count()
-
-    if ifr is None:
-        frags = []
-        for fr in range(nfr):
-            (res, hint) = efpobj._efp_get_frag_xyzabc(fr)
-            _result_to_error(res)
-
-            frags.append(hint)
-        return frags
-
-    else:
-        if ifr in range(nfr):
-            (res, hint) = efpobj._efp_get_frag_xyzabc(ifr)
-            _result_to_error(res)
-
-            return hint
-        else:
-            raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
+    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic='xyzabc')
 
 
 def to_dict(efpobj):
