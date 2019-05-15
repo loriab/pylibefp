@@ -1,13 +1,12 @@
 name: test
 channels:
   - defaults
-  - psi4
   - conda-forge
+  #- psi4
 dependencies:
     # Base depends
   - cmake
-  - libefp
-  - nomkl
+  #- libefp
   - numpy
   - pybind11
   - python
