@@ -1,21 +1,16 @@
 name: test
 channels:
-  - default
+  - defaults
+  - conda-forge
 dependencies:
     # Base depends
   - cmake
+  - nomkl
   - numpy
   - python
 
     # Testing
   - pytest
   - pytest-cov
+  - codecov
 
-    # Pip depends
-  - pip:
-      # Base depends
-    - pint
-
-      # Testing
-    - codecov
-    - deepdiff
