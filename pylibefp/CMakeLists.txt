@@ -73,8 +73,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metadata.py
 install(FILES __init__.py extras.py exceptions.py psiutil.py
         DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
 
-install(FILES ../tests/utils.py
-              ../tests/addons.py
+install(FILES ../tests/addons.py
               ../tests/conftest.py
               ../tests/systems.py
               ../tests/test_efpefp.py

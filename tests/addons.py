@@ -1,34 +1,19 @@
 import pytest
 
-def _plugin_import(plug):
-    import sys
-    if sys.version_info >= (3, 4):
-        from importlib import util
-        plug_spec = util.find_spec(plug)
-    else:
-        import pkgutil
-        plug_spec = pkgutil.find_loader(plug)
-    if plug_spec is None:
-        return False
-    else:
-        return True
+from qcelemental.util import which_import, parse_version
 
 
 def is_psi4_new_enough(version_feature_introduced):
-    if not _plugin_import('psi4'):
+    if which_import('psi4') is None:
         return False
     import psi4
-    from pkg_resources import parse_version
     return parse_version(psi4.__version__) >= parse_version(version_feature_introduced)
 
 
-using_qcdb = pytest.mark.skipif(_plugin_import('qcdb') is False,
-                                reason='Not detecting package qcdb. Install package if necessary and and to envvar PYTHONPATH')
-using_molparse = pytest.mark.skipif(_plugin_import('molparse') is False,
-                                reason='Not detecting package molparse. Install package if necessary and and to envvar PYTHONPATH')
-using_psi4 = pytest.mark.skipif(_plugin_import('psi4') is False,
-                                reason='Not detecting package psi4. Install package if necessary and and to envvar PYTHONPATH')
+using_psi4 = pytest.mark.skipif(
+    which_import('psi4', return_bool=True) is False,
+    reason='Not detecting package psi4. Install package if necessary and and to envvar PYTHONPATH')
 
-using_psi4_efpmints = pytest.mark.skipif(is_psi4_new_enough("1.2a1.dev507") is False,
-                                    reason="Psi4 does not include EFP integrals in mints. Update to development head")
-
+using_psi4_efpmints = pytest.mark.skipif(
+    is_psi4_new_enough("1.2a1.dev507") is False,
+    reason="Psi4 does not include EFP integrals in mints. Update to development head")
