@@ -13,8 +13,7 @@ else()
     message(STATUS "Suitable libefp could not be located, ${Magenta}Building libefp${ColourReset} instead.")
     ExternalProject_Add(libefp_external
         #DEPENDS lapack_external
-        GIT_REPOSITORY https://github.com/ilyak/libefp
-        GIT_TAG 15cd7ce  # v1.5.0 + 10 (docs and a cmake lapack patch)
+        URL https://github.com/ilyak/libefp/archive/15cd7ce.tar.gz  # v1.5.0 + 10 (docs and a cmake lapack patch)
 #        DOWNLOAD_COMMAND ""
 #        SOURCE_DIR "/home/psilocaluser/gits/libefp"
         UPDATE_COMMAND ""
