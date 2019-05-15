@@ -1,21 +1,19 @@
 name: test
 channels:
-  - default
+  - defaults
+  - conda-forge
+  #- psi4
 dependencies:
     # Base depends
   - cmake
+  #- libefp
   - numpy
+  - pybind11
   - python
+  - qcelemental >=0.4.0
 
     # Testing
   - pytest
   - pytest-cov
+  - codecov
 
-    # Pip depends
-  - pip:
-      # Base depends
-    - pint
-
-      # Testing
-    - codecov
-    - deepdiff

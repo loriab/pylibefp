@@ -58,7 +58,7 @@ matrix:
         - gcc-6
     env:
       - CXX_COMPILER='g++-6'
-      - PYTHON_VER='3.5'
+      - PYTHON_VER='3.6'
       - C_COMPILER='gcc-6'
       - GCOV='gcov-6'
 
@@ -115,7 +115,7 @@ before_script:
 
 script:
   # test and codecov build
-  - conda install ci-psi4 psi4 -c psi4/label/dev  # interferes with build if earlier
+#  - conda install ci-psi4 psi4 -c psi4/label/dev  # interferes with build if earlier
   - PYTHONPATH=stage/lib/ pytest -rws --cov-report term-missing --cov=stage/lib/ ../tests/
   - test "${GCOV}" = "" || bash <(curl -s https://codecov.io/bash) -x ${GCOV} || echo 'Codecov failed to upload'
   # test install
