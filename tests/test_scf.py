@@ -23,14 +23,17 @@ __license__   = "BSD-3-Clause"
 __date__      = "2017-08-28"
 
 import pytest
-from utils import *
 from addons import *
-import time
-import numpy as np
-np.set_printoptions(precision=5, linewidth=200, suppress=True)
-import pylibefp
 
 import os
+import time
+
+import numpy as np
+np.set_printoptions(precision=5, linewidth=200, suppress=True)
+from qcelemental.testing import compare, compare_values
+
+import pylibefp
+
 print('PyLibEFP  loc:', os.path.abspath(pylibefp.__file__))
 
 
@@ -283,7 +286,7 @@ def test_qmefp():
 
     # <-- efp: add in permanent moment contribution and cache
     Vefp = modify_Fock_permanent(mol, nbf, efpmol)
-    assert(compare_integers(1, np.allclose(Vefp, ref_V2), 'EFP permanent Fock contrib'))
+    assert compare(1, np.allclose(Vefp, ref_V2), 'EFP permanent Fock contrib')
     H = H + Vefp
     Horig = H.copy()
     set_qm_atoms(mol, efpmol)
@@ -373,12 +376,12 @@ def test_qmefp():
     print('Total time for SCF iterations: %.3f seconds \n' % (time.time() - t))
 
     # references confirmed against Q-Chem & Psi4
-    assert(compare_values( 0.2622598847, efpene['total'] - efpene['ind'], 6, 'EFP corr to SCF'))
-    assert(compare_values(-0.0117694790, efpene['ind'], 6, 'QM-EFP Indc'))
-    assert(compare_values(-0.0021985285, efpene['disp'], 6, 'EFP-EFP Disp'))
-    assert(compare_values( 0.0056859871, efpene['exch'], 6, 'EFP-EFP Exch'))
-    assert(compare_values( 0.2504904057, efpene['total'], 6, 'EFP-EFP Totl'))
-    assert(compare_values(-76.0139362744, SCF_E, 6, 'SCF'))
+    assert compare_values( 0.2622598847, efpene['total'] - efpene['ind'], 'EFP corr to SCF', atol=1.e-6)
+    assert compare_values(-0.0117694790, efpene['ind'], 'QM-EFP Indc', atol=1.e-6)
+    assert compare_values(-0.0021985285, efpene['disp'], 'EFP-EFP Disp', atol=1.e-6)
+    assert compare_values( 0.0056859871, efpene['exch'], 'EFP-EFP Exch', atol=1.e-6)
+    assert compare_values( 0.2504904057, efpene['total'], 'EFP-EFP Totl', atol=1.e-6)
+    assert compare_values(-76.0139362744, SCF_E, 'SCF', atol=1.e-6)
     efpmol.clean()
 
 if __name__ == '__main__':

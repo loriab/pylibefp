@@ -2,8 +2,9 @@ import sys
 import pytest
 import pprint
 import pylibefp
-from utils import *
 from systems import *
+
+from qcelemental.testing import compare, compare_values
 
 def test_dict_1():
     sys1 = system_1()
@@ -25,8 +26,8 @@ def test_dict_1():
     print(sys1p.geometry_summary(units_to_bohr=b2a))
     print(sys1p.geometry_summary(units_to_bohr=1.0))
 
-    assert(compare_integers(2, sys1p.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag'))
-    assert(compare_values(0.0001922903, ene['total'], 6,  sys._getframe().f_code.co_name + ': ene'))
+    assert compare(2, sys1p.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag')
+    assert compare_values(0.0001922903, ene['total'], sys._getframe().f_code.co_name + ': ene', atol=1.e-6)
 
 
 def test_dict_2a():
@@ -37,8 +38,8 @@ def test_dict_2a():
     sys1p.compute()
     ene = sys1p.get_energy()
 
-    assert(compare_integers(5, sys1p.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag'))
-    assert(compare_values(0.0007440865, ene['total'], 6, sys._getframe().f_code.co_name))
+    assert compare(5, sys1p.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag')
+    assert compare_values(0.0007440865, ene['total'], sys._getframe().f_code.co_name, atol=1.e-6)
 
 
 def test_dict_3a():
@@ -49,8 +50,8 @@ def test_dict_3a():
     sys1p.compute()
     ene = sys1p.get_energy()
 
-    assert(compare_integers(9, sys1p.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag'))
-    assert(compare_values(0.0061408841, ene['total'], 5, sys._getframe().f_code.co_name))
+    assert compare(9, sys1p.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag')
+    assert compare_values(0.0061408841, ene['total'], sys._getframe().f_code.co_name, atol=1.e-5)
 
 
 def test_dict_4a():
@@ -61,8 +62,8 @@ def test_dict_4a():
     sys1p.compute()
     ene = sys1p.get_energy()
 
-    assert(compare_integers(12, sys1p.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag'))
-    assert(compare_values(-0.0095597483, ene['total'], 5, sys._getframe().f_code.co_name))
+    assert compare(12, sys1p.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag')
+    assert compare_values(-0.0095597483, ene['total'], sys._getframe().f_code.co_name, atol=1.e-5)
 
 
 def test_dict_5():

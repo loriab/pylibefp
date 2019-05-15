@@ -1,19 +1,14 @@
 import sys
-#import pytest
 import pylibefp
-from utils import *
 from systems import *
 
-try:
-    long(1)
-except NameError:
-    long = int
-
+from qcelemental.testing import compare, compare_recursive, compare_values
 
 def test_elec_1c():
     asdf = system_1()
 
     opts = asdf.set_opts({'elec': True, 'elec_damp': 'off', 'enable_pbc': True, 'enable_cutoff': True, 'swf_cutoff': 6.0 * a2b})
+    import pprint
     pprint.pprint(opts)
     asdf.set_periodic_box([20.0 * a2b, 20.0 * a2b, 20.0 * a2b])
     box = asdf.get_periodic_box()
@@ -22,8 +17,8 @@ def test_elec_1c():
     ene = asdf.get_energy()
     pprint.pprint(ene)
     print(asdf.energy_summary())
-    assert(compare_values(20.0 * a2b, box[2], 6, sys._getframe().f_code.co_name + ': pbc'))
-    assert(compare_values(0.0002839577, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(20.0 * a2b, box[2], sys._getframe().f_code.co_name + ': pbc', atol=1.e-6)
+    assert compare_values(0.0002839577, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
 
 def test_disp_1c():
@@ -35,7 +30,7 @@ def test_disp_1c():
 
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(-0.0000980020, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(-0.0000980020, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
 
 def test_qm_1a():
@@ -57,12 +52,9 @@ def test_qm_1a():
     ptc_info = {'n': asdf.get_point_charge_count(),
                 'xyz': asdf.get_point_charge_coordinates(),
                 'val': asdf.get_point_charge_values()}
-    try:
-        nptc = long(4)
-    except SyntaxError:
-        nptc = 4
-    assert(compare_dicts({'n': nptc, 'xyz': coords, 'val': ptc}, ptc_info, 6, sys._getframe().f_code.co_name + ': ptc'))
-    assert(compare_values(-0.0787829370, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    nptc = 4
+    assert compare_recursive({'n': nptc, 'xyz': coords, 'val': ptc}, ptc_info, sys._getframe().f_code.co_name + ': ptc', atol=1.e-6)
+    assert compare_values(-0.0787829370, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
     ptc_x2 = [c * 2 for c in ptc]
     coords_x2 = [c * 2 for c in coords]
     asdf.set_point_charge_values(ptc_x2)
@@ -70,7 +62,7 @@ def test_qm_1a():
     ptc_info_x2 = {'n': asdf.get_point_charge_count(),
                    'xyz': asdf.get_point_charge_coordinates(),
                    'val': asdf.get_point_charge_values()}
-    assert(compare_dicts({'n': nptc, 'xyz': coords_x2, 'val': ptc_x2}, ptc_info_x2, 6, sys._getframe().f_code.co_name + ': ptc reset'))
+    assert compare_recursive({'n': nptc, 'xyz': coords_x2, 'val': ptc_x2}, ptc_info_x2, sys._getframe().f_code.co_name + ': ptc reset', atol=1.e-6)
 
 
 def test_qm_1b():
@@ -90,11 +82,11 @@ def test_qm_1b():
 
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(-0.0787829370, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(-0.0787829370, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
-    assert(compare_values(382.798972923, asdf.nuclear_repulsion_energy(use_efp_frags=True, use_point_charges=True), 4, sys._getframe().f_code.co_name + ': NRE qmefp'))
-    assert(compare_values(1.90431498139, asdf.nuclear_repulsion_energy(use_efp_frags=False, use_point_charges=True), 4, sys._getframe().f_code.co_name + ': NRE qm'))
-    assert(compare_values(321.754522402, asdf.nuclear_repulsion_energy(use_efp_frags=True, use_point_charges=False), 4, sys._getframe().f_code.co_name + ': NRE efp'))
+    assert compare_values(382.798972923, asdf.nuclear_repulsion_energy(use_efp_frags=True, use_point_charges=True), sys._getframe().f_code.co_name + ': NRE qmefp', atol=1.e-4)
+    assert compare_values(1.90431498139, asdf.nuclear_repulsion_energy(use_efp_frags=False, use_point_charges=True), sys._getframe().f_code.co_name + ': NRE qm', atol=1.e-4)
+    assert compare_values(321.754522402, asdf.nuclear_repulsion_energy(use_efp_frags=True, use_point_charges=False), sys._getframe().f_code.co_name + ': NRE efp', atol=1.e-4)
 
 
 def test_qm_2a():
@@ -113,7 +105,7 @@ def test_qm_2a():
 
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(-0.2314262632, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(-0.2314262632, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
 
 def test_qm_2b():
@@ -134,7 +126,7 @@ def test_qm_2b():
     asdf.compute()
     ene = asdf.get_energy()
     print(asdf.geometry_summary(units_to_bohr=0.529177))
-    assert(compare_values(-0.2314262632, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(-0.2314262632, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
 
 def test_total_5a():
@@ -147,7 +139,7 @@ def test_total_5a():
 
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(0.0001206197, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(0.0001206197, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
 
 def test_total_5b():
@@ -160,7 +152,7 @@ def test_total_5b():
 
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(0.0001206296, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(0.0001206296, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
 
 def test_total_5c():
@@ -173,7 +165,7 @@ def test_total_5c():
 
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(0.0001205050, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(0.0001205050, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
 
 def test_total_5d():
@@ -187,7 +179,7 @@ def test_total_5d():
 
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(0.0001205050, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(0.0001205050, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
 
 def test_total_6a():
@@ -200,7 +192,7 @@ def test_total_6a():
 
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(-0.0054950567, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(-0.0054950567, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
 
 def test_total_6b():
@@ -213,7 +205,7 @@ def test_total_6b():
 
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(-0.0051253344, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(-0.0051253344, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
 
 def test_total_6c():
@@ -226,7 +218,7 @@ def test_total_6c():
 
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(-0.0064013486, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(-0.0064013486, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)
 
 
 def test_total_6d():
@@ -239,4 +231,4 @@ def test_total_6d():
 
     asdf.compute()
     ene = asdf.get_energy()
-    assert(compare_values(-0.0051253344, ene['total'], 6, sys._getframe().f_code.co_name + ': total'))
+    assert compare_values(-0.0051253344, ene['total'], sys._getframe().f_code.co_name + ': total', atol=1.e-6)

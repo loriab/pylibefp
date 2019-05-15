@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3 FATAL_ERROR)  # 3.3: EP_add(DEPENDS interfacelib
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)  # 3.3: EP_add(DEPENDS interfacelib
 # project_VERSION* variables undefined, handled in primary EP
 
 project(pylibefp
@@ -54,8 +54,8 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 message(STATUS "pylibefp install: ${CMAKE_INSTALL_PREFIX}")
 
-set(Python_ADDITIONAL_VERSIONS 3.7 3.6 3.5)  # adjust with CMake minimum FindPythonInterp
-find_package(PythonLibsNew 2.7 REQUIRED)
+set(Python_ADDITIONAL_VERSIONS 3.7 3.6)  # adjust with CMake minimum FindPythonInterp
+find_package(PythonLibsNew 3.6 REQUIRED)
 message(STATUS "${Cyan}Found Python ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}${ColourReset}: ${PYTHON_EXECUTABLE} (found version ${PYTHON_VERSION_STRING})")
 
 set(STAGED_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/stage)

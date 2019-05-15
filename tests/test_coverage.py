@@ -1,8 +1,9 @@
 import sys
 import pytest
 import pylibefp
-from utils import *
 from systems import *
+
+from qcelemental.testing import compare
 
 
 def test_grad_fail():
@@ -43,7 +44,7 @@ def test_multifrag_pass():
     asdf.add_potential('nh3', duplicates_ok=True)
     asdf.add_fragment(['nh3'] * 5)
     asdf.prepare()
-    assert(compare_integers(5, asdf.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag'))
+    assert compare(5, asdf.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag')
 
 def test_frag_fail_1():
     asdf = system_1()
