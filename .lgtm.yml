@@ -4,11 +4,6 @@ extraction:
   python:
     python_setup:
       version: 3
-#  cpp:
-#    prepare:
-#      packages:
-#        - python3-pint
-#        - python3-numpy
 path_classifiers:
   library:
     - pylibefp/versioner.py
