@@ -6,6 +6,7 @@ from systems import *
 
 from qcelemental.testing import compare, compare_values
 
+
 def test_dict_1():
     sys1 = system_1()
 
@@ -46,7 +47,15 @@ def test_dict_3a():
     sys1 = system_3()
     sys1p = pylibefp.from_dict(sys1.to_dict())
 
-    sys1p.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True, 'elec_damp': 'screen', 'disp_damp': 'tt', 'pol_damp': 'tt'})
+    sys1p.set_opts({
+        'elec': True,
+        'pol': True,
+        'disp': True,
+        'xr': True,
+        'elec_damp': 'screen',
+        'disp_damp': 'tt',
+        'pol_damp': 'tt'
+    })
     sys1p.compute()
     ene = sys1p.get_energy()
 
@@ -58,7 +67,15 @@ def test_dict_4a():
     sys1 = system_4()
     sys1p = pylibefp.from_dict(sys1.to_dict())
 
-    sys1p.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True, 'elec_damp': 'screen', 'disp_damp': 'tt', 'pol_damp': 'tt'})
+    sys1p.set_opts({
+        'elec': True,
+        'pol': True,
+        'disp': True,
+        'xr': True,
+        'elec_damp': 'screen',
+        'disp_damp': 'tt',
+        'pol_damp': 'tt'
+    })
     sys1p.compute()
     ene = sys1p.get_energy()
 
@@ -67,10 +84,7 @@ def test_dict_4a():
 
 
 def test_dict_5():
-    dsys = {'units': 'Angstrom',
-            'fragment_files': [],
-            'hint_types': [],
-            'geom_hints': []}
+    dsys = {'units': 'Angstrom', 'fragment_files': [], 'hint_types': [], 'geom_hints': []}
 
     sys = pylibefp.from_dict(dsys)
 

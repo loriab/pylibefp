@@ -22,8 +22,6 @@ from . import core
 from . import psiutil
 from .exceptions import Fatal, NoMemory, FileNotFound, EFPSyntaxError, UnknownFragment, PolNotConverged, PyEFPSyntaxError
 
-
-
 _lbtl = {
     'libefp': {},
     'psi': {
@@ -318,8 +316,8 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_ELEC
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR, 'invalid value for [T/F] {}: {}'.format(
-                topic, dopts[topic]))
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('pol', 'pol')
     if topic in dopts:
@@ -328,8 +326,8 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_POL
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR, 'invalid value for [T/F] {}: {}'.format(
-                topic, dopts[topic]))
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('disp', 'disp')
     if topic in dopts:
@@ -338,8 +336,8 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_DISP
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR, 'invalid value for [T/F] {}: {}'.format(
-                topic, dopts[topic]))
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('xr', 'xr')
     if topic in dopts:
@@ -348,8 +346,8 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_XR
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR, 'invalid value for [T/F] {}: {}'.format(
-                topic, dopts[topic]))
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     # may be enabled in a future libefp release
     # topic = _lbtl[label].get('chtr', 'chtr')
@@ -374,8 +372,8 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
                 'off': core.EFP_POL_DAMP_OFF,
             }[dopts[topic].lower()]
         except KeyError:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR, 'invalid value for [tt/off] {}: {}'.format(
-                topic, dopts[topic]))
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                             'invalid value for [tt/off] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('disp_damp', 'disp_damp')
     if topic in dopts:
@@ -396,8 +394,8 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] in falses:
             opts.enable_pbc = 0
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR, 'invalid value for [T/F] {}: {}'.format(
-                topic, dopts[topic]))
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('enable_cutoff', 'enable_cutoff')
     if topic in dopts:
@@ -406,8 +404,8 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] in falses:
             opts.enable_cutoff = 0
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR, 'invalid value for [T/F] {}: {}'.format(
-                topic, dopts[topic]))
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('swf_cutoff', 'swf_cutoff')
     if topic in dopts:
@@ -431,8 +429,8 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_AI_ELEC
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR, 'invalid value for [T/F] {}: {}'.format(
-                topic, dopts[topic]))
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     topic = _lbtl[label].get('ai_pol', 'ai_pol')
     if topic in dopts:
@@ -441,8 +439,8 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_AI_POL
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR, 'invalid value for [T/F] {}: {}'.format(
-                topic, dopts[topic]))
+            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
 
     # may be enabled in a future libefp release
     # topic = _lbtl[label].get('ai_disp', 'ai_disp')
@@ -1038,9 +1036,11 @@ def geometry_summary(efpobj, units_to_bohr=1.0):
         if iat in terminal_frag:
             text += '    --\n'
             ifr += 1
-        text += '    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}   {}\n'.format(
-            at['symbol'], '', at['x'] * units_to_bohr, at['y'] * units_to_bohr, at['z'] * units_to_bohr,
-            frag_names[ifr].lower())
+        text += '    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}   {}\n'.format(at['symbol'], '',
+                                                                               at['x'] * units_to_bohr,
+                                                                               at['y'] * units_to_bohr,
+                                                                               at['z'] * units_to_bohr,
+                                                                               frag_names[ifr].lower())
 
     # TODO move into dict?
     ptc_info = {
@@ -1053,9 +1053,11 @@ def geometry_summary(efpobj, units_to_bohr=1.0):
         mult3 = list(map(list, zip(*[iter(ptc_info['xyz'])] * 3)))
         text += '    ------------\n'
         for ptc in range(ptc_info['n']):
-            text += '    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}   {}\n'.format(
-                ptc_info['val'][ptc], '', mult3[ptc][0] * units_to_bohr, mult3[ptc][1] * units_to_bohr,
-                mult3[ptc][2] * units_to_bohr, 'point_charge')
+            text += '    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}   {}\n'.format(ptc_info['val'][ptc], '',
+                                                                                   mult3[ptc][0] * units_to_bohr,
+                                                                                   mult3[ptc][1] * units_to_bohr,
+                                                                                   mult3[ptc][2] * units_to_bohr,
+                                                                                   'point_charge')
 
     text += '\n'
     return text
@@ -1451,7 +1453,8 @@ def to_dict(efpobj):
 
     nfr = efpobj.get_frag_count()
     fnat = efpobj.get_frag_atom_count()
-    frs = functools.reduce(lambda c, x: c + [c[-1] + x], fnat, [0])[1:]  # np.cumsum(fnat)  https://stackoverflow.com/a/33034961
+    frs = functools.reduce(lambda c, x: c + [c[-1] + x], fnat,
+                           [0])[1:]  # np.cumsum(fnat)  https://stackoverflow.com/a/33034961
     nat = frs[-1]
 
     molrec['units'] = 'Bohr'
@@ -1634,8 +1637,8 @@ def from_dict(efp_init):
         elif htype == 'points':
             return [h * iutau for h in hint]
 
-    for ifr, (fl, ht, gh) in enumerate(
-            zip(efp_init['fragment_files'], efp_init['hint_types'], efp_init['geom_hints'])):
+    for ifr, (fl, ht, gh) in enumerate(zip(efp_init['fragment_files'], efp_init['hint_types'],
+                                           efp_init['geom_hints'])):
         sys.add_potential(fl, duplicates_ok=True)
         sys.add_fragment(fl)
         hint = hint_to_au(gh, ht, input_units_to_au)

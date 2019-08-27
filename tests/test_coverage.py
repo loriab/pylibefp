@@ -29,6 +29,7 @@ def test_frag_missing_fail():
     with pytest.raises(pylibefp.UnknownFragment) as e_info:
         asdf.add_fragment('h2o')
 
+
 def test_multifrag_fail():
     asdf = pylibefp.core.efp()
 
@@ -46,15 +47,16 @@ def test_multifrag_pass():
     asdf.prepare()
     assert compare(5, asdf.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag')
 
+
 def test_frag_fail_1():
     asdf = system_1()
 
     with pytest.raises(pylibefp.PyEFPSyntaxError) as e_info:
         asdf.get_frag_multiplicity(3)
 
+
 def test_frag_fail_2():
     asdf = system_1()
 
     with pytest.raises(pylibefp.PyEFPSyntaxError) as e_info:
         asdf.get_frag_name(-1)
-

@@ -15,12 +15,12 @@ import os
 
 _success_flag_ = False
 
-
 ###   # Working directory
 ###   _input_dir_ = os.getcwd()
-###   
+###
 ###   def get_input_directory():
 ###       return _input_dir_
+
 
 # Testing
 def test(extent='full', extras=None):

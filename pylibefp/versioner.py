@@ -126,7 +126,8 @@ def reconcile_and_compute_version_output(quiet=False):
 
     # this is the tag format (PEP440 compliant) that our machinery is expecting.
     #   let's catch any deviations with Travis before it can corrupt versioning.
-    sane_tag = re.compile("""^(?P<tag>(?P<forwardseries>\d+\.\d+(?P<patch>\.[1-9]+)?)(?(patch)|(?P<prere>((a)|(b)|(rc))\d+)?))$""")
+    sane_tag = re.compile(
+        """^(?P<tag>(?P<forwardseries>\d+\.\d+(?P<patch>\.[1-9]+)?)(?(patch)|(?P<prere>((a)|(b)|(rc))\d+)?))$""")
 
     mobj = sane_tag.match(meta_latest_annotated_v_tag)
     if mobj:
@@ -145,8 +146,7 @@ def reconcile_and_compute_version_output(quiet=False):
                 tmp[-1] = bumpdown
                 backwardseries = '.'.join(tmp)
     else:
-        print("""Tag in {} is malformed: {}""".format(
-            'metadata.py', meta_latest_annotated_v_tag))
+        print("""Tag in {} is malformed: {}""".format('metadata.py', meta_latest_annotated_v_tag))
         sys.exit()
 
     cwd = os.path.dirname(os.path.abspath(__file__))
@@ -181,13 +181,15 @@ def reconcile_and_compute_version_output(quiet=False):
                         project_version_long = trial_version_long_release
 
                     else:
-                        print("""Undefining version for irreconcilable hashes: {} (computed) vs {} (recorded)""".format(
-                            trial_version_long_release, res['long']))
+                        print(
+                            """Undefining version for irreconcilable hashes: {} (computed) vs {} (recorded)""".format(
+                                trial_version_long_release, res['long']))
 
             else:
                 if res['branch_name'].endswith('.x'):
-                    print("""Undefining version as development snapshots not allowed on maintenance branch: {} (rejected computed)""".format(
-                        trial_version_long_devel))
+                    print(
+                        """Undefining version as development snapshots not allowed on maintenance branch: {} (rejected computed)"""
+                        .format(trial_version_long_devel))
 
                 # TODO prob should be undef unless on master
                 else:
@@ -202,8 +204,7 @@ def reconcile_and_compute_version_output(quiet=False):
                 res['latest_annotated_v_tag'], meta_latest_annotated_v_tag))
 
     else:
-        print("""Blindly (no git) accepting release version: {} (recorded)""".format(
-            res['long']))
+        print("""Blindly (no git) accepting release version: {} (recorded)""".format(res['long']))
         # assumes that zip only comes from [pre]release. GitHub hides others, but they're there.
         project_release = not bool(mobj.group('prere'))
         project_prerelease = bool(mobj.group('prere'))
@@ -229,14 +230,16 @@ def reconcile_and_compute_version_output(quiet=False):
         cm = '.'.join(cm)
         return cm
 
-    return {'__version__': project_version,
-            '__version_long': project_version_long,
-            '__version_is_clean': res['is_clean'],
-            '__version_branch_name': res['branch_name'],
-            '__version_last_release': backwardseries,
-            '__version_cmake': mapped_cmake_version(backwardseries, project_release),
-            '__version_release': project_release,
-            '__version_prerelease': project_prerelease}
+    return {
+        '__version__': project_version,
+        '__version_long': project_version_long,
+        '__version_is_clean': res['is_clean'],
+        '__version_branch_name': res['branch_name'],
+        '__version_last_release': backwardseries,
+        '__version_cmake': mapped_cmake_version(backwardseries, project_release),
+        '__version_release': project_release,
+        '__version_prerelease': project_prerelease
+    }
 
 
 def write_new_metafile(versdata, outfile='metadata.out.py'):
@@ -293,7 +296,8 @@ def version_formatter(versdata, formatstring="""{version}"""):
     if formatstring == 'all':
         formatstring = '{version} {{{branch}}} {githash} {cmake} {clean} {release} {lastrel} <-- {versionlong}'
 
-    release = 'release' if versdata['__version_release'] else ('prerelease' if versdata['__version_prerelease'] else '')
+    release = 'release' if versdata['__version_release'] else (
+        'prerelease' if versdata['__version_prerelease'] else '')
 
     ans = formatstring.format(version=versdata['__version__'],
                               versionlong=versdata['__version_long'],
@@ -308,11 +312,19 @@ def version_formatter(versdata, formatstring="""{version}"""):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Script to extract PylibEFP version from source. Use pylibefp.version_formatter(fmt_string) after build.')
+    parser = argparse.ArgumentParser(
+        description=
+        'Script to extract PylibEFP version from source. Use pylibefp.version_formatter(fmt_string) after build.')
     parser.add_argument('--metaout', default='metadata.out.py', help='file to which the computed version info written')
-    parser.add_argument('--cmakeout', default='metadata.out.cmake', help='file to which the CMake ConfigVersion generator written')
-    parser.add_argument('--format', default='all', help='string like "{version} {githash}" to be filled in and returned')
-    parser.add_argument('--formatonly', action='store_true', help='print only the format string, not the detection info')
+    parser.add_argument('--cmakeout',
+                        default='metadata.out.cmake',
+                        help='file to which the CMake ConfigVersion generator written')
+    parser.add_argument('--format',
+                        default='all',
+                        help='string like "{version} {githash}" to be filled in and returned')
+    parser.add_argument('--formatonly',
+                        action='store_true',
+                        help='print only the format string, not the detection info')
     args = parser.parse_args()
 
     ans = reconcile_and_compute_version_output(quiet=args.formatonly)
