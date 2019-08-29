@@ -1,7 +1,7 @@
 /*
     pylibefp/core.cc: Main binding of libefp with pybind11
 
-    Copyright (c) 2017-2018 The Psi4 Developers
+    Copyright (c) 2017-2019 The Psi4 Developers
 
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE file.
@@ -485,7 +485,7 @@ void _clean(efp* efp) {
 PYBIND11_MODULE(core, m) {
     m.doc() = "Python wrapping of parallel implementation of the Effective Fragment Potential (EFP) method";
 
-    m.attr("__copyright__") = py::str("Copyright (c) 2017-2018 The Psi4 Developers");
+    m.attr("__copyright__") = py::str("Copyright (c) 2017-2019 The Psi4 Developers");
     py::exception<libefpException>(m, "libefpException");
 
     // clang-format off
