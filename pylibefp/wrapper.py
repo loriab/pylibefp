@@ -13,6 +13,7 @@
 
 import os
 import re
+import sys
 import math
 import functools
 from typing import Dict
@@ -1487,7 +1488,7 @@ def to_dict(efpobj, dtype='psi4'):
 
     molrec['molecular_charge'] = sum(molrec['fragment_charges'])
     molrec['molecular_multiplicity'] = _high_spin_sum(molrec['fragment_multiplicities'])
-    molrec['provenance'] = provenance_stamp(__name__)
+    molrec['provenance'] = provenance_stamp(__name__ + '.' + sys._getframe().f_code.co_name)
 
     molrec['fragment_files'] = [fl.lower() for fl in efpobj.get_frag_name()]
     molrec['hint_types'] = ['xyzabc'] * nfr
@@ -1635,7 +1636,7 @@ def from_dict(efp_init):
         :py:func:`pylibefp.core.efp.prepare`.
 
     """
-    sys = core.efp()
+    efpobj = core.efp()
 
     units, input_units_to_au = process_units(efp_init)
 
@@ -1647,15 +1648,15 @@ def from_dict(efp_init):
 
     for ifr, (fl, ht, gh) in enumerate(zip(efp_init['fragment_files'], efp_init['hint_types'],
                                            efp_init['geom_hints'])):
-        sys.add_potential(fl, duplicates_ok=True)
-        sys.add_fragment(fl)
+        efpobj.add_potential(fl, duplicates_ok=True)
+        efpobj.add_fragment(fl)
         hint = hint_to_au(gh, ht, input_units_to_au)
-        sys.set_frag_coordinates(ifr, ht, hint)
+        efpobj.set_frag_coordinates(ifr, ht, hint)
 
-    #sys.input_units_to_au = efp_init['input_units_to_au']
-    sys.input_units_to_au = input_units_to_au
-    sys.prepare()
-    return sys
+    #efpobj.input_units_to_au = efp_init['input_units_to_au']
+    efpobj.input_units_to_au = input_units_to_au
+    efpobj.prepare()
+    return efpobj
 
 
 def provenance_stamp(routine: str) -> Dict[str, str]:
