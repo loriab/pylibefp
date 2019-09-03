@@ -9,9 +9,10 @@ from systems import *
 
 
 def blank_ene():
-    fields = ['charge_penetration', 'disp', 'dispersion', 'elec',
-              'electrostatic', 'electrostatic_point_charges',
-              'exchange_repulsion', 'pol', 'polarization', 'xr']
+    fields = [
+        'charge_penetration', 'disp', 'dispersion', 'elec', 'electrostatic', 'electrostatic_point_charges',
+        'exchange_repulsion', 'pol', 'polarization', 'xr'
+    ]
     ene = {f: 0.0 for f in fields}
     return ene
 
@@ -110,10 +111,14 @@ def test_xr_1():
 
 def test_total_1a():
     asdf = system_1()
-    asdf.set_opts({'elec': True, 'elec_damp': 'screen',
-                     'xr': True,
-                    'pol': True, # 'pol_damp': 'tt',
-                   'disp': True, 'disp_damp': 'tt'})
+    asdf.set_opts({
+        'elec': True,
+        'elec_damp': 'screen',
+        'xr': True,
+        'pol': True,  # 'pol_damp': 'tt',
+        'disp': True,
+        'disp_damp': 'tt'
+    })
     asdf.compute()
     ene = asdf.get_energy()
     pprint.pprint(ene)
@@ -262,7 +267,15 @@ def test_xr_3():
 
 def test_total_3a():
     asdf = system_3()
-    asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True, 'elec_damp': 'screen', 'disp_damp': 'tt', 'pol_damp': 'tt'})
+    asdf.set_opts({
+        'elec': True,
+        'pol': True,
+        'disp': True,
+        'xr': True,
+        'elec_damp': 'screen',
+        'disp_damp': 'tt',
+        'pol_damp': 'tt'
+    })
     asdf.compute()
     ene = asdf.get_energy()
     assert compare(9, asdf.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag')
@@ -271,23 +284,40 @@ def test_total_3a():
 
 def test_total_4a():
     asdf = system_4()
-    asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True, 'elec_damp': 'screen', 'disp_damp': 'tt', 'pol_damp': 'tt'})
+    asdf.set_opts({
+        'elec': True,
+        'pol': True,
+        'disp': True,
+        'xr': True,
+        'elec_damp': 'screen',
+        'disp_damp': 'tt',
+        'pol_damp': 'tt'
+    })
     asdf.compute()
     ene = asdf.get_energy()
 
     nfrags = ['ACETONE', 'C2H5OH', 'C6H6', 'CCL4', 'CH3OH', 'CH4', 'CL2', 'DCM', 'DMSO', 'H2', 'H2O', 'NH3']
     mfrags = [1 for fr in range(12)]
     cfrags = [0.0 for fr in range(12)]
+    tnm = sys._getframe().f_code.co_name
     assert compare(12, asdf.get_frag_count(), sys._getframe().f_code.co_name + ': nfrag')
-    assert compare_recursive({'dummy': cfrags}, {'dummy': asdf.get_frag_charge()}, sys._getframe().f_code.co_name + ': f_chg', atol=1.e-2)
-    assert compare_recursive({'dummy': mfrags}, {'dummy': asdf.get_frag_multiplicity()}, sys._getframe().f_code.co_name + ': f_mult', atol=1.e-2)
-    assert compare_recursive({'dummy': nfrags}, {'dummy': asdf.get_frag_name()}, sys._getframe().f_code.co_name + ': f_names', atol=1.e-2)
+    assert compare_recursive({'dummy': cfrags}, {'dummy': asdf.get_frag_charge()}, tnm + ': f_chg', atol=1.e-2)
+    assert compare_recursive({'dummy': mfrags}, {'dummy': asdf.get_frag_multiplicity()}, tnm + ': f_mult', atol=1.e-2)
+    assert compare_recursive({'dummy': nfrags}, {'dummy': asdf.get_frag_name()}, tnm + ': f_names', atol=1.e-2)
     assert compare_values(-0.0095597483, ene['total'], sys._getframe().f_code.co_name, atol=1.e-5)
 
 
 def test_total_4b():
     asdf = system_4()
-    asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True, 'elec_damp': 'overlap', 'disp_damp': 'overlap', 'pol_damp': 'tt'})
+    asdf.set_opts({
+        'elec': True,
+        'pol': True,
+        'disp': True,
+        'xr': True,
+        'elec_damp': 'overlap',
+        'disp_damp': 'overlap',
+        'pol_damp': 'tt'
+    })
     asdf.compute()
     ene = asdf.get_energy()
     assert compare_values(-0.0092400662, ene['total'], atol=1.e-5)
@@ -295,7 +325,15 @@ def test_total_4b():
 
 def test_total_4c():
     asdf = system_4()
-    asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True, 'elec_damp': 'off', 'disp_damp': 'off', 'pol_damp': 'tt'})
+    asdf.set_opts({
+        'elec': True,
+        'pol': True,
+        'disp': True,
+        'xr': True,
+        'elec_damp': 'off',
+        'disp_damp': 'off',
+        'pol_damp': 'tt'
+    })
     asdf.compute()
     ene = asdf.get_energy()
     assert compare_values(-0.0091278725, ene['total'], atol=1.e-5)
@@ -303,10 +341,20 @@ def test_total_4c():
 
 def test_total_4d():
     asdf = system_4()
-    asdf.set_opts({'elec': True, 'pol': True, 'disp': True, 'xr': True, 'elec_damp': 'screen', 'disp_damp': 'tt', 'pol_damp': 'tt', 'pol_driver': 'direct'})
+    asdf.set_opts({
+        'elec': True,
+        'pol': True,
+        'disp': True,
+        'xr': True,
+        'elec_damp': 'screen',
+        'disp_damp': 'tt',
+        'pol_damp': 'tt',
+        'pol_driver': 'direct'
+    })
     asdf.compute()
     ene = asdf.get_energy()
     assert compare_values(-0.0095597483, ene['total'], atol=1.e-5)
+
 
 if __name__ == '__main__':
     test_total_4d()

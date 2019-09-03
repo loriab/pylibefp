@@ -1,7 +1,7 @@
 /*
     pylibefp/core.cc: Main binding of libefp with pybind11
 
-    Copyright (c) 2017-2018 The Psi4 Developers
+    Copyright (c) 2017-2019 The Psi4 Developers
 
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE file.
@@ -485,100 +485,101 @@ void _clean(efp* efp) {
 PYBIND11_MODULE(core, m) {
     m.doc() = "Python wrapping of parallel implementation of the Effective Fragment Potential (EFP) method";
 
-    m.attr("__copyright__") = py::str("Copyright (c) 2017-2018 The Psi4 Developers");
+    m.attr("__copyright__") = py::str("Copyright (c) 2017-2019 The Psi4 Developers");
     py::exception<libefpException>(m, "libefpException");
 
     // clang-format off
     py::enum_<efp_result>(m, "efp_result", "Result of a libefp operation")
-        .value("EFP_RESULT_SUCCESS", EFP_RESULT_SUCCESS)                      /* Operation was successful. */
-        .value("EFP_RESULT_FATAL", EFP_RESULT_FATAL)                          /* Fatal error has occurred. */
-        .value("EFP_RESULT_NO_MEMORY", EFP_RESULT_NO_MEMORY)                  /* Insufficient memory. */
-        .value("EFP_RESULT_FILE_NOT_FOUND", EFP_RESULT_FILE_NOT_FOUND)        /* File not found. */
-        .value("EFP_RESULT_SYNTAX_ERROR", EFP_RESULT_SYNTAX_ERROR)            /* Syntax error. */
-        .value("EFP_RESULT_UNKNOWN_FRAGMENT", EFP_RESULT_UNKNOWN_FRAGMENT)    /* Unknown EFP fragment. */
-        .value("EFP_RESULT_POL_NOT_CONVERGED", EFP_RESULT_POL_NOT_CONVERGED)  /* Polarization SCF procedure did not converge. */
+        .value("EFP_RESULT_SUCCESS", EFP_RESULT_SUCCESS,                      "Operation was successful.")
+        .value("EFP_RESULT_FATAL", EFP_RESULT_FATAL,                          "Fatal error has occurred.")
+        .value("EFP_RESULT_NO_MEMORY", EFP_RESULT_NO_MEMORY,                  "Insufficient memory.")
+        .value("EFP_RESULT_FILE_NOT_FOUND", EFP_RESULT_FILE_NOT_FOUND,        "File not found.")
+        .value("EFP_RESULT_SYNTAX_ERROR", EFP_RESULT_SYNTAX_ERROR,            "Syntax error.")
+        .value("EFP_RESULT_UNKNOWN_FRAGMENT", EFP_RESULT_UNKNOWN_FRAGMENT,    "Unknown EFP fragment.")
+        .value("EFP_RESULT_POL_NOT_CONVERGED", EFP_RESULT_POL_NOT_CONVERGED,  "Polarization SCF procedure did not converge.")
         .export_values();
 
     py::enum_<efp_term>(m, "efp_term", py::arithmetic(), "Flags to specify EFP energy terms")
-        .value("EFP_TERM_ELEC", EFP_TERM_ELEC)                                /* EFP/EFP electrostatics. */
-        .value("EFP_TERM_POL", EFP_TERM_POL)                                  /* EFP/EFP polarization. */
-        .value("EFP_TERM_DISP", EFP_TERM_DISP)                                /* EFP/EFP dispersion. */
-        .value("EFP_TERM_XR", EFP_TERM_XR)                                    /* EFP/EFP exchange repulsion. */
-        .value("EFP_TERM_CHTR", EFP_TERM_CHTR)                                /* EFP/EFP charge transfer, reserved for future. */
-        .value("EFP_TERM_AI_ELEC", EFP_TERM_AI_ELEC)                          /* Ab initio/EFP electrostatics. */
-        .value("EFP_TERM_AI_POL", EFP_TERM_AI_POL)                            /* Ab initio/EFP polarization. */
-        .value("EFP_TERM_AI_DISP", EFP_TERM_AI_DISP)                          /* Ab initio/EFP dispersion, reserved for future. */
-        .value("EFP_TERM_AI_XR", EFP_TERM_AI_XR)                              /* Ab initio/EFP exchange repulsion, reserved for future. */
-        .value("EFP_TERM_AI_CHTR", EFP_TERM_AI_CHTR)                          /* Ab initio/EFP charge transfer, reserved for future. */
-        .export_values();
+        .value("EFP_TERM_ELEC", EFP_TERM_ELEC,                                "EFP/EFP electrostatics.")
+        .value("EFP_TERM_POL", EFP_TERM_POL,                                  "EFP/EFP polarization.")
+        .value("EFP_TERM_DISP", EFP_TERM_DISP,                                "EFP/EFP dispersion.")
+        .value("EFP_TERM_XR", EFP_TERM_XR,                                    "EFP/EFP exchange repulsion.")
+        .value("EFP_TERM_CHTR", EFP_TERM_CHTR,                                "EFP/EFP charge transfer, reserved for future.")
+        .value("EFP_TERM_AI_ELEC", EFP_TERM_AI_ELEC,                          "Ab initio/EFP electrostatics.")
+        .value("EFP_TERM_AI_POL", EFP_TERM_AI_POL,                            "Ab initio/EFP polarization.")
+        .value("EFP_TERM_AI_DISP", EFP_TERM_AI_DISP,                          "Ab initio/EFP dispersion, reserved for future.")
+        .value("EFP_TERM_AI_XR", EFP_TERM_AI_XR,                              "Ab initio/EFP exchange repulsion, reserved for future.")
+        .value("EFP_TERM_AI_CHTR", EFP_TERM_AI_CHTR,                          "Ab initio/EFP charge transfer, reserved for future.")
+        .export_values()
+        .def("__invert__", [](efp_term& value) { return ~value; });
 
     py::enum_<efp_disp_damp>(m, "efp_disp_damp", "Fragment-fragment dispersion damping type")
-        .value("EFP_DISP_DAMP_OVERLAP", EFP_DISP_DAMP_OVERLAP)                /* Overlap-based damping (default). */
-        .value("EFP_DISP_DAMP_TT", EFP_DISP_DAMP_TT)                          /* Tang-Toennies damping. */
-        .value("EFP_DISP_DAMP_OFF", EFP_DISP_DAMP_OFF)                        /* No dispersion damping. */
+        .value("EFP_DISP_DAMP_OVERLAP", EFP_DISP_DAMP_OVERLAP,                "Overlap-based damping (default).")
+        .value("EFP_DISP_DAMP_TT", EFP_DISP_DAMP_TT,                          "Tang-Toennies damping.")
+        .value("EFP_DISP_DAMP_OFF", EFP_DISP_DAMP_OFF,                        "No dispersion damping.")
         .export_values();
 
     py::enum_<efp_elec_damp>(m, "efp_elec_damp", "Fragment-fragment electrostatic damping type")
-        .value("EFP_ELEC_DAMP_SCREEN", EFP_ELEC_DAMP_SCREEN)                  /* SCREEN-controlled damping (default). */
-        .value("EFP_ELEC_DAMP_OVERLAP", EFP_ELEC_DAMP_OVERLAP)                /* Overlap-based damping. */
-        .value("EFP_ELEC_DAMP_OFF", EFP_ELEC_DAMP_OFF)                        /* No electrostatic damping. */
+        .value("EFP_ELEC_DAMP_SCREEN", EFP_ELEC_DAMP_SCREEN,                  "SCREEN-controlled damping (default).")
+        .value("EFP_ELEC_DAMP_OVERLAP", EFP_ELEC_DAMP_OVERLAP,                "Overlap-based damping.")
+        .value("EFP_ELEC_DAMP_OFF", EFP_ELEC_DAMP_OFF,                        "No electrostatic damping.")
         .export_values();
 
     py::enum_<efp_pol_damp>(m, "efp_pol_damp", "Fragment-fragment polarization damping type")
-        .value("EFP_POL_DAMP_TT", EFP_POL_DAMP_TT)                            /* Tang-Toennies like damping (default). */
-        .value("EFP_POL_DAMP_OFF", EFP_POL_DAMP_OFF)                          /* No polarization damping. */
+        .value("EFP_POL_DAMP_TT", EFP_POL_DAMP_TT,                            "Tang-Toennies like damping (default).")
+        .value("EFP_POL_DAMP_OFF", EFP_POL_DAMP_OFF,                          "No polarization damping.")
         .export_values();
 
     py::enum_<efp_coord_type>(m, "efp_coord_type", "Describes the way fragment coordinates are specified")
-        .value("EFP_COORD_TYPE_XYZABC", EFP_COORD_TYPE_XYZABC)                /* Coordinates of center of mass of a fragment and Euler angles. */
-        .value("EFP_COORD_TYPE_POINTS", EFP_COORD_TYPE_POINTS)                /* Coordinates of three points belonging to a fragment. */
-        .value("EFP_COORD_TYPE_ROTMAT", EFP_COORD_TYPE_ROTMAT)                /* Coordinates of fragment center of mass and its rotation matrix. */
+        .value("EFP_COORD_TYPE_XYZABC", EFP_COORD_TYPE_XYZABC,                "Coordinates of center of mass of a fragment and Euler angles.")
+        .value("EFP_COORD_TYPE_POINTS", EFP_COORD_TYPE_POINTS,                "Coordinates of three points belonging to a fragment.")
+        .value("EFP_COORD_TYPE_ROTMAT", EFP_COORD_TYPE_ROTMAT,                "Coordinates of fragment center of mass and its rotation matrix.")
         .export_values();
 
 
     py::enum_<efp_pol_driver>(m, "efp_pol_driver", "Driver used for solving polarization equations")
-        .value("EFP_POL_DRIVER_ITERATIVE", EFP_POL_DRIVER_ITERATIVE)          /* Iterative solution of polarization equations. */
-        .value("EFP_POL_DRIVER_DIRECT", EFP_POL_DRIVER_DIRECT)                /* Direct solution of polarization equations. */
+        .value("EFP_POL_DRIVER_ITERATIVE", EFP_POL_DRIVER_ITERATIVE,          "Iterative solution of polarization equations.")
+        .value("EFP_POL_DRIVER_DIRECT", EFP_POL_DRIVER_DIRECT,                "Direct solution of polarization equations.")
         .export_values();
 
     py::class_<efp_opts>(m, "efp_opts", "Options controlling EFP computation")
         .def(py::init())
-        .def_readwrite("terms", &efp_opts::terms)                             /* Specifies which energy terms to compute. */
-        .def_readwrite("disp_damp", &efp_opts::disp_damp)                     /* Dispersion damping type (see #efp_disp_damp). */
-        .def_readwrite("elec_damp", &efp_opts::elec_damp)                     /* Electrostatic damping type (see #efp_elec_damp). */
-        .def_readwrite("pol_damp", &efp_opts::pol_damp)                       /* Polarization damping type (see #efp_pol_damp). */
-        .def_readwrite("pol_driver", &efp_opts::pol_driver)                   /* Driver used to find polarization induced dipoles. */
-        .def_readwrite("enable_pbc", &efp_opts::enable_pbc)                   /* Enable periodic boundary conditions if nonzero. */
-        .def_readwrite("enable_cutoff", &efp_opts::enable_cutoff)             /* Enable frag-fraginteraction cutoff if nonzero. */
-        .def_readwrite("swf_cutoff", &efp_opts::swf_cutoff);                  /* Cutoff distance for frag-frag interactions. */
+        .def_readwrite("terms", &efp_opts::terms,                             "Specifies which energy terms to compute.")
+        .def_readwrite("disp_damp", &efp_opts::disp_damp,                     "Dispersion damping type (see #efp_disp_damp).")
+        .def_readwrite("elec_damp", &efp_opts::elec_damp,                     "Electrostatic damping type (see #efp_elec_damp).")
+        .def_readwrite("pol_damp", &efp_opts::pol_damp,                       "Polarization damping type (see #efp_pol_damp).")
+        .def_readwrite("pol_driver", &efp_opts::pol_driver,                   "Driver used to find polarization induced dipoles.")
+        .def_readwrite("enable_pbc", &efp_opts::enable_pbc,                   "Enable periodic boundary conditions if nonzero.")
+        .def_readwrite("enable_cutoff", &efp_opts::enable_cutoff,             "Enable frag-fraginteraction cutoff if nonzero.")
+        .def_readwrite("swf_cutoff", &efp_opts::swf_cutoff,                   "Cutoff distance for frag-frag interactions.");
 
     py::class_<efp_energy>(m, "efp_energy", "EFP energy terms")
         .def(py::init())
-        .def_readwrite("electrostatic", &efp_energy::electrostatic)           /* EFP/EFP electrostatic energy. */
-        .def_readwrite("charge_penetration", &efp_energy::charge_penetration) /* Charge penetration energy from
-                                                                                 overlap-based electrostatic damping.
-                                                                                 Zero if overlap-based damping is turned
-                                                                                 off. */
-        .def_readwrite("electrostatic_point_charges", &efp_energy::electrostatic_point_charges)
-                                                                              /* Interaction energy of EFP electrostatics
-                                                                                 with point charges. */
-        .def_readwrite("polarization", &efp_energy::polarization)             /* All polarization energy goes here.
-                                                                                 Polarization is computed self-consist-
-                                                                                 ently so it can't be separated into
-                                                                                 EFP/EFP and AI/EFP parts. */
-        .def_readwrite("dispersion", &efp_energy::dispersion)                 /* EFP/EFP dispersion energy. */
-        .def_readwrite("ai_dispersion", &efp_energy::ai_dispersion)           /* AI/EFP dispersion energy. */
-        .def_readwrite("exchange_repulsion", &efp_energy::exchange_repulsion) /* EFP/EFP exchange-repulsion energy. */
-        .def_readwrite("total", &efp_energy::total);                          /* Sum of all the above energy terms. */
+        .def_readwrite("electrostatic", &efp_energy::electrostatic,           "EFP/EFP electrostatic energy.")
+        .def_readwrite("charge_penetration", &efp_energy::charge_penetration, "Charge penetration energy from"
+                                                                              "overlap-based electrostatic damping."
+                                                                              "Zero if overlap-based damping is turned"
+                                                                              "off.")
+        .def_readwrite("electrostatic_point_charges", &efp_energy::electrostatic_point_charges,
+                                                                              "Interaction energy of EFP electrostatics"
+                                                                              "with point charges.")
+        .def_readwrite("polarization", &efp_energy::polarization,             "All polarization energy goes here."
+                                                                              "Polarization is computed self-consist-"
+                                                                              "ently so it can't be separated into"
+                                                                              "EFP/EFP and AI/EFP parts.")
+        .def_readwrite("dispersion", &efp_energy::dispersion,                 "EFP/EFP dispersion energy.")
+        .def_readwrite("ai_dispersion", &efp_energy::ai_dispersion,           "AI/EFP dispersion energy.")
+        .def_readwrite("exchange_repulsion", &efp_energy::exchange_repulsion, "EFP/EFP exchange-repulsion energy.")
+        .def_readwrite("total", &efp_energy::total,                           "Sum of all the above energy terms.");
 
     py::class_<efp_atom>(m, "efp_atom", "EFP atom info")
         .def(py::init())
-        //.def_readonly("label", &efp_atom::label)  // char label[32];        /* Atom label. */
-        .def_readwrite("x", &efp_atom::x)                                     /* X coordinate of atom position. */
-        .def_readwrite("y", &efp_atom::y)                                     /* Y coordinate of atom position. */
-        .def_readwrite("z", &efp_atom::z)                                     /* Z coordinate of atom position. */
-        .def_readwrite("mass", &efp_atom::mass)                               /* Atom mass. */
-        .def_readwrite("znuc", &efp_atom::znuc);                              /* Nuclear charge. */
+        //.def_readonly("label", &efp_atom::label,                            "Atom label.")  // char label[32]
+        .def_readwrite("x", &efp_atom::x,                                     "X coordinate of atom position.")
+        .def_readwrite("y", &efp_atom::y,                                     "Y coordinate of atom position.")
+        .def_readwrite("z", &efp_atom::z,                                     "Z coordinate of atom position.")
+        .def_readwrite("mass", &efp_atom::mass,                               "Atom mass.")
+        .def_readwrite("znuc", &efp_atom::znuc,                               "Nuclear charge.");
     // clang-format on
 
     py::class_<efp, std::unique_ptr<efp, py::nodelete>>(m, "efp", py::dynamic_attr(), "Main libefp opaque structure")

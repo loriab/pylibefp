@@ -3,7 +3,7 @@
 #
 #   pylibefp/extras.py:
 #
-#   Copyright (c) 2017-2018 The Psi4 Developers
+#   Copyright (c) 2017-2019 The Psi4 Developers
 #
 #   All rights reserved. Use of this source code is governed by a
 #   BSD-style license that can be found in the LICENSE file.
@@ -15,12 +15,12 @@ import os
 
 _success_flag_ = False
 
-
 ###   # Working directory
 ###   _input_dir_ = os.getcwd()
-###   
+###
 ###   def get_input_directory():
 ###       return _input_dir_
+
 
 # Testing
 def test(extent='full', extras=None):
