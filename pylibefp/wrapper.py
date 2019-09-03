@@ -15,6 +15,7 @@ import os
 import re
 import math
 import functools
+from typing import Dict
 
 import qcelemental as qcel
 
@@ -1448,7 +1449,7 @@ def get_frag_xyzabc(efpobj, ifr=None):
     return _get_frag_common(efpobj=efpobj, ifr=ifr, topic='xyzabc')
 
 
-def to_dict(efpobj):
+def to_dict(efpobj, dtype='psi4'):
     molrec = {}
 
     nfr = efpobj.get_frag_count()
@@ -1478,14 +1479,21 @@ def to_dict(efpobj):
     molrec['fragment_charges'] = efpobj.get_frag_charge()
     molrec['fragment_multiplicities'] = efpobj.get_frag_multiplicity()
 
-    #molrec['molecular_charge']
-    #molrec['molecular_multiplicity']
+    def _high_spin_sum(mult_list):
+        mm = 1
+        for m in mult_list:
+            mm += m - 1
+        return mm
+
+    molrec['molecular_charge'] = sum(molrec['fragment_charges'])
+    molrec['molecular_multiplicity'] = _high_spin_sum(molrec['fragment_multiplicities'])
+    molrec['provenance'] = provenance_stamp(__name__)
 
     molrec['fragment_files'] = [fl.lower() for fl in efpobj.get_frag_name()]
     molrec['hint_types'] = ['xyzabc'] * nfr
     molrec['geom_hints'] = efpobj.get_frag_xyzabc()
 
-    return molrec
+    return qcel.molparse.to_schema(molrec, dtype=dtype)
 
 
 def old_to_dict(efpobj):
@@ -1648,3 +1656,14 @@ def from_dict(efp_init):
     sys.input_units_to_au = input_units_to_au
     sys.prepare()
     return sys
+
+
+def provenance_stamp(routine: str) -> Dict[str, str]:
+    """Return dictionary satisfying QCSchema,
+    https://github.com/MolSSI/QCSchema/blob/master/qcschema/dev/definitions.py#L23-L41
+    with PylibEFP's credentials for creator and version. The
+    generating routine's name is passed in through `routine`.
+
+    """
+    from .metadata import __version__
+    return {'creator': 'PylibEFP', 'version': __version__, 'routine': routine}
