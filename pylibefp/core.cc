@@ -510,8 +510,7 @@ PYBIND11_MODULE(core, m) {
         .value("EFP_TERM_AI_DISP", EFP_TERM_AI_DISP,                          "Ab initio/EFP dispersion, reserved for future.")
         .value("EFP_TERM_AI_XR", EFP_TERM_AI_XR,                              "Ab initio/EFP exchange repulsion, reserved for future.")
         .value("EFP_TERM_AI_CHTR", EFP_TERM_AI_CHTR,                          "Ab initio/EFP charge transfer, reserved for future.")
-        .export_values()
-        .def("__invert__", [](efp_term& value) { return ~value; });
+        .export_values();
 
     py::enum_<efp_disp_damp>(m, "efp_disp_damp", "Fragment-fragment dispersion damping type")
         .value("EFP_DISP_DAMP_OVERLAP", EFP_DISP_DAMP_OVERLAP,                "Overlap-based damping (default).")
