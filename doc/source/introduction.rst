@@ -3,7 +3,7 @@
 .. #
 .. #   docs/source/introduction.rst: Sphinx docs intro
 .. #
-.. #   Copyright (c) 2017 The Psi4 Developers
+.. #   Copyright (c) 2017-2020 The Psi4 Developers
 .. #
 .. #   All rights reserved. Use of this source code is governed by a
 .. #   BSD-style license that can be found in the LICENSE file.
