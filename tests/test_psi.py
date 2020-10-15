@@ -1,6 +1,6 @@
 import sys
 import pylibefp
-from systems import *
+from systems import system_3
 
 from qcelemental.testing import compare_recursive, compare_values
 

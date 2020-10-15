@@ -1,7 +1,7 @@
 import sys
 import pytest
 import pylibefp
-from systems import *
+from systems import system_1
 
 from qcelemental.testing import compare
 
@@ -10,8 +10,8 @@ def test_grad_fail():
     asdf = system_1()
     asdf.compute(do_gradient=False)
 
-    with pytest.raises(pylibefp.Fatal) as e_info:
-        grad = asdf.get_gradient()
+    with pytest.raises(pylibefp.Fatal):
+        asdf.get_gradient()
 
 
 #def test_frag_file_fail():
@@ -26,7 +26,7 @@ def test_grad_fail():
 def test_frag_missing_fail():
     asdf = pylibefp.core.efp()
 
-    with pytest.raises(pylibefp.UnknownFragment) as e_info:
+    with pytest.raises(pylibefp.UnknownFragment):
         asdf.add_fragment('h2o')
 
 
@@ -34,7 +34,7 @@ def test_multifrag_fail():
     asdf = pylibefp.core.efp()
 
     asdf.add_potential(['nh3', 'nh3'])
-    with pytest.raises(pylibefp.Fatal) as e_info:
+    with pytest.raises(pylibefp.Fatal):
         asdf.add_potential('nh3')
 
 
@@ -51,12 +51,12 @@ def test_multifrag_pass():
 def test_frag_fail_1():
     asdf = system_1()
 
-    with pytest.raises(pylibefp.PyEFPSyntaxError) as e_info:
+    with pytest.raises(pylibefp.PyEFPSyntaxError):
         asdf.get_frag_multiplicity(3)
 
 
 def test_frag_fail_2():
     asdf = system_1()
 
-    with pytest.raises(pylibefp.PyEFPSyntaxError) as e_info:
+    with pytest.raises(pylibefp.PyEFPSyntaxError):
         asdf.get_frag_name(-1)

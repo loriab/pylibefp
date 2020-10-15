@@ -2,7 +2,7 @@ import sys
 import pytest
 import pprint
 import pylibefp
-from systems import *
+from systems import system_1
 
 from qcelemental.testing import compare_recursive
 
@@ -114,16 +114,16 @@ def test_opts_libefp():
 def test_opts_fail_1():
     asdf = system_1()
 
-    ans = asdf.set_opts({'nonsense_key': 'harmless'})
-    with pytest.raises(pylibefp.EFPSyntaxError) as e_info:
-        ans = asdf.set_opts({'elec_damp': 'nonsense'})
+    asdf.set_opts({'nonsense_key': 'harmless'})
+    with pytest.raises(pylibefp.EFPSyntaxError):
+        asdf.set_opts({'elec_damp': 'nonsense'})
 
 
 def test_opts_fail_2():
     asdf = system_1()
 
-    with pytest.raises(pylibefp.EFPSyntaxError) as e_info:
-        ans = asdf.set_opts({'elec': 'yEs'})
+    with pytest.raises(pylibefp.EFPSyntaxError):
+        asdf.set_opts({'elec': 'yEs'})
 
 
 def test_opts_psi():

@@ -5,7 +5,7 @@ import pylibefp
 
 from qcelemental.testing import compare, compare_recursive, compare_values
 
-from systems import *
+from systems import b2a, system_1, system_2, system_3, system_4, system_5, system_6
 
 
 def blank_ene():

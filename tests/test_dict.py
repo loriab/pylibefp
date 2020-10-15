@@ -2,7 +2,7 @@ import sys
 import pytest
 import pprint
 import pylibefp
-from systems import *
+from systems import b2a, system_1, system_2, system_3, system_4
 
 from qcelemental.testing import compare, compare_values
 
@@ -88,7 +88,7 @@ def test_dict_5():
 
     sys = pylibefp.from_dict(dsys)
 
-    with pytest.raises(pylibefp.PolNotConverged) as e_info:
+    with pytest.raises(pylibefp.PolNotConverged):
         sys.compute()
     assert sys.get_frag_count() == 0
 

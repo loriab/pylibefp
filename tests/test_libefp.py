@@ -1,6 +1,6 @@
 import sys
 import pylibefp
-from systems import *
+from systems import a2b, system_1, system_5, system_6, system_qm1, system_qm2
 
 from qcelemental.testing import compare, compare_recursive, compare_values
 
@@ -31,7 +31,7 @@ def test_elec_1c():
 def test_disp_1c():
     asdf = system_1()
 
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'disp': True,
         'disp_damp': 'off',
         'enable_pbc': True,
@@ -39,7 +39,7 @@ def test_disp_1c():
         'swf_cutoff': 6.0 * a2b
     })
     asdf.set_periodic_box([20.0 * a2b, 20.0 * a2b, 20.0 * a2b])
-    box = asdf._efp_get_periodic_box()
+    asdf._efp_get_periodic_box()
 
     asdf.compute()
     ene = asdf.get_energy()
@@ -49,7 +49,7 @@ def test_disp_1c():
 def test_qm_1a():
     asdf = system_qm1()
 
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,
@@ -106,7 +106,7 @@ def test_qm_1a():
 def test_qm_1b():
     asdf = system_qm1()
 
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,
@@ -153,7 +153,7 @@ def test_qm_2a():
                 8.0,   9.0,   8.0,
                 5.0,   8.0,   8.0 ]  # yapf: disable
     asdf.set_point_charges(ptc, [c * a2b for c in coords])
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,
@@ -175,7 +175,7 @@ def test_qm_2b():
     ptc = [7., 10., 1., 2., 2.]
     coords = [4.0, 5.0, 5.0, 8.0, 5.0, 6.0, 5.0, 8.0, 5.0, 8.0, 9.0, 8.0, 5.0, 8.0, 8.0]
     asdf.set_point_charges(ptc, [c * a2b for c in coords])
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,
@@ -196,7 +196,7 @@ def test_qm_2b():
 def test_total_5a():
     asdf = system_5()
 
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,
@@ -218,7 +218,7 @@ def test_total_5a():
 def test_total_5b():
     asdf = system_5()
 
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,
@@ -240,7 +240,7 @@ def test_total_5b():
 def test_total_5c():
     asdf = system_5()
 
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,
@@ -262,7 +262,7 @@ def test_total_5c():
 def test_total_5d():
     asdf = system_5()
 
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,
@@ -285,7 +285,7 @@ def test_total_5d():
 def test_total_6a():
     asdf = system_6()
 
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,
@@ -307,7 +307,7 @@ def test_total_6a():
 def test_total_6b():
     asdf = system_6()
 
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,
@@ -329,7 +329,7 @@ def test_total_6b():
 def test_total_6c():
     asdf = system_6()
 
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,
@@ -351,7 +351,7 @@ def test_total_6c():
 def test_total_6d():
     asdf = system_6()
 
-    opts = asdf.set_opts({
+    asdf.set_opts({
         'elec': True,
         'pol': True,
         'disp': True,

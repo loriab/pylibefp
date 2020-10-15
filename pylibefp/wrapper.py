@@ -157,7 +157,7 @@ def add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
         res = efpobj._efp_add_potential(pot)
         try:
             _result_to_error(res, uniq_pots[ipot])
-        except Fatal as e:
+        except Fatal:
             if duplicates_ok:
                 pass
             else:
@@ -474,7 +474,7 @@ def set_periodic_box(efpobj, xyz):
 
     res = efpobj._efp_set_periodic_box(xyz[0], xyz[1], xyz[2])
     _result_to_error(res)
-    (res, xyz2) = efpobj._efp_get_periodic_box()
+    (res, _) = efpobj._efp_get_periodic_box()
     _result_to_error(res)
 
 
@@ -1608,7 +1608,7 @@ def process_units(molrec):
     elif units in ['Angstrom', 'Bohr'] and input_units_to_au is not None:
         expected_iutau = a2b if units == 'Angstrom' else 1.
 
-        if perturn_check(input_units_to_au, expected_iutau):
+        if perturb_check(input_units_to_au, expected_iutau):
             funits = units
             fiutau = input_units_to_au
         else:
@@ -1638,7 +1638,7 @@ def from_dict(efp_init):
     """
     efpobj = core.efp()
 
-    units, input_units_to_au = process_units(efp_init)
+    _, input_units_to_au = process_units(efp_init)
 
     def hint_to_au(hint, htype, iutau):
         if htype == 'xyzabc':
