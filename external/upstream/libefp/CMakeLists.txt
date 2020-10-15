@@ -14,6 +14,7 @@ else()
     ExternalProject_Add(libefp_external
         #DEPENDS lapack_external
         URL https://github.com/ilyak/libefp/archive/15cd7ce.tar.gz  # v1.5.0 + 10 (docs and a cmake lapack patch)
+    #    URL https://github.com/libefp2/libefp/archive/master.tar.gz
 #        DOWNLOAD_COMMAND ""
 #        SOURCE_DIR "/home/psilocaluser/gits/libefp"
         UPDATE_COMMAND ""
