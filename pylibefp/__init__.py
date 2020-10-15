@@ -18,7 +18,7 @@ pylibefp_module_loc = os.path.dirname(os.path.abspath(__file__))
 from . import core
 
 # Load driver and version paraphernalia
-from .wrapper import from_dict, to_dict
+from .wrapper import from_dict, to_dict, extract_subsets
 from .exceptions import EFPException, Fatal, NoMemory, FileNotFound, EFPSyntaxError, UnknownFragment, PolNotConverged, PyEFPSyntaxError
 from .metadata import __version__, version_formatter
 

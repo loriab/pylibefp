@@ -91,3 +91,26 @@ def test_dict_5():
     with pytest.raises(pylibefp.PolNotConverged) as e_info:
         sys.compute()
     assert sys.get_frag_count() == 0
+
+
+def test_subset_1():
+    sys2 = system_2()
+    ss15_files = [sys2.get_frag_name(0).lower(), sys2.get_frag_name(4).lower()]
+    ss15_xyzabc = [sys2.get_frag_xyzabc(0), sys2.get_frag_xyzabc(4)]
+
+    ss15 = pylibefp.extract_subsets(sys2, [1,5])
+    dss15 = ss15.to_dict()
+
+    assert compare(ss15_files, dss15["fragment_files"], "ss_fragfiles")
+    assert compare_values(ss15_xyzabc, dss15["geom_hints"], "ss_xyzabc", atol=1.e-6)
+
+
+@pytest.mark.parametrize("args", [
+    {"reals": 0},
+    {"reals": [2, 6]},
+    {"reals": 2, "ghosts": 3},
+])
+def test_subset_error(args):
+    sys2 = system_2()
+    with pytest.raises(pylibefp.PyEFPSyntaxError):
+        pylibefp.extract_subsets(sys2, **args)

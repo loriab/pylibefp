@@ -16,7 +16,7 @@ import re
 import sys
 import math
 import functools
-from typing import Dict
+from typing import Dict, List, Union
 
 import qcelemental as qcel
 
@@ -1668,3 +1668,50 @@ def provenance_stamp(routine: str) -> Dict[str, str]:
     """
     from .metadata import __version__
     return {'creator': 'PylibEFP', 'version': __version__, 'routine': routine}
+
+
+def extract_subsets(efpobj, reals: Union[int, List], ghosts: Union[int, List]=None):
+    """Return new efpobj containing only `reals` fragments.
+
+    Parameters
+    ----------
+    reals
+        Fragments (1-indexed) to be included.
+    ghosts
+        Fragments (1-indexed) to be ghosted. In EFP this is always an error.
+
+    Returns
+    -------
+    :py:class:`pylibefp.core.efp`
+        New EFP instance with selected fragments extracted, then finished off through
+        :py:func:`pylibefp.core.efp.prepare`.
+
+    Raises
+    ------
+    PyEFPSyntaxError
+        When any index in `reals` outside range. When any `ghosts` present.
+
+    """
+    lreals = []
+    try:
+        for idx in reals:
+            lreals.append(idx - 1)
+    except TypeError:
+        lreals = [reals - 1]
+    lreals = list(set(lreals))
+
+    if ghosts is not None:
+        raise PyEFPSyntaxError(f"Ghost fragments have no meaning for EFP: {ghosts}")
+
+    for ifr in lreals:
+        if (ifr < 0) or (ifr >= efpobj.get_frag_count()):
+            raise PyEFPSyntaxError(f"Fragment (1-indexed) out of bounds: {lreals}<-{reals}")
+
+    full = efpobj.to_dict()
+
+    subset_init = {"units": full["units"]}
+    for field in ["hint_types", "geom_hints", "fragment_files"]:
+        subset_init[field] = [full[field][i] for i in lreals]
+
+    subset = from_dict(subset_init)
+    return subset
