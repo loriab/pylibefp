@@ -11,34 +11,41 @@
 # @END LICENSE
 #
 
+import functools
+import math
 import os
 import re
 import sys
-import math
-import functools
 from typing import Dict, List, Union
 
 import qcelemental as qcel
 
-from . import core
-from . import psiutil
-from .exceptions import Fatal, NoMemory, FileNotFound, EFPSyntaxError, UnknownFragment, PolNotConverged, PyEFPSyntaxError
+from . import core, psiutil
+from .exceptions import (
+    EFPSyntaxError,
+    Fatal,
+    FileNotFound,
+    NoMemory,
+    PolNotConverged,
+    PyEFPSyntaxError,
+    UnknownFragment,
+)
 
 _lbtl = {
-    'libefp': {},
-    'psi': {
-        'elec': 'elst',
-        'pol': 'ind',
-        'xr': 'exch',
-        'elec_damp': 'elst_damping',
-        'pol_damp': 'ind_damping',
-        'disp_damp': 'disp_damping',
-        'pol_driver': 'ind_driver',
-        'ai_elec': 'qm_elst',
-        'ai_pol': 'qm_ind',
-        'ai_disp': 'qm_disp',
-        'ai_xr': 'qm_exch',
-        'ai_chtr': 'qm_chtr',
+    "libefp": {},
+    "psi": {
+        "elec": "elst",
+        "pol": "ind",
+        "xr": "exch",
+        "elec_damp": "elst_damping",
+        "pol_damp": "ind_damping",
+        "disp_damp": "disp_damping",
+        "pol_driver": "ind_driver",
+        "ai_elec": "qm_elst",
+        "ai_pol": "qm_ind",
+        "ai_disp": "qm_disp",
+        "ai_xr": "qm_exch",
+        "ai_chtr": "qm_chtr",
     },
 }
 
@@ -51,7 +58,7 @@ def _rekey(rawdict, label):
     return newdict
 
 
-def _result_to_error(res, msg=''):
+def _result_to_error(res, msg=""):
 
     if res == core.efp_result.EFP_RESULT_SUCCESS:
         return
@@ -98,7 +105,7 @@ def compute(efpobj, do_gradient=False):
     _result_to_error(res)
 
 
-def add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
+def add_potential(efpobj, potential, fragpath="LIBRARY", duplicates_ok=False):
     """Searches for EFP fragments and adds to `efpobj`.
 
     Parameters
@@ -128,9 +135,9 @@ def add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
     # form unified path list for efpfrags
     paths = []
     for pth in fragpath.split(os.pathsep):
-        if pth == 'LIBRARY':
-            paths.append('@libefp_FRAGLIB_DIRS@')
-            paths.append('/opt/anaconda1anaconda2anaconda3/share/libefp/fraglib')
+        if pth == "LIBRARY":
+            paths.append("@libefp_FRAGLIB_DIRS@")
+            paths.append("/opt/anaconda1anaconda2anaconda3/share/libefp/fraglib")
         else:
             paths.append(os.path.expandvars(os.path.expanduser(pth)))
     paths = os.pathsep.join(paths)
@@ -148,8 +155,8 @@ def add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
         potential = [potential]
     uniq_pots = list(set(potential))
     for pot in uniq_pots:
-        if not pot.endswith('.efp'):
-            pot += '.efp'
+        if not pot.endswith(".efp"):
+            pot += ".efp"
         abspath_pots.append(psiutil.search_file(pot, paths))
 
     # load the potentials
@@ -161,7 +168,7 @@ def add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
             if duplicates_ok:
                 pass
             else:
-                raise Fatal('Invalid fragment name (probably already added): {}'.format(uniq_pots[ipot]))
+                raise Fatal("Invalid fragment name (probably already added): {}".format(uniq_pots[ipot]))
 
         print(r"""  EFP fragment {} read from {}""".format(uniq_pots[ipot], pot))
 
@@ -186,7 +193,7 @@ def add_fragment(efpobj, fragments):
         _result_to_error(res, frag)
 
 
-def get_opts(efpobj, label='libefp'):
+def get_opts(efpobj, label="libefp"):
     """Returns the options state of *efpobj* as a dictionary.
 
     Parameters
@@ -208,48 +215,48 @@ def get_opts(efpobj, label='libefp'):
 
     dopts = {}
 
-    dopts['elec'] = bool(opts.terms & core.efp_term.EFP_TERM_ELEC)
-    dopts['pol'] = bool(opts.terms & core.efp_term.EFP_TERM_POL)
-    dopts['disp'] = bool(opts.terms & core.efp_term.EFP_TERM_DISP)
-    dopts['xr'] = bool(opts.terms & core.efp_term.EFP_TERM_XR)
-    dopts['chtr'] = bool(opts.terms & core.efp_term.EFP_TERM_CHTR)
+    dopts["elec"] = bool(opts.terms & core.efp_term.EFP_TERM_ELEC)
+    dopts["pol"] = bool(opts.terms & core.efp_term.EFP_TERM_POL)
+    dopts["disp"] = bool(opts.terms & core.efp_term.EFP_TERM_DISP)
+    dopts["xr"] = bool(opts.terms & core.efp_term.EFP_TERM_XR)
+    dopts["chtr"] = bool(opts.terms & core.efp_term.EFP_TERM_CHTR)
 
-    dopts['elec_damp'] = {
-        core.EFP_ELEC_DAMP_SCREEN: 'screen',
-        core.EFP_ELEC_DAMP_OVERLAP: 'overlap',
-        core.EFP_ELEC_DAMP_OFF: 'off',
+    dopts["elec_damp"] = {
+        core.EFP_ELEC_DAMP_SCREEN: "screen",
+        core.EFP_ELEC_DAMP_OVERLAP: "overlap",
+        core.EFP_ELEC_DAMP_OFF: "off",
     }[opts.elec_damp]
 
-    dopts['pol_damp'] = {
-        core.EFP_POL_DAMP_TT: 'tt',
-        core.EFP_POL_DAMP_OFF: 'off',
+    dopts["pol_damp"] = {
+        core.EFP_POL_DAMP_TT: "tt",
+        core.EFP_POL_DAMP_OFF: "off",
     }[opts.pol_damp]
 
-    dopts['disp_damp'] = {
-        core.EFP_DISP_DAMP_TT: 'tt',
-        core.EFP_DISP_DAMP_OVERLAP: 'overlap',
-        core.EFP_DISP_DAMP_OFF: 'off',
+    dopts["disp_damp"] = {
+        core.EFP_DISP_DAMP_TT: "tt",
+        core.EFP_DISP_DAMP_OVERLAP: "overlap",
+        core.EFP_DISP_DAMP_OFF: "off",
     }[opts.disp_damp]
 
-    dopts['enable_pbc'] = bool(opts.enable_pbc)
-    dopts['enable_cutoff'] = bool(opts.enable_cutoff)
-    dopts['swf_cutoff'] = opts.swf_cutoff
+    dopts["enable_pbc"] = bool(opts.enable_pbc)
+    dopts["enable_cutoff"] = bool(opts.enable_cutoff)
+    dopts["swf_cutoff"] = opts.swf_cutoff
 
-    dopts['pol_driver'] = {
-        core.EFP_POL_DRIVER_ITERATIVE: 'iterative',
-        core.EFP_POL_DRIVER_DIRECT: 'direct',
+    dopts["pol_driver"] = {
+        core.EFP_POL_DRIVER_ITERATIVE: "iterative",
+        core.EFP_POL_DRIVER_DIRECT: "direct",
     }[opts.pol_driver]
 
-    dopts['ai_elec'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_ELEC)
-    dopts['ai_pol'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_POL)
-    dopts['ai_disp'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_DISP)
-    dopts['ai_xr'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_XR)
-    dopts['ai_chtr'] = bool(opts.terms & core.efp_term.EFP_TERM_AI_CHTR)
+    dopts["ai_elec"] = bool(opts.terms & core.efp_term.EFP_TERM_AI_ELEC)
+    dopts["ai_pol"] = bool(opts.terms & core.efp_term.EFP_TERM_AI_POL)
+    dopts["ai_disp"] = bool(opts.terms & core.efp_term.EFP_TERM_AI_DISP)
+    dopts["ai_xr"] = bool(opts.terms & core.efp_term.EFP_TERM_AI_XR)
+    dopts["ai_chtr"] = bool(opts.terms & core.efp_term.EFP_TERM_AI_CHTR)
 
     return _rekey(dopts, label=label)
 
 
-def set_opts(efpobj, dopts, label='libefp', append='libefp'):
+def set_opts(efpobj, dopts, label="libefp", append="libefp"):
     """Sets the options state of `efpobj` from dictionary `dopts`.
 
     Parameters
@@ -277,21 +284,32 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
     """
     # warn on stray dopts keys
     allowed = [
-        'elec', 'pol', 'disp', 'xr', 'elec_damp', 'pol_damp', 'disp_damp', 'enable_pbc', 'enable_cutoff', 'swf_cutoff',
-        'pol_driver', 'ai_elec', 'ai_pol'
+        "elec",
+        "pol",
+        "disp",
+        "xr",
+        "elec_damp",
+        "pol_damp",
+        "disp_damp",
+        "enable_pbc",
+        "enable_cutoff",
+        "swf_cutoff",
+        "pol_driver",
+        "ai_elec",
+        "ai_pol",
     ]
     label_allowed = [_lbtl[label].get(itm, itm) for itm in allowed]
     for key in dopts.keys():
         if key not in label_allowed:
-            print('Warning: unrecognized key {}'.format(key))
-    trues = [True, 1, 'yes', 'true', 'on']
-    falses = [False, 0, 'no', 'false', 'off']
+            print("Warning: unrecognized key {}".format(key))
+    trues = [True, 1, "yes", "true", "on"]
+    falses = [False, 0, "no", "false", "off"]
 
     # prepare base options state for dopts
     opts = core.efp_opts()
-    if append == 'libefp':
+    if append == "libefp":
         pass
-    elif append == 'psi':
+    elif append == "psi":
         opts.terms |= core.efp_term.EFP_TERM_ELEC
         opts.terms |= core.efp_term.EFP_TERM_POL
         opts.terms |= core.efp_term.EFP_TERM_DISP
@@ -301,148 +319,163 @@ def set_opts(efpobj, dopts, label='libefp', append='libefp'):
         opts.disp_damp = core.EFP_DISP_DAMP_OVERLAP
         opts.terms |= core.efp_term.EFP_TERM_AI_ELEC
         opts.terms |= core.efp_term.EFP_TERM_AI_POL
-    #elif append == 'qchem':
+    # elif append == 'qchem':
     #    # q-chem and psi4 have different defaults for at least this option
     #    opts.disp_damp = core.EFP_DISP_DAMP_TT
-    elif append == 'append':
+    elif append == "append":
         res = efpobj._efp_get_opts(opts)
         _result_to_error(res)
     else:
-        raise PyEFPSyntaxError('Unrecognized opts default set: {}'.format(append))
+        raise PyEFPSyntaxError("Unrecognized opts default set: {}".format(append))
 
     # apply dopts to options state
-    topic = _lbtl[label].get('elec', 'elec')
+    topic = _lbtl[label].get("elec", "elec")
     if topic in dopts:
         if dopts[topic] in trues:
             opts.terms |= core.efp_term.EFP_TERM_ELEC
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_ELEC
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR, "invalid value for [T/F] {}: {}".format(topic, dopts[topic])
+            )
 
-    topic = _lbtl[label].get('pol', 'pol')
+    topic = _lbtl[label].get("pol", "pol")
     if topic in dopts:
         if dopts[topic] in trues:
             opts.terms |= core.efp_term.EFP_TERM_POL
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_POL
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR, "invalid value for [T/F] {}: {}".format(topic, dopts[topic])
+            )
 
-    topic = _lbtl[label].get('disp', 'disp')
+    topic = _lbtl[label].get("disp", "disp")
     if topic in dopts:
         if dopts[topic] in trues:
             opts.terms |= core.efp_term.EFP_TERM_DISP
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_DISP
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR, "invalid value for [T/F] {}: {}".format(topic, dopts[topic])
+            )
 
-    topic = _lbtl[label].get('xr', 'xr')
+    topic = _lbtl[label].get("xr", "xr")
     if topic in dopts:
         if dopts[topic] in trues:
             opts.terms |= core.efp_term.EFP_TERM_XR
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_XR
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR, "invalid value for [T/F] {}: {}".format(topic, dopts[topic])
+            )
 
     # may be enabled in a future libefp release
     # topic = _lbtl[label].get('chtr', 'chtr')
 
-    topic = _lbtl[label].get('elec_damp', 'elec_damp')
+    topic = _lbtl[label].get("elec_damp", "elec_damp")
     if topic in dopts:
         try:
             opts.elec_damp = {
-                'screen': core.EFP_ELEC_DAMP_SCREEN,
-                'overlap': core.EFP_ELEC_DAMP_OVERLAP,
-                'off': core.EFP_ELEC_DAMP_OFF,
+                "screen": core.EFP_ELEC_DAMP_SCREEN,
+                "overlap": core.EFP_ELEC_DAMP_OVERLAP,
+                "off": core.EFP_ELEC_DAMP_OFF,
             }[dopts[topic].lower()]
         except KeyError:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [screen/overlap/off] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                "invalid value for [screen/overlap/off] {}: {}".format(topic, dopts[topic]),
+            )
 
-    topic = _lbtl[label].get('pol_damp', 'pol_damp')
+    topic = _lbtl[label].get("pol_damp", "pol_damp")
     if topic in dopts:
         try:
             opts.pol_damp = {
-                'tt': core.EFP_POL_DAMP_TT,
-                'off': core.EFP_POL_DAMP_OFF,
+                "tt": core.EFP_POL_DAMP_TT,
+                "off": core.EFP_POL_DAMP_OFF,
             }[dopts[topic].lower()]
         except KeyError:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [tt/off] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR, "invalid value for [tt/off] {}: {}".format(topic, dopts[topic])
+            )
 
-    topic = _lbtl[label].get('disp_damp', 'disp_damp')
+    topic = _lbtl[label].get("disp_damp", "disp_damp")
     if topic in dopts:
         try:
             opts.disp_damp = {
-                'overlap': core.EFP_DISP_DAMP_OVERLAP,
-                'tt': core.EFP_DISP_DAMP_TT,
-                'off': core.EFP_DISP_DAMP_OFF,
+                "overlap": core.EFP_DISP_DAMP_OVERLAP,
+                "tt": core.EFP_DISP_DAMP_TT,
+                "off": core.EFP_DISP_DAMP_OFF,
             }[dopts[topic].lower()]
         except KeyError:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [overlap/tt/off] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                "invalid value for [overlap/tt/off] {}: {}".format(topic, dopts[topic]),
+            )
 
-    topic = _lbtl[label].get('enable_pbc', 'enable_pbc')
+    topic = _lbtl[label].get("enable_pbc", "enable_pbc")
     if topic in dopts:
         if dopts[topic] in trues:
             opts.enable_pbc = 1
         elif dopts[topic] in falses:
             opts.enable_pbc = 0
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR, "invalid value for [T/F] {}: {}".format(topic, dopts[topic])
+            )
 
-    topic = _lbtl[label].get('enable_cutoff', 'enable_cutoff')
+    topic = _lbtl[label].get("enable_cutoff", "enable_cutoff")
     if topic in dopts:
         if dopts[topic] in trues:
             opts.enable_cutoff = 1
         elif dopts[topic] in falses:
             opts.enable_cutoff = 0
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR, "invalid value for [T/F] {}: {}".format(topic, dopts[topic])
+            )
 
-    topic = _lbtl[label].get('swf_cutoff', 'swf_cutoff')
+    topic = _lbtl[label].get("swf_cutoff", "swf_cutoff")
     if topic in dopts:
         opts.swf_cutoff = float(dopts[topic])
 
-    topic = _lbtl[label].get('pol_driver', 'pol_driver')
+    topic = _lbtl[label].get("pol_driver", "pol_driver")
     if topic in dopts:
         try:
             opts.pol_driver = {
-                'iterative': core.EFP_POL_DRIVER_ITERATIVE,
-                'direct': core.EFP_POL_DRIVER_DIRECT,
+                "iterative": core.EFP_POL_DRIVER_ITERATIVE,
+                "direct": core.EFP_POL_DRIVER_DIRECT,
             }[dopts[topic].lower()]
         except KeyError:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [iterative/direct] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                "invalid value for [iterative/direct] {}: {}".format(topic, dopts[topic]),
+            )
 
-    topic = _lbtl[label].get('ai_elec', 'ai_elec')
+    topic = _lbtl[label].get("ai_elec", "ai_elec")
     if topic in dopts:
         if dopts[topic] in trues:
             opts.terms |= core.efp_term.EFP_TERM_AI_ELEC
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_AI_ELEC
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR, "invalid value for [T/F] {}: {}".format(topic, dopts[topic])
+            )
 
-    topic = _lbtl[label].get('ai_pol', 'ai_pol')
+    topic = _lbtl[label].get("ai_pol", "ai_pol")
     if topic in dopts:
         if dopts[topic] in trues:
             opts.terms |= core.efp_term.EFP_TERM_AI_POL
         elif dopts[topic] in falses:
             opts.terms &= ~core.efp_term.EFP_TERM_AI_POL
         else:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [T/F] {}: {}'.format(topic, dopts[topic]))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR, "invalid value for [T/F] {}: {}".format(topic, dopts[topic])
+            )
 
     # may be enabled in a future libefp release
     # topic = _lbtl[label].get('ai_disp', 'ai_disp')
@@ -470,7 +503,7 @@ def set_periodic_box(efpobj, xyz):
 
     """
     if len(xyz) != 3:
-        raise PyEFPSyntaxError('Invalid periodic box setting: {}'.format(xyz))
+        raise PyEFPSyntaxError("Invalid periodic box setting: {}".format(xyz))
 
     res = efpobj._efp_set_periodic_box(xyz[0], xyz[1], xyz[2])
     _result_to_error(res)
@@ -493,7 +526,7 @@ def get_periodic_box(efpobj):
     return xyz
 
 
-#def opts_summary(efpobj, labels='libefp'):
+# def opts_summary(efpobj, labels='libefp'):
 #
 #    opts = efpobj.get_opts()
 ##    py::dict opts = opts_to_dict(efp);
@@ -530,7 +563,7 @@ def get_periodic_box(efpobj):
 #    return text
 
 
-def get_energy(efpobj, label='libefp'):
+def get_energy(efpobj, label="libefp"):
     """Gets the energy components from `efpobj` computation as a dictionary.
 
     Parameters
@@ -551,17 +584,17 @@ def get_energy(efpobj, label='libefp'):
     _result_to_error(res)
 
     energies = {
-        'electrostatic': ene.electrostatic,
-        'charge_penetration': ene.charge_penetration,
-        'electrostatic_point_charges': ene.electrostatic_point_charges,
-        'polarization': ene.polarization,
-        'dispersion': ene.dispersion,
-        'exchange_repulsion': ene.exchange_repulsion,
-        'total': ene.total,
-        'elec': ene.electrostatic + ene.charge_penetration + ene.electrostatic_point_charges,
-        'xr': ene.exchange_repulsion,
-        'pol': ene.polarization,
-        'disp': ene.dispersion,
+        "electrostatic": ene.electrostatic,
+        "charge_penetration": ene.charge_penetration,
+        "electrostatic_point_charges": ene.electrostatic_point_charges,
+        "polarization": ene.polarization,
+        "dispersion": ene.dispersion,
+        "exchange_repulsion": ene.exchange_repulsion,
+        "total": ene.total,
+        "elec": ene.electrostatic + ene.charge_penetration + ene.electrostatic_point_charges,
+        "xr": ene.exchange_repulsion,
+        "pol": ene.polarization,
+        "disp": ene.dispersion,
     }
 
     return _rekey(energies, label=label)
@@ -627,9 +660,9 @@ def get_multipole_coordinates(efpobj, verbose=1):
     if verbose >= 1:
         xyz3 = list(map(list, zip(*[iter(xyz)] * 3)))
 
-        text = '\n  ==>  EFP Multipole Coordinates  <==\n\n'
+        text = "\n  ==>  EFP Multipole Coordinates  <==\n\n"
         for mu in range(nmult):
-            text += '{:6d}   {:14.8f} {:14.8f} {:14.8f}\n'.format(mu, *xyz3[mu])
+            text += "{:6d}   {:14.8f} {:14.8f} {:14.8f}\n".format(mu, *xyz3[mu])
         print(text)
 
     return xyz
@@ -668,18 +701,19 @@ def get_multipole_values(efpobj, verbose=1):
     if verbose >= 1:
         mult20 = list(map(list, zip(*[iter(mult)] * 20)))
 
-        text = '\n  ==>  EFP Multipoles: Charge & Dipole  <==\n\n'
+        text = "\n  ==>  EFP Multipoles: Charge & Dipole  <==\n\n"
         for mu in range(nmult):
-            text += '{:6d}   {:14.8f}   {:14.8f} {:14.8f} {:14.8f}\n'.format(mu, *mult20[mu][:4])
+            text += "{:6d}   {:14.8f}   {:14.8f} {:14.8f} {:14.8f}\n".format(mu, *mult20[mu][:4])
 
         if verbose >= 2:
-            text += '\n  ==>  EFP Multipoles: Quadrupole  <==\n\n'
+            text += "\n  ==>  EFP Multipoles: Quadrupole  <==\n\n"
             for mu in range(nmult):
-                text += '{:6d}   {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f}\n'.format(mu, *mult20[mu][4:10])
-            text += '\n  ==>  EFP Multipoles: Octupole  <==\n\n'
+                text += "{:6d}   {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f}\n".format(mu, *mult20[mu][4:10])
+            text += "\n  ==>  EFP Multipoles: Octupole  <==\n\n"
             for mu in range(nmult):
-                text += '{:6d}   {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f}\n'.format(
-                    mu, *mult20[mu][10:])
+                text += "{:6d}   {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f}\n".format(
+                    mu, *mult20[mu][10:]
+                )
         print(text)
 
     return mult
@@ -722,9 +756,9 @@ def get_induced_dipole_coordinates(efpobj, verbose=1):
     if verbose >= 1:
         xyz3 = list(map(list, zip(*[iter(xyz)] * 3)))
 
-        text = '\n  ==>  EFP Induced Dipole Coordinates  <==\n\n'
+        text = "\n  ==>  EFP Induced Dipole Coordinates  <==\n\n"
         for mu in range(ndip):
-            text += '{:6d}   {:14.8f} {:14.8f} {:14.8f}\n'.format(mu, *xyz3[mu])
+            text += "{:6d}   {:14.8f} {:14.8f} {:14.8f}\n".format(mu, *xyz3[mu])
         print(text)
 
     return xyz
@@ -758,9 +792,9 @@ def get_induced_dipole_values(efpobj, verbose=1):
     if verbose >= 1:
         vals3 = list(map(list, zip(*[iter(vals)] * 3)))
 
-        text = '\n  ==>  EFP Induced Dipoles  <==\n\n'
+        text = "\n  ==>  EFP Induced Dipoles  <==\n\n"
         for mu in range(ndip):
-            text += '{:6d}   {:14.8f} {:14.8f} {:14.8f}\n'.format(mu, *vals3[mu])
+            text += "{:6d}   {:14.8f} {:14.8f} {:14.8f}\n".format(mu, *vals3[mu])
         print(text)
 
     return vals
@@ -788,9 +822,9 @@ def get_induced_dipole_conj_values(efpobj, verbose=1):
     if verbose >= 1:
         vals3 = list(map(list, zip(*[iter(vals)] * 3)))
 
-        text = '\n  ==>  EFP Conj. Induced Dipoles  <==\n\n'
+        text = "\n  ==>  EFP Conj. Induced Dipoles  <==\n\n"
         for mu in range(ndip):
-            text += '{:6d}   {:14.8f} {:14.8f} {:14.8f}\n'.format(mu, *vals3[mu])
+            text += "{:6d}   {:14.8f} {:14.8f} {:14.8f}\n".format(mu, *vals3[mu])
         print(text)
 
     return vals
@@ -833,9 +867,9 @@ def get_point_charge_coordinates(efpobj, verbose=1):
     if verbose >= 1:
         xyz3 = list(map(list, zip(*[iter(xyz)] * 3)))
 
-        text = '\n  ==>  EFP Point Charge Coordinates  <==\n\n'
+        text = "\n  ==>  EFP Point Charge Coordinates  <==\n\n"
         for mu in range(nptc):
-            text += '{:6d}   {:14.8f} {:14.8f} {:14.8f}\n'.format(mu, *xyz3[mu])
+            text += "{:6d}   {:14.8f} {:14.8f} {:14.8f}\n".format(mu, *xyz3[mu])
         print(text)
 
     return xyz
@@ -866,9 +900,9 @@ def get_point_charge_values(efpobj, verbose=1):
     _result_to_error(res)
 
     if verbose >= 1:
-        text = '\n  ==>  EFP Point Charges  <==\n\n'
+        text = "\n  ==>  EFP Point Charges  <==\n\n"
         for mu in range(nptc):
-            text += '{:6d}   {:14.8f}\n'.format(mu, vals[mu])
+            text += "{:6d}   {:14.8f}\n".format(mu, vals[mu])
         print(text)
 
     return vals
@@ -917,15 +951,15 @@ def gradient_summary(efpobj):
     grad = efpobj.get_gradient()
     grad6 = list(map(list, zip(*[iter(grad)] * 6)))
 
-    text = '\n  ==>  EFP Gradient & Torque  <==\n\n'
+    text = "\n  ==>  EFP Gradient & Torque  <==\n\n"
     for fr in grad6:
-        text += '{:14.8f} {:14.8f} {:14.8f}   {:14.8f} {:14.8f} {:14.8f}\n'.format(*fr)
+        text += "{:14.8f} {:14.8f} {:14.8f}   {:14.8f} {:14.8f} {:14.8f}\n".format(*fr)
 
-    text += '\n'
+    text += "\n"
     return text
 
 
-def energy_summary(efpobj, label='libefp', scfefp=None):
+def energy_summary(efpobj, label="libefp", scfefp=None):
     """Forms summary of EFP and SCFEFP energy components from `efpobj`.
 
     Parameters
@@ -950,20 +984,20 @@ def energy_summary(efpobj, label='libefp', scfefp=None):
     opt = efpobj.get_opts()
     ene = efpobj.get_energy()
 
-    def _enabled(tf, t='*', f='', suffix=''):
+    def _enabled(tf, t="*", f="", suffix=""):
         if tf:
             return t + suffix
         else:
             return f
 
-    elec = 'Electrostatics'
-    disp = 'Dispersion'
-    if label == 'libefp':
-        xr = 'Exchange-Repulsion'
-        indc = 'Polarization'
-    elif label == 'psi':
-        xr = 'Exchange'
-        indc = 'Induction'
+    elec = "Electrostatics"
+    disp = "Dispersion"
+    if label == "libefp":
+        xr = "Exchange-Repulsion"
+        indc = "Polarization"
+    elif label == "psi":
+        xr = "Exchange"
+        indc = "Induction"
 
     # yapf: disable
     text = '\n'
@@ -1000,12 +1034,12 @@ def energy_summary(efpobj, label='libefp', scfefp=None):
     text += '\n    {:<30}{:20.12f} [Eh]\n'.format('Total EFP', ene['total'])
     # yapf: enable
     if scfefp is not None:
-        wie = ene['total'] - ene['pol']
-        text += '    EFP excluding EFP {:<12}{:20.12f} [Eh]\n'.format(indc, wie)
-        text += '    SCF including EFP {:<12}{:20.12f} [Eh]\n'.format(indc, scfefp - wie)
-        text += '    Total SCF including Total EFP {:20.12f} [Eh]\n'.format(scfefp)
+        wie = ene["total"] - ene["pol"]
+        text += "    EFP excluding EFP {:<12}{:20.12f} [Eh]\n".format(indc, wie)
+        text += "    SCF including EFP {:<12}{:20.12f} [Eh]\n".format(indc, scfefp - wie)
+        text += "    Total SCF including Total EFP {:20.12f} [Eh]\n".format(scfefp)
 
-    text += '\n'
+    text += "\n"
     return text
 
 
@@ -1023,45 +1057,51 @@ def geometry_summary(efpobj, units_to_bohr=1.0):
         Summary of EFP geometry & point charges (QM atoms) suitable for printing.
 
     """
-    text = ''
-    text += '\n  ==>  EFP Geometry  <==\n\n'
-    text += '    Geometry (in {} * {:12.8f}):\n\n'.format('Bohr', units_to_bohr)
-    text += '       Center              X                  Y                   Z             QM/EFP\n'
-    text += '    ------------   -----------------  -----------------  -----------------   ------------\n'
+    text = ""
+    text += "\n  ==>  EFP Geometry  <==\n\n"
+    text += "    Geometry (in {} * {:12.8f}):\n\n".format("Bohr", units_to_bohr)
+    text += "       Center              X                  Y                   Z             QM/EFP\n"
+    text += "    ------------   -----------------  -----------------  -----------------   ------------\n"
 
     mol_info = efpobj.get_atoms()
-    terminal_frag = [fr[0] for fr in mol_info['fragments'][1:]]
+    terminal_frag = [fr[0] for fr in mol_info["fragments"][1:]]
     frag_names = efpobj.get_frag_name()
 
     ifr = 0
-    for iat, at in enumerate(mol_info['full_atoms']):
+    for iat, at in enumerate(mol_info["full_atoms"]):
         if iat in terminal_frag:
-            text += '    --\n'
+            text += "    --\n"
             ifr += 1
-        text += '    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}   {}\n'.format(at['symbol'], '',
-                                                                               at['x'] * units_to_bohr,
-                                                                               at['y'] * units_to_bohr,
-                                                                               at['z'] * units_to_bohr,
-                                                                               frag_names[ifr].lower())
+        text += "    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}   {}\n".format(
+            at["symbol"],
+            "",
+            at["x"] * units_to_bohr,
+            at["y"] * units_to_bohr,
+            at["z"] * units_to_bohr,
+            frag_names[ifr].lower(),
+        )
 
     # TODO move into dict?
     ptc_info = {
-        'n': efpobj.get_point_charge_count(),
-        'xyz': efpobj.get_point_charge_coordinates(verbose=0),
-        'val': efpobj.get_point_charge_values(verbose=0)
+        "n": efpobj.get_point_charge_count(),
+        "xyz": efpobj.get_point_charge_coordinates(verbose=0),
+        "val": efpobj.get_point_charge_values(verbose=0),
     }
 
-    if ptc_info['n'] > 0:
-        mult3 = list(map(list, zip(*[iter(ptc_info['xyz'])] * 3)))
-        text += '    ------------\n'
-        for ptc in range(ptc_info['n']):
-            text += '    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}   {}\n'.format(ptc_info['val'][ptc], '',
-                                                                                   mult3[ptc][0] * units_to_bohr,
-                                                                                   mult3[ptc][1] * units_to_bohr,
-                                                                                   mult3[ptc][2] * units_to_bohr,
-                                                                                   'point_charge')
+    if ptc_info["n"] > 0:
+        mult3 = list(map(list, zip(*[iter(ptc_info["xyz"])] * 3)))
+        text += "    ------------\n"
+        for ptc in range(ptc_info["n"]):
+            text += "    {:8}{:4}   {:17.12f}  {:17.12f}  {:17.12f}   {}\n".format(
+                ptc_info["val"][ptc],
+                "",
+                mult3[ptc][0] * units_to_bohr,
+                mult3[ptc][1] * units_to_bohr,
+                mult3[ptc][2] * units_to_bohr,
+                "point_charge",
+            )
 
-    text += '\n'
+    text += "\n"
     return text
 
 
@@ -1086,32 +1126,27 @@ def nuclear_repulsion_energy(efpobj, use_efp_frags=True, use_point_charges=False
     loc = []
 
     if use_efp_frags:
-        loc.extend(efpobj.get_atoms()['full_atoms'])
+        loc.extend(efpobj.get_atoms()["full_atoms"])
     if use_point_charges:
         ptc_xyz = efpobj.get_point_charge_coordinates(verbose=0)
         ptc_val = efpobj.get_point_charge_values(verbose=0)
         for ptc in range(efpobj.get_point_charge_count()):
-            loc.append({
-                'Z': ptc_val[ptc],
-                'x': ptc_xyz[ptc * 3],
-                'y': ptc_xyz[ptc * 3 + 1],
-                'z': ptc_xyz[ptc * 3 + 2]
-            })
+            loc.append({"Z": ptc_val[ptc], "x": ptc_xyz[ptc * 3], "y": ptc_xyz[ptc * 3 + 1], "z": ptc_xyz[ptc * 3 + 2]})
 
     for iat1, at1 in enumerate(loc):
         for iat2, at2 in enumerate(loc):
             if iat2 < iat1:
-                ZZ = at1['Z'] * at2['Z']
-                dx = at1['x'] - at2['x']
-                dy = at1['y'] - at2['y']
-                dz = at1['z'] - at2['z']
+                ZZ = at1["Z"] * at2["Z"]
+                dx = at1["x"] - at2["x"]
+                dy = at1["y"] - at2["y"]
+                dz = at1["z"] - at2["z"]
                 dist = math.sqrt(dx * dx + dy * dy + dz * dz)
                 nre += ZZ / dist
 
     return nre
 
 
-#def _frag_idx_validation(efpobj, ifr):
+# def _frag_idx_validation(efpobj, ifr):
 #    nfr = efpobj.get_frag_count()
 #    if (ifr < 0) or (ifr >= nfr):
 #        raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
@@ -1137,13 +1172,15 @@ def set_frag_coordinates(efpobj, ifr, ctype, coord):
     if isinstance(ctype, str):
         try:
             ctype = {
-                'xyzabc': core.EFP_COORD_TYPE_XYZABC,
-                'points': core.EFP_COORD_TYPE_POINTS,
-                'rotmat': core.EFP_COORD_TYPE_ROTMAT,
+                "xyzabc": core.EFP_COORD_TYPE_XYZABC,
+                "points": core.EFP_COORD_TYPE_POINTS,
+                "rotmat": core.EFP_COORD_TYPE_ROTMAT,
             }[ctype.lower()]
         except KeyError:
-            _result_to_error(core.efp_result.EFP_RESULT_SYNTAX_ERROR,
-                             'invalid value for [xyzabc/points/rotmat] {}: {}'.format('ctype', ctype))
+            _result_to_error(
+                core.efp_result.EFP_RESULT_SYNTAX_ERROR,
+                "invalid value for [xyzabc/points/rotmat] {}: {}".format("ctype", ctype),
+            )
 
     efpobj.input_units_to_au = 1.0
     res = efpobj._efp_set_frag_coordinates(ifr, ctype, coord)
@@ -1168,9 +1205,9 @@ def set_point_charge_coordinates(efpobj, xyz):
     """
     n_ptc = efpobj.get_point_charge_count()
     if n_ptc == 0:
-        raise PyEFPSyntaxError('Must initialize point charges with set_point_charges')
+        raise PyEFPSyntaxError("Must initialize point charges with set_point_charges")
     if len(xyz) != (3 * n_ptc):
-        raise PyEFPSyntaxError('Invalid point charge length: {}'.format(xyz))
+        raise PyEFPSyntaxError("Invalid point charge length: {}".format(xyz))
 
     res = efpobj._efp_set_point_charge_coordinates(len(xyz), xyz)
     _result_to_error(res)
@@ -1193,9 +1230,9 @@ def set_point_charge_values(efpobj, ptc):
     """
     n_ptc = efpobj.get_point_charge_count()
     if n_ptc == 0:
-        raise PyEFPSyntaxError('Must initialize point charges with set_point_charges')
+        raise PyEFPSyntaxError("Must initialize point charges with set_point_charges")
     if len(ptc) != n_ptc:
-        raise PyEFPSyntaxError('Invalid point charge length: {}'.format(ptc))
+        raise PyEFPSyntaxError("Invalid point charge length: {}".format(ptc))
 
     res = efpobj._efp_set_point_charge_values(len(ptc), ptc)
     _result_to_error(res)
@@ -1222,7 +1259,7 @@ def set_point_charges(efpobj, ptc, coord):
         coord = sum(coord, [])
 
     if (len(ptc) * 3) != len(coord):
-        raise PyEFPSyntaxError('Invalid point charges setting: {}'.format(coord))
+        raise PyEFPSyntaxError("Invalid point charges setting: {}".format(coord))
 
     res = efpobj._efp_set_point_charges(len(ptc), ptc, coord)
     _result_to_error(res)
@@ -1243,18 +1280,18 @@ def get_frag_name(efpobj, ifr=None):
         fragments in list.
 
     """
-    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic='name')
+    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic="name")
 
 
 def _get_frag_common(efpobj, ifr, topic):
     nfr = efpobj.get_frag_count()
 
     fn_mapper = {
-        'name': efpobj._efp_get_frag_name,
-        'charge': efpobj._efp_get_frag_charge,
-        'xyzabc': efpobj._efp_get_frag_xyzabc,
-        'atom_count': efpobj._efp_get_frag_atom_count,
-        'multiplicity': efpobj._efp_get_frag_multiplicity,
+        "name": efpobj._efp_get_frag_name,
+        "charge": efpobj._efp_get_frag_charge,
+        "xyzabc": efpobj._efp_get_frag_xyzabc,
+        "atom_count": efpobj._efp_get_frag_atom_count,
+        "multiplicity": efpobj._efp_get_frag_multiplicity,
     }
 
     if ifr is None:
@@ -1273,7 +1310,7 @@ def _get_frag_common(efpobj, ifr, topic):
 
             return ftopic
         else:
-            raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
+            raise PyEFPSyntaxError("Invalid fragment index for 0-indexed {}-fragment EFP: {}".format(nfr, ifr))
 
 
 def get_frag_charge(efpobj, ifr=None, zero=1e-8):
@@ -1293,7 +1330,7 @@ def get_frag_charge(efpobj, ifr=None, zero=1e-8):
         fragments in list.
 
     """
-    chg = _get_frag_common(efpobj=efpobj, ifr=ifr, topic='charge')
+    chg = _get_frag_common(efpobj=efpobj, ifr=ifr, topic="charge")
     if ifr is None:
         return [(0.0 if math.fabs(c) < zero else c) for c in chg]
     else:
@@ -1318,7 +1355,7 @@ def get_frag_multiplicity(efpobj, ifr=None):
         of all fragments in list.
 
     """
-    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic='multiplicity')
+    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic="multiplicity")
 
 
 def get_frag_atom_count(efpobj, ifr=None):
@@ -1336,7 +1373,7 @@ def get_frag_atom_count(efpobj, ifr=None):
         of all fragments in list.
 
     """
-    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic='atom_count')
+    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic="atom_count")
 
 
 def get_frag_atoms(efpobj, ifr):
@@ -1369,20 +1406,20 @@ def get_frag_atoms(efpobj, ifr):
         _result_to_error(res)
 
         for at in atoms:
-            mobj = re.match(r'\AA\d*(?P<symbol>[A-Z]{1,3})\d*\Z', at['label'])
+            mobj = re.match(r"\AA\d*(?P<symbol>[A-Z]{1,3})\d*\Z", at["label"])
             if mobj:
-                at['symbol'] = mobj.group('symbol').capitalize()
+                at["symbol"] = mobj.group("symbol").capitalize()
         return atoms
     else:
-        raise PyEFPSyntaxError('Invalid fragment index for 0-indexed {}-fragment EFP: {}'.format(nfr, ifr))
+        raise PyEFPSyntaxError("Invalid fragment index for 0-indexed {}-fragment EFP: {}".format(nfr, ifr))
 
 
 def get_atoms(efpobj):
-    #enum efp_result res;
-    #size_t frag_natom, natom=0;
-    #double frag_chg;
-    #int frag_mult;
-    #py::list fr, frt, frcg, frmp, full_atoms;
+    # enum efp_result res;
+    # size_t frag_natom, natom=0;
+    # double frag_chg;
+    # int frag_mult;
+    # py::list fr, frt, frcg, frmp, full_atoms;
 
     natom = 0
     frag_count = efpobj.get_frag_count()
@@ -1405,11 +1442,11 @@ def get_atoms(efpobj):
     mol_info["fix_orientation"] = True
     mol_info["fix_symmetry"] = "c1"
 
-    mol_info['fragments'] = fr
-    mol_info['fragment_types'] = ['Real'] * frag_count
-    mol_info['fragment_charges'] = efpobj.get_frag_charge()
-    mol_info['fragment_multiplicities'] = efpobj.get_frag_multiplicity()
-    mol_info['full_atoms'] = full_atoms
+    mol_info["fragments"] = fr
+    mol_info["fragment_types"] = ["Real"] * frag_count
+    mol_info["fragment_charges"] = efpobj.get_frag_charge()
+    mol_info["fragment_multiplicities"] = efpobj.get_frag_multiplicity()
+    mol_info["full_atoms"] = full_atoms
 
     return mol_info
 
@@ -1417,15 +1454,15 @@ def get_atoms(efpobj):
 def to_viz_dict(efpobj):
 
     pyat = efpobj.get_atoms()
-    for at in pyat['full_atoms']:
-        at['ghosted'] = False
-        at['at_type'] = 'efpxyz'
-        mobj = re.match(r'\AA\d*(?P<symbol>[A-Z]{1,3})\d*\Z', at['label'])
+    for at in pyat["full_atoms"]:
+        at["ghosted"] = False
+        at["at_type"] = "efpxyz"
+        mobj = re.match(r"\AA\d*(?P<symbol>[A-Z]{1,3})\d*\Z", at["label"])
         if mobj:
-            at['symbol'] = mobj.group('symbol').capitalize()
-        at['charge'] = at['Z']
-        #pyat['molecule']['fragment_charges'].append(efpobj.get_frag_charges(fr)
-        #pyat['molecule']['fragment_multiplicities'].append(efpobj.get_frag_multiplicity(fr)
+            at["symbol"] = mobj.group("symbol").capitalize()
+        at["charge"] = at["Z"]
+        # pyat['molecule']['fragment_charges'].append(efpobj.get_frag_charges(fr)
+        # pyat['molecule']['fragment_multiplicities'].append(efpobj.get_frag_multiplicity(fr)
 
     return pyat
 
@@ -1447,38 +1484,39 @@ def get_frag_xyzabc(efpobj, ifr=None):
         through XYZABC will have the angles standardized to (-pi, pi].
 
     """
-    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic='xyzabc')
+    return _get_frag_common(efpobj=efpobj, ifr=ifr, topic="xyzabc")
 
 
-def to_dict(efpobj, dtype='psi4'):
+def to_dict(efpobj, dtype="psi4"):
     molrec = {}
 
     nfr = efpobj.get_frag_count()
     fnat = efpobj.get_frag_atom_count()
-    frs = functools.reduce(lambda c, x: c + [c[-1] + x], fnat,
-                           [0])[1:]  # np.cumsum(fnat)  https://stackoverflow.com/a/33034961
+    frs = functools.reduce(lambda c, x: c + [c[-1] + x], fnat, [0])[
+        1:
+    ]  # np.cumsum(fnat)  https://stackoverflow.com/a/33034961
     nat = frs[-1]
 
-    molrec['units'] = 'Bohr'
-    molrec['fix_com'] = True
-    molrec['fix_orientation'] = True
+    molrec["units"] = "Bohr"
+    molrec["fix_com"] = True
+    molrec["fix_orientation"] = True
 
-    atommajor = efpobj.get_atoms()['full_atoms']
+    atommajor = efpobj.get_atoms()["full_atoms"]
     geom = []
     for at in atommajor:
-        xyz = [at['x'], at['y'], at['z']]
+        xyz = [at["x"], at["y"], at["z"]]
         geom.extend(xyz)
-    molrec['geom'] = geom
-    molrec['elea'] = [-1] * nat
-    molrec['elez'] = [int(at['Z']) for at in atommajor]
-    molrec['elem'] = [at['symbol'] for at in atommajor]
-    molrec['mass'] = [at['mass'] for at in atommajor]
-    molrec['real'] = [True] * nat
-    molrec['elbl'] = ['_' + at['label'].lower() for at in atommajor]
+    molrec["geom"] = geom
+    molrec["elea"] = [-1] * nat
+    molrec["elez"] = [int(at["Z"]) for at in atommajor]
+    molrec["elem"] = [at["symbol"] for at in atommajor]
+    molrec["mass"] = [at["mass"] for at in atommajor]
+    molrec["real"] = [True] * nat
+    molrec["elbl"] = ["_" + at["label"].lower() for at in atommajor]
 
-    molrec['fragment_separators'] = frs[:-1]
-    molrec['fragment_charges'] = efpobj.get_frag_charge()
-    molrec['fragment_multiplicities'] = efpobj.get_frag_multiplicity()
+    molrec["fragment_separators"] = frs[:-1]
+    molrec["fragment_charges"] = efpobj.get_frag_charge()
+    molrec["fragment_multiplicities"] = efpobj.get_frag_multiplicity()
 
     def _high_spin_sum(mult_list):
         mm = 1
@@ -1486,29 +1524,31 @@ def to_dict(efpobj, dtype='psi4'):
             mm += m - 1
         return mm
 
-    molrec['molecular_charge'] = sum(molrec['fragment_charges'])
-    molrec['molecular_multiplicity'] = _high_spin_sum(molrec['fragment_multiplicities'])
-    molrec['provenance'] = provenance_stamp(__name__ + '.' + sys._getframe().f_code.co_name)
+    molrec["molecular_charge"] = sum(molrec["fragment_charges"])
+    molrec["molecular_multiplicity"] = _high_spin_sum(molrec["fragment_multiplicities"])
+    molrec["provenance"] = provenance_stamp(__name__ + "." + sys._getframe().f_code.co_name)
 
-    molrec['fragment_files'] = [fl.lower() for fl in efpobj.get_frag_name()]
-    molrec['hint_types'] = ['xyzabc'] * nfr
-    molrec['geom_hints'] = efpobj.get_frag_xyzabc()
+    molrec["fragment_files"] = [fl.lower() for fl in efpobj.get_frag_name()]
+    molrec["hint_types"] = ["xyzabc"] * nfr
+    molrec["geom_hints"] = efpobj.get_frag_xyzabc()
 
     return qcel.molparse.to_schema(molrec, dtype=dtype)
 
 
 def old_to_dict(efpobj):
     pysys = {}
-    pysys['full_fragments'] = []
+    pysys["full_fragments"] = []
 
     for fr in range(efpobj.get_frag_count()):
-        pysys['full_fragments'].append({
-            'coordinates_hint': efpobj.get_frag_xyzabc(fr),
-            'efp_type': 'xyzabc',
-            'fragment_file': efpobj.get_frag_name(fr).lower(),
-        })
+        pysys["full_fragments"].append(
+            {
+                "coordinates_hint": efpobj.get_frag_xyzabc(fr),
+                "efp_type": "xyzabc",
+                "fragment_file": efpobj.get_frag_name(fr).lower(),
+            }
+        )
 
-    #pysys['molecule'] = {
+    # pysys['molecule'] = {
     #    'fix_com': True,
     #    'fix_orientation': True,
     #    'fix_symmetry': 'c1',
@@ -1521,7 +1561,7 @@ def old_to_dict(efpobj):
     #    'name': 'default',
     #    'input_units_to_au': 1.0}
     #    #'units': 'Bohr'}
-    pysys['molecule'] = {'input_units_to_au': efpobj.input_units_to_au}
+    pysys["molecule"] = {"input_units_to_au": efpobj.input_units_to_au}
 
     return pysys
 
@@ -1577,46 +1617,48 @@ def process_units(molrec):
     guaranteed to have "units"), but function is general-purpose.
 
     """
-    units = molrec.get('units', None)
-    input_units_to_au = molrec.get('input_units_to_au', None)
+    units = molrec.get("units", None)
+    input_units_to_au = molrec.get("input_units_to_au", None)
 
     b2a = qcel.constants.bohr2angstroms
-    a2b = 1. / b2a
+    a2b = 1.0 / b2a
 
     def perturb_check(candidate, reference):
-        return (abs(candidate, reference) < 0.05)
+        return abs(candidate, reference) < 0.05
 
     if units is None and input_units_to_au is not None:
-        if perturb_check(input_units_to_au, 1.):
-            funits = 'Bohr'
+        if perturb_check(input_units_to_au, 1.0):
+            funits = "Bohr"
             fiutau = input_units_to_au
         elif perturb_check(input_units_to_au, a2b):
-            funits = 'Angstrom'
+            funits = "Angstrom"
             fiutau = input_units_to_au
         else:
-            raise PyEFPSyntaxError("""No big perturbations to physical constants! {} !~= ({} or {})""".format(
-                input_units_to_au, 1.0, a2b))
+            raise PyEFPSyntaxError(
+                """No big perturbations to physical constants! {} !~= ({} or {})""".format(input_units_to_au, 1.0, a2b)
+            )
 
-    elif units in ['Angstrom', 'Bohr'] and input_units_to_au is None:
+    elif units in ["Angstrom", "Bohr"] and input_units_to_au is None:
         funits = units
 
-        if funits == 'Bohr':
-            fiutau = 1.
-        elif funits == 'Angstrom':
+        if funits == "Bohr":
+            fiutau = 1.0
+        elif funits == "Angstrom":
             fiutau = a2b
 
-    elif units in ['Angstrom', 'Bohr'] and input_units_to_au is not None:
-        expected_iutau = a2b if units == 'Angstrom' else 1.
+    elif units in ["Angstrom", "Bohr"] and input_units_to_au is not None:
+        expected_iutau = a2b if units == "Angstrom" else 1.0
 
         if perturb_check(input_units_to_au, expected_iutau):
             funits = units
             fiutau = input_units_to_au
         else:
-            raise PyEFPSyntaxError("""No big perturbations to physical constants! {} !~= {}""".format(
-                input_units_to_au, expected_iutau))
+            raise PyEFPSyntaxError(
+                """No big perturbations to physical constants! {} !~= {}""".format(input_units_to_au, expected_iutau)
+            )
 
     else:
-        raise PyEFPSyntaxError('Insufficient information: {} & {}'.format(units, input_units_to_au))
+        raise PyEFPSyntaxError("Insufficient information: {} & {}".format(units, input_units_to_au))
 
     return funits, fiutau
 
@@ -1641,19 +1683,18 @@ def from_dict(efp_init):
     _, input_units_to_au = process_units(efp_init)
 
     def hint_to_au(hint, htype, iutau):
-        if htype == 'xyzabc':
+        if htype == "xyzabc":
             return [(h * iutau if idx < 3 else h) for idx, h in enumerate(hint)]
-        elif htype == 'points':
+        elif htype == "points":
             return [h * iutau for h in hint]
 
-    for ifr, (fl, ht, gh) in enumerate(zip(efp_init['fragment_files'], efp_init['hint_types'],
-                                           efp_init['geom_hints'])):
+    for ifr, (fl, ht, gh) in enumerate(zip(efp_init["fragment_files"], efp_init["hint_types"], efp_init["geom_hints"])):
         efpobj.add_potential(fl, duplicates_ok=True)
         efpobj.add_fragment(fl)
         hint = hint_to_au(gh, ht, input_units_to_au)
         efpobj.set_frag_coordinates(ifr, ht, hint)
 
-    #efpobj.input_units_to_au = efp_init['input_units_to_au']
+    # efpobj.input_units_to_au = efp_init['input_units_to_au']
     efpobj.input_units_to_au = input_units_to_au
     efpobj.prepare()
     return efpobj
@@ -1667,10 +1708,11 @@ def provenance_stamp(routine: str) -> Dict[str, str]:
 
     """
     from .metadata import __version__
-    return {'creator': 'PylibEFP', 'version': __version__, 'routine': routine}
+
+    return {"creator": "PylibEFP", "version": __version__, "routine": routine}
 
 
-def extract_subsets(efpobj, reals: Union[int, List], ghosts: Union[int, List]=None):
+def extract_subsets(efpobj, reals: Union[int, List], ghosts: Union[int, List] = None):
     """Return new efpobj containing only `reals` fragments.
 
     Parameters

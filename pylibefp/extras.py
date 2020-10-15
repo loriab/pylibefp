@@ -23,7 +23,7 @@ _success_flag_ = False
 
 
 # Testing
-def test(extent='full', extras=None):
+def test(extent="full", extras=None):
     """Runs a test suite through pytest.
 
     Parameters
@@ -46,19 +46,19 @@ def test(extent='full', extras=None):
     try:
         import pytest
     except ImportError:
-        raise RuntimeError('Testing module `pytest` is not installed. Run `conda install pytest`')
+        raise RuntimeError("Testing module `pytest` is not installed. Run `conda install pytest`")
     abs_test_dir = os.path.sep.join([os.path.abspath(os.path.dirname(__file__)), "tests"])
 
-    command = ['-rws', '-v']
-    if extent.lower() in ['smoke', 'quick']:
-        command.extend(['-m', 'quick'])
-    elif extent.lower() == 'full':
-        command.extend(['-m', 'not long'])
-    elif extent.lower() == 'long':
+    command = ["-rws", "-v"]
+    if extent.lower() in ["smoke", "quick"]:
+        command.extend(["-m", "quick"])
+    elif extent.lower() == "full":
+        command.extend(["-m", "not long"])
+    elif extent.lower() == "long":
         pass
     if extras is not None:
         command.extend(extras)
-    command.extend(['--capture=sys', abs_test_dir])
+    command.extend(["--capture=sys", abs_test_dir])
 
     retcode = pytest.main(command)
     return retcode

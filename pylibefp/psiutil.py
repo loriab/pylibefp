@@ -15,7 +15,7 @@ import os
 
 
 ## {{{ http://code.activestate.com/recipes/52224/#c4
-def search_file(filename, search_path, implicitExt=''):
+def search_file(filename, search_path, implicitExt=""):
     """Given a search_pathsep-delimited search_path string, find filename.
     Returns search_path to filename if found, otherwise None.
     Also allows for files with implicit extensions (eg, .exe), but
@@ -26,13 +26,13 @@ def search_file(filename, search_path, implicitExt=''):
 
     """
 
-    if (os.path.isfile(filename) or implicitExt and os.path.isfile(filename + implicitExt)):
+    if os.path.isfile(filename) or implicitExt and os.path.isfile(filename + implicitExt):
         # Already absolute path.
         return filename
     for p in search_path.split(os.pathsep):
         fp = os.path.abspath(os.path.expandvars(os.path.expanduser(p)))
         candidate = os.path.join(fp, filename)
-        if (os.path.isfile(candidate) or implicitExt and os.path.isfile(candidate + implicitExt)):
+        if os.path.isfile(candidate) or implicitExt and os.path.isfile(candidate + implicitExt):
             return candidate
     return None
 

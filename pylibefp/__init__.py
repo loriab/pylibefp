@@ -12,15 +12,25 @@
 #
 
 import os
-pylibefp_module_loc = os.path.dirname(os.path.abspath(__file__))
 
 # Init core
 from . import core
-
-# Load driver and version paraphernalia
-from .wrapper import from_dict, to_dict, extract_subsets
-from .exceptions import EFPException, Fatal, NoMemory, FileNotFound, EFPSyntaxError, UnknownFragment, PolNotConverged, PyEFPSyntaxError
-from .metadata import __version__, version_formatter
+from .exceptions import (
+    EFPException,
+    EFPSyntaxError,
+    Fatal,
+    FileNotFound,
+    NoMemory,
+    PolNotConverged,
+    PyEFPSyntaxError,
+    UnknownFragment,
+)
 
 # A few extraneous functions
 from .extras import test
+from .metadata import __version__, version_formatter
+
+# Load driver and version paraphernalia
+from .wrapper import extract_subsets, from_dict, to_dict
+
+pylibefp_module_loc = os.path.dirname(os.path.abspath(__file__))
