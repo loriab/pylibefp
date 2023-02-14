@@ -93,7 +93,7 @@ ExternalProject_Add(pylibefp-core
               -DPYTHON_LIBRARY=${PYTHON_LIBRARY}
               -DPYLIBEFP_ROOT=${CMAKE_CURRENT_SOURCE_DIR}
               -DTargetLAPACK_DIR=${TargetLAPACK_DIR}
-              -Dlibefp_DIR=${libefp_DIR}
+              #-Dlibefp_DIR=${libefp_DIR}
               -Dpybind11_DIR=${pybind11_DIR}
               -DLIBC_INTERJECT=${LIBC_INTERJECT}
    CMAKE_CACHE_ARGS -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
