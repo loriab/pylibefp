@@ -17,7 +17,8 @@ else()
 #        DOWNLOAD_COMMAND ""
 #        SOURCE_DIR "/home/psilocaluser/gits/libefp"
         UPDATE_COMMAND ""
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
+        CMAKE_ARGS -G${CMAKE_GENERATOR}
+                   -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
                    -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}
