@@ -72,7 +72,7 @@ ExternalProject_Add(pylibefp-core
    DEPENDS #lapack_external
            libefp_external
            pybind11_external
-           qcelemental_external
+           #qcelemental_external
    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pylibefp
    CMAKE_ARGS -G${CMAKE_GENERATOR}
               -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
