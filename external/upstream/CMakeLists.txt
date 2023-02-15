@@ -1,6 +1,6 @@
 foreach(dir libefp
             pybind11
-            #qcelemental
+            qcelemental
 )
    add_subdirectory(${dir})
 endforeach()
