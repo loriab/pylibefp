@@ -45,7 +45,7 @@
 
 set(PN pylibefp)
 
-set(${PN}_PYMOD "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@@PYMOD_INSTALL_LIBDIR@")
+set(${PN}_PYMOD "${PACKAGE_PREFIX_DIR}/@PYMOD_INSTALL_DIR@")
 
 check_required_components(${PN})
 

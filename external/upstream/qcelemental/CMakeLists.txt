@@ -15,7 +15,7 @@ else()
     include(ExternalProject)
     message(STATUS "Suitable qcelemental could not be located, ${Magenta}Building qcelemental${ColourReset} instead.")
 
-    file(TO_NATIVE_PATH "${STAGED_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}" _install_lib)
+    file(TO_NATIVE_PATH "${STAGED_INSTALL_PREFIX}/${PYMOD_INSTALL_DIR}" _install_lib)
 
     ExternalProject_Add(qcelemental_external
         BUILD_ALWAYS 1

@@ -40,7 +40,7 @@ option_with_flags(ENABLE_XHOST "Enables processor-specific optimization" ON
                   "-xHost" "-march=native")
 option_with_default(CMAKE_BUILD_TYPE "Build type (Release or Debug)" Release)
 option_with_default(CMAKE_INSTALL_LIBDIR "Directory to which libraries installed" lib)
-option_with_default(PYMOD_INSTALL_LIBDIR "Location within CMAKE_INSTALL_LIBDIR to which python modules are installed" /)
+option_with_default(PYMOD_INSTALL_DIR "Location within PREFIX to which python modules are installed" /)
 option_with_default(ENABLE_GENERIC "Enables mostly static linking of system libraries for shared library" OFF)
 option_with_default(pylibefp_CXX_STANDARD "Specify C++ standard for core pylibefp" 11)
 
@@ -88,7 +88,7 @@ ExternalProject_Add(pylibefp-core
               -DCMAKE_INSTALL_BINDIR=${CMAKE_INSTALL_BINDIR}
               -DCMAKE_INSTALL_DATADIR=${CMAKE_INSTALL_DATADIR}
               -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}
-              -DPYMOD_INSTALL_LIBDIR=${PYMOD_INSTALL_LIBDIR}
+              -DPYMOD_INSTALL_DIR=${PYMOD_INSTALL_DIR}
               -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
               -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
               -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}

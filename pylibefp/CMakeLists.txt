@@ -43,7 +43,7 @@ target_link_libraries(core PRIVATE Threads::Threads)
 set(PN pylibefp)
 install(TARGETS core
         EXPORT "${PN}Targets"
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
+        LIBRARY DESTINATION ${PYMOD_INSTALL_DIR}/pylibefp)
 install(EXPORT "${PN}Targets"
         NAMESPACE "${PN}::"
         DESTINATION ${CMAKECONFIG_INSTALL_DIR})
@@ -66,12 +66,12 @@ add_custom_target(update_version ALL
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                   COMMENT "Generating version info")
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metadata.py
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
+        DESTINATION ${PYMOD_INSTALL_DIR}/pylibefp)
 
 # <<<  Install  >>>
 
 install(FILES __init__.py extras.py exceptions.py psiutil.py
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
+        DESTINATION ${PYMOD_INSTALL_DIR}/pylibefp)
 
 install(FILES ../tests/addons.py
               ../tests/conftest.py
@@ -83,11 +83,11 @@ install(FILES ../tests/addons.py
               ../tests/test_scf.py
               ../tests/test_psi.py
               ../tests/test_libefp.py
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp/tests/)
+        DESTINATION ${PYMOD_INSTALL_DIR}/pylibefp/tests/)
 
 configure_file(wrapper.py wrapper.py @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/wrapper.py
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}/pylibefp)
+        DESTINATION ${PYMOD_INSTALL_DIR}/pylibefp)
 
 # <<<  Export Config  >>>
 

@@ -14,6 +14,6 @@ endif()
 
 # A single command to remake and run the pytest smoke tests
 add_custom_target(pytest
-                  COMMAND PYTHONPATH=${STAGED_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}
+                  COMMAND PYTHONPATH=${STAGED_INSTALL_PREFIX}/${PYMOD_INSTALL_DIR}
                           ${PYTHON_EXECUTABLE} -m pytest -rws -v --capture=sys ${CMAKE_CURRENT_SOURCE_DIR}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
