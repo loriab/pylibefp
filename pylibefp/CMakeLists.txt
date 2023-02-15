@@ -8,7 +8,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(custom_color_messages)
 # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
-set(CMAKECONFIG_INSTALL_DIR "share/cmake/pylibefp")
+set(CMAKECONFIG_INSTALL_DIR "lib/cmake/pylibefp")
 
 # <<<  Marshal Dependencies & Add-ons  >>>
 
