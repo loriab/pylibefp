@@ -72,9 +72,10 @@ ExternalProject_Add(pylibefp-core
    DEPENDS #lapack_external
            libefp_external
            pybind11_external
-           qcelemental_external
+           #qcelemental_external
    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pylibefp
-   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
+   CMAKE_ARGS -G${CMAKE_GENERATOR}
+              -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
               -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
               -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
               -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
@@ -88,6 +89,10 @@ ExternalProject_Add(pylibefp-core
               -DCMAKE_INSTALL_DATADIR=${CMAKE_INSTALL_DATADIR}
               -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}
               -DPYMOD_INSTALL_LIBDIR=${PYMOD_INSTALL_LIBDIR}
+              -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+              -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
+              -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+              -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=${CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS}
               -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
               -DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_DIR}
               -DPYTHON_LIBRARY=${PYTHON_LIBRARY}

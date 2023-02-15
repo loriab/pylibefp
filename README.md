@@ -9,4 +9,4 @@
 | **Foundation** | [![license](https://img.shields.io/github/license/loriab/pylibefp.svg)](https://opensource.org/licenses/BSD-3-Clause) [![platforms](https://img.shields.io/conda/pn/psi4/pylibefp.svg)](https://anaconda.org/psi4/pylibefp) [![python](https://img.shields.io/badge/python-3.6+-blue.svg)](http://python3statement.org/) |
 | **Installation** | [![Conda](https://img.shields.io/conda/v/psi4/pylibefp.svg)](https://anaconda.org/psi4/pylibefp) [![Anaconda-Server Badge](https://anaconda.org/psi4/pylibefp/badges/latest_release_relative_date.svg)](https://anaconda.org/psi4/pylibefp) |
 
-python wrapper to I. Kaliman's [libefp](https://libefp.github.io/) for effective fragment potentials
+python wrapper to I. Kaliman and L. Slipchenko's [libefp](https://libefp2.github.io/) for effective fragment potentials

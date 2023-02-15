@@ -13,18 +13,22 @@ else()
     message(STATUS "Suitable libefp could not be located, ${Magenta}Building libefp${ColourReset} instead.")
     ExternalProject_Add(libefp_external
         #DEPENDS lapack_external
-        URL https://github.com/ilyak/libefp/archive/15cd7ce.tar.gz  # v1.5.0 + 10 (docs and a cmake lapack patch)
+        URL https://github.com/loriab/libefp/archive/longstanding.tar.gz
 #        DOWNLOAD_COMMAND ""
 #        SOURCE_DIR "/home/psilocaluser/gits/libefp"
         UPDATE_COMMAND ""
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
+        CMAKE_ARGS -G${CMAKE_GENERATOR}
+                   -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
                    -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}
                    -DCMAKE_INSTALL_BINDIR=${CMAKE_INSTALL_BINDIR}
                    -DCMAKE_INSTALL_DATADIR=${CMAKE_INSTALL_DATADIR}
                    -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}
+                   -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+                   -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
                    -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+                   -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=${CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS}
                    -DENABLE_OPENMP=${ENABLE_OPENMP}
                    -DENABLE_XHOST=${ENABLE_XHOST}
                    -DBUILD_FPIC=${BUILD_FPIC}
