@@ -20,7 +20,7 @@ set(CMAKECONFIG_INSTALL_DIR "share/cmake/pylibefp")
 
 #  <<  Pybind11 & Python  >>
 set(PYBIND11_CPP_STANDARD "-std=c++${CMAKE_CXX_STANDARD}")
-find_package(pybind11 2.3.0 CONFIG REQUIRED)
+find_package(pybind11 2.6.2 CONFIG REQUIRED)
 message(STATUS "${Cyan}Using pybind11${ColourReset}: ${pybind11_INCLUDE_DIR} (version ${pybind11_VERSION} for Py${PYTHON_VERSION_STRING} and ${PYBIND11_CPP_STANDARD})")
 message(STATUS "${Cyan}Using Python ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}${ColourReset}: ${PYTHON_EXECUTABLE}")
 
@@ -34,10 +34,9 @@ message(STATUS "${Cyan}Using libefp${ColourReset}: ${_loc} (version ${libefp_VER
 
 # <<<  Build  >>>
 
-pybind11_add_module(core NO_EXTRAS core.cc)
+pybind11_add_module(core MODULE core.cc)
 target_link_libraries(core PRIVATE libefp::efp)
 target_link_libraries(core PRIVATE ${LIBC_INTERJECT})
-target_link_libraries(core PUBLIC pybind11::module)
 target_link_libraries(core PRIVATE Threads::Threads)
 
 set(PN pylibefp)
@@ -54,6 +53,20 @@ set_target_properties(core PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"  # for py
                            SUFFIX "${PYTHON_MODULE_EXTENSION}" # for python module
                            INSTALL_RPATH "${psi4_RPATH}"
                            BUILD_WITH_INSTALL_RPATH ON)
+
+target_compile_features(core PRIVATE "cxx_std_17")
+
+    target_compile_definitions(core PRIVATE NDEBUG=1)
+
+if(MSVC)
+    target_compile_definitions(core PUBLIC _USE_MATH_DEFINES)
+    target_compile_options(core PUBLIC "/EHsc")
+    set_target_properties(
+      core
+      PROPERTIES
+        WINDOWS_EXPORT_ALL_SYMBOLS ON
+      )
+endif()
 
 # <<<  Version  >>>
 
