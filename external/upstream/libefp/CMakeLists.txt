@@ -27,6 +27,7 @@ else()
                    -DCMAKE_INSTALL_BINDIR=${CMAKE_INSTALL_BINDIR}
                    -DCMAKE_INSTALL_DATADIR=${CMAKE_INSTALL_DATADIR}
                    -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}
+                   -DLIBEFP_CMAKECONFIG_INSTALL_DIR=${LIBEFP_CMAKECONFIG_INSTALL_DIR}
                    -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
                    -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
                    -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
@@ -44,5 +45,5 @@ else()
                    #-DTargetLAPACK_DIR=${STAGED_INSTALL_PREFIX}/share/cmake/TargetLAPACK
         CMAKE_CACHE_ARGS -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS})
 
-    set(libefp_DIR ${STAGED_INSTALL_PREFIX}/share/cmake/libefp CACHE PATH "path to internally built libefpConfig.cmake" FORCE)
+    set(libefp_DIR ${STAGED_INSTALL_PREFIX}/${LIBEFP_CMAKECONFIG_INSTALL_DIR} CACHE PATH "path to internally built libefpConfig.cmake" FORCE)
 endif()
