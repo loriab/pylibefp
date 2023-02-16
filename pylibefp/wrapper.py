@@ -131,6 +131,7 @@ def add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
         if pth == 'LIBRARY':
             paths.append('@libefp_FRAGLIB_DIRS@')
             paths.append('/opt/anaconda1anaconda2anaconda3/share/libefp/fraglib')
+            paths.append('/opt/anaconda1anaconda2anaconda3/Library/share/libefp/fraglib')
         else:
             paths.append(os.path.expandvars(os.path.expanduser(pth)))
     paths = os.pathsep.join(paths)
