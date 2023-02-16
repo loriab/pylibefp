@@ -13,11 +13,9 @@ else()
     message(STATUS "Suitable libefp could not be located, ${Magenta}Building libefp${ColourReset} instead.")
     ExternalProject_Add(libefp_external
         #DEPENDS lapack_external
-        #URL https://github.com/libefp2/libefp/archive/15cd7ce.tar.gz  # v1.5.0 + 10 (docs and a cmake lapack patch)
-        #URL https://github.com/loriab/libefp/archive/dc89607.tar.gz  # v1.5.0 + 11 (above and a cmake install windows patch)
-        URL https://github.com/loriab/libefp/archive/workwin.tar.gz
-#        DOWNLOAD_COMMAND ""
-#        SOURCE_DIR "/home/psilocaluser/gits/libefp"
+        #URL https://github.com/libefp2/libefp/archive/15cd7ce.tar.gz  # v1.5.0 + 10 (docs and a cmake lapack patch) (longstanding; present on master branch in both GH:ilyak/libefp and GH:libefp2/libefp)
+        URL https://github.com/loriab/libefp/archive/14f8594.tar.gz  # v1.5.0 + 13 (above plus some cmake patches for windows) (head of patched_v150 branch only at GH:loriab/libefp)
+        URL_HASH SHA256=26026fc3f9bae4715fe06113a53908f3602127398bb219fce4e8b3750f2a05e0
         UPDATE_COMMAND ""
         CMAKE_ARGS -G${CMAKE_GENERATOR}
                    -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
