@@ -54,19 +54,23 @@ set_target_properties(core PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"  # for py
                            INSTALL_RPATH "${psi4_RPATH}"
                            BUILD_WITH_INSTALL_RPATH ON)
 
-target_compile_features(core PRIVATE "cxx_std_17")
-
-    target_compile_definitions(core PRIVATE NDEBUG=1)
-
-if(MSVC)
-    target_compile_definitions(core PUBLIC _USE_MATH_DEFINES)
-    target_compile_options(core PUBLIC "/EHsc")
-    set_target_properties(
-      core
-      PROPERTIES
-        WINDOWS_EXPORT_ALL_SYMBOLS ON
-      )
-endif()
+#target_compile_features(core PRIVATE "cxx_std_11")
+#
+##if (pybind11_VERSION VERSION_GREATER_EQUAL 2.7.0)
+#    # suppress error in L2
+#    # * https://github.com/pybind/pybind11/pull/2919
+#    target_compile_definitions(core PRIVATE NDEBUG=1)
+##endif()
+#
+#if(MSVC)
+#    target_compile_definitions(core PUBLIC _USE_MATH_DEFINES)
+#    target_compile_options(core PUBLIC "/EHsc")
+#    set_target_properties(
+#      core
+#      PROPERTIES
+#        WINDOWS_EXPORT_ALL_SYMBOLS ON
+#      )
+#endif()
 
 # <<<  Version  >>>
 
