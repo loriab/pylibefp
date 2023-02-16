@@ -135,7 +135,6 @@ def add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
         else:
             paths.append(os.path.expandvars(os.path.expanduser(pth)))
     paths = os.pathsep.join(paths)
-    print("paths", paths)
 
     #        paths.append(libraryPath)
     #    elif pth in os.environ:
@@ -149,13 +148,11 @@ def add_potential(efpobj, potential, fragpath='LIBRARY', duplicates_ok=False):
     if isinstance(potential, str):
         potential = [potential]
     uniq_pots = list(set(potential))
-    print("uniq_pots", uniq_pots)
     for pot in uniq_pots:
         if not pot.endswith('.efp'):
             pot += '.efp'
         abspath_pots.append(psiutil.search_file(pot, paths))
 
-    print("abspath_pots", abspath_pots)
     # load the potentials
     for ipot, pot in enumerate(abspath_pots):
         res = efpobj._efp_add_potential(pot)
