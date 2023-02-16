@@ -51,14 +51,6 @@ set_target_properties(core PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"  # for py
                            INSTALL_RPATH "${psi4_RPATH}"
                            BUILD_WITH_INSTALL_RPATH ON)
 
-if(MSVC)
-    target_compile_options(core PUBLIC "/EHsc")
-    set_target_properties(
-      core
-      PROPERTIES
-        WINDOWS_EXPORT_ALL_SYMBOLS ON
-      )
-endif()
 
 # <<<  Version  >>>
 
