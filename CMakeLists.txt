@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)  # 3.3: EP_add(DEPENDS interfacelib
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+    # Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
+    cmake_policy(SET CMP0135 NEW)
+endif()
 # project_VERSION* variables undefined, handled in primary EP
 
 project(pylibefp
@@ -43,6 +47,8 @@ option_with_default(CMAKE_INSTALL_LIBDIR "Directory to which libraries installed
 option_with_default(PYMOD_INSTALL_LIBDIR "Location within CMAKE_INSTALL_LIBDIR to which python modules are installed" /)
 option_with_default(ENABLE_GENERIC "Enables mostly static linking of system libraries for shared library" OFF)
 option_with_default(pylibefp_CXX_STANDARD "Specify C++ standard for core pylibefp" 11)
+option_with_default(PYLIBEFP_CMAKECONFIG_INSTALL_DIR "Directory within CMAKE_INSTALL_PREFIX to which CMake configuration files installed" "share/cmake/pylibefp")
+option_with_default(LIBEFP_CMAKECONFIG_INSTALL_DIR "Directory within CMAKE_INSTALL_PREFIX to which CMake configuration files installed" "share/cmake/libefp")
 
 ########################  Process & Validate Options  ##########################
 include(GNUInstallDirs)
@@ -72,9 +78,10 @@ ExternalProject_Add(pylibefp-core
    DEPENDS #lapack_external
            libefp_external
            pybind11_external
-           qcelemental_external
+           #qcelemental_external
    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pylibefp
-   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
+   CMAKE_ARGS -G${CMAKE_GENERATOR}
+              -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
               -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
               -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
               -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
@@ -87,7 +94,12 @@ ExternalProject_Add(pylibefp-core
               -DCMAKE_INSTALL_BINDIR=${CMAKE_INSTALL_BINDIR}
               -DCMAKE_INSTALL_DATADIR=${CMAKE_INSTALL_DATADIR}
               -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}
+              -DPYLIBEFP_CMAKECONFIG_INSTALL_DIR=${PYLIBEFP_CMAKECONFIG_INSTALL_DIR}
               -DPYMOD_INSTALL_LIBDIR=${PYMOD_INSTALL_LIBDIR}
+              -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+              -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
+              -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+              -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=${CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS}
               -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
               -DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_DIR}
               -DPYTHON_LIBRARY=${PYTHON_LIBRARY}
