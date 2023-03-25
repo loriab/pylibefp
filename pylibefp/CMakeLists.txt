@@ -17,9 +17,10 @@ include(custom_color_messages)
 #message(STATUS "${Cyan}Using LAPACK${_isMKL}${ColourReset}: ${_ill0};...")
 
 #  <<  Pybind11 & Python  >>
+find_package(Python 3.6 COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 2.6.2 CONFIG REQUIRED)
-message(STATUS "${Cyan}Using pybind11${ColourReset}: ${pybind11_INCLUDE_DIR} (version ${pybind11_VERSION} for Py${PYTHON_VERSION_STRING} and ${PYBIND11_CPP_STANDARD})")
-message(STATUS "${Cyan}Using Python ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}${ColourReset}: ${PYTHON_EXECUTABLE}")
+message(STATUS "${Cyan}Using pybind11${ColourReset}: ${pybind11_INCLUDE_DIR} (version ${pybind11_VERSION} for Py${Python_VERSION} and ${CMAKE_CXX_STANDARD})")
+message(STATUS "${Cyan}Using Python ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}${ColourReset}: ${Python_EXECUTABLE}")
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 find_package(Threads REQUIRED)
@@ -45,10 +46,8 @@ install(EXPORT "${PN}Targets"
         DESTINATION ${PYLIBEFP_CMAKECONFIG_INSTALL_DIR})
 
 set_target_properties(core PROPERTIES
-                           #PREFIX "${PYTHON_MODULE_PREFIX}"  # for python module
                            OUTPUT_NAME core
                            EXPORT_NAME core
-                           #SUFFIX "${PYTHON_MODULE_EXTENSION}" # for python module (fails for py311)
                            INSTALL_RPATH "${psi4_RPATH}"
                            BUILD_WITH_INSTALL_RPATH ON)
 
@@ -56,7 +55,7 @@ set_target_properties(core PROPERTIES
 # <<<  Version  >>>
 
 add_custom_target(update_version ALL
-                  COMMAND ${PYTHON_EXECUTABLE} versioner.py --metaout ${CMAKE_CURRENT_BINARY_DIR}/metadata.py
+                  COMMAND ${Python_EXECUTABLE} versioner.py --metaout ${CMAKE_CURRENT_BINARY_DIR}/metadata.py
                                                             --cmakeout ${CMAKE_CURRENT_BINARY_DIR}/metadata.cmake
                   COMMAND ${CMAKE_COMMAND} -DWTO="${CMAKE_CURRENT_BINARY_DIR}/${PYLIBEFP_CMAKECONFIG_INSTALL_DIR}"
                                            -DPN="pylibefp"

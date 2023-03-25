@@ -6,6 +6,7 @@
 # * Remove ``if(NOT PY_${module})`` so runs each time, also remove module caps
 # * Module name, not path in fphsa
 # * Added version handling via parse_version call
+# * Switched PYTHON -> Python
 
 #.rst:
 #
@@ -34,7 +35,7 @@ macro(find_python_module module)
         set(${module}_tgtver ${ARG_EXACT})
     else()
         # deceive handle_standard_arguments into not caring about version
-        set(_${module}_requested_version_found "${PYTHON_EXECUTABLE}")
+        set(_${module}_requested_version_found "${Python_EXECUTABLE}")
     endif()
 
     unset(PY_${module} CACHE)
@@ -44,7 +45,7 @@ macro(find_python_module module)
     #   it's a .so file.
     # * Unsure of the balance btwn submission to user's PYTHONPATH and avoiding
     #   strays in same. So clobbering user for now with `sys.path.insert(0`
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c"
+    execute_process(COMMAND "${Python_EXECUTABLE}" "-c"
                             "import re, sys; \
                              sys.path.insert(0, '${STAGED_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}'); \
                              import ${module}; \
@@ -57,7 +58,7 @@ macro(find_python_module module)
         set(PY_${module} ${_${module}_location} CACHE STRING
             "Location of Python module ${module}" FORCE)
 
-        execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c"
+        execute_process(COMMAND "${Python_EXECUTABLE}" "-c"
                                 "import sys; \
                                  sys.path.insert(0, '${STAGED_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}'); \
                                  import ${module}; \
@@ -71,7 +72,7 @@ macro(find_python_module module)
                 "Version of Python module ${module}" FORCE)
 
             if(${module}_tgtver)
-                execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c"
+                execute_process(COMMAND "${Python_EXECUTABLE}" "-c"
                                         "from pkg_resources import parse_version; \
                                          print(parse_version('${${module}_VERSION}') ${_op} parse_version('${${module}_tgtver}'))"
                 RESULT_VARIABLE _${module}_verenuf_status
@@ -80,7 +81,7 @@ macro(find_python_module module)
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
                 if(NOT ${_${module}_verenuf_status})
                     if(${_${module}_verenuf} STREQUAL "True")
-                        set(_${module}_requested_version_found "${PYTHON_EXECUTABLE}")
+                        set(_${module}_requested_version_found "${Python_EXECUTABLE}")
                     endif()
                 endif()
             endif()

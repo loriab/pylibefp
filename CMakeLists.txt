@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)  # 3.3: EP_add(DEPENDS interfacelib
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
     # Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
     cmake_policy(SET CMP0135 NEW)
@@ -60,9 +60,9 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 message(STATUS "pylibefp install: ${CMAKE_INSTALL_PREFIX}")
 
-set(Python_ADDITIONAL_VERSIONS 3.7 3.6)  # adjust with CMake minimum FindPythonInterp
-find_package(PythonLibsNew 3.6 REQUIRED)
-message(STATUS "${Cyan}Found Python ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}${ColourReset}: ${PYTHON_EXECUTABLE} (found version ${PYTHON_VERSION_STRING})")
+set(Python_ADDITIONAL_VERSIONS 3.11 3.10 3.9 3.8)  # adjust with CMake minimum FindPythonInterp
+find_package(Python 3.6 COMPONENTS Interpreter Development NumPy REQUIRED)
+message(STATUS "${Cyan}Found Python ${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}${ColourReset}: ${Python_EXECUTABLE} (found version ${Python_VERSION})")
 
 set(STAGED_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/stage)
 message(STATUS "PylibEFP staging: ${STAGED_INSTALL_PREFIX}")
@@ -100,9 +100,9 @@ ExternalProject_Add(pylibefp-core
               -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
               -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
               -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=${CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS}
-              -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
-              -DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_DIR}
-              -DPYTHON_LIBRARY=${PYTHON_LIBRARY}
+              -DPython_EXECUTABLE=${Python_EXECUTABLE}
+              -DPython_INCLUDE_DIR=${Python_INCLUDE_DIR}
+              -DPython_LIBRARY=${Python_LIBRARY}
               -DPYLIBEFP_ROOT=${CMAKE_CURRENT_SOURCE_DIR}
               -DTargetLAPACK_DIR=${TargetLAPACK_DIR}
               -Dlibefp_DIR=${libefp_DIR}
