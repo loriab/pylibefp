@@ -109,6 +109,8 @@ ExternalProject_Add(pylibefp-core
               -Dpybind11_DIR=${pybind11_DIR}
               -DLIBC_INTERJECT=${LIBC_INTERJECT}
    CMAKE_CACHE_ARGS -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
+                    -DCMAKE_C_COMPILER_ARG1:STRING=${CMAKE_C_COMPILER_ARG1}
+                    -DCMAKE_CXX_COMPILER_ARG1:STRING=${CMAKE_CXX_COMPILER_ARG1}
    BUILD_ALWAYS 1)
 
 add_subdirectory(doc)

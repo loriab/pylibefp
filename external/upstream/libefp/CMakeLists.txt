@@ -41,7 +41,8 @@ else()
                    -DLAPACK_LIBRARIES=${LAPACK_LIBRARIES}
                    -DDISABLE_FIND_PACKAGE_TargetLAPACK=${DISABLE_FIND_PACKAGE_TargetLAPACK}
                    #-DTargetLAPACK_DIR=${STAGED_INSTALL_PREFIX}/share/cmake/TargetLAPACK
-        CMAKE_CACHE_ARGS -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS})
+        CMAKE_CACHE_ARGS -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
+                         -DCMAKE_C_COMPILER_ARG1:STRING=${CMAKE_C_COMPILER_ARG1})
 
     set(libefp_DIR ${STAGED_INSTALL_PREFIX}/${LIBEFP_CMAKECONFIG_INSTALL_DIR} CACHE PATH "path to internally built libefpConfig.cmake" FORCE)
 endif()
