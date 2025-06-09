@@ -14,18 +14,20 @@ else()
 
     include(ExternalProject)
     message(STATUS "Suitable qcelemental could not be located, ${Magenta}Building qcelemental${ColourReset} instead.")
-
+    
     file(TO_NATIVE_PATH "${STAGED_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}${PYMOD_INSTALL_LIBDIR}" _install_lib)
 
     ExternalProject_Add(qcelemental_external
         BUILD_ALWAYS 1
-        URL https://github.com/MolSSI/QCElemental/archive/v0.11.0.tar.gz
+        URL https://github.com/MolSSI/QCElemental/archive/v0.29.0.tar.gz
+        DOWNLOAD_NO_EXTRACT 1
         CONFIGURE_COMMAND ""
         UPDATE_COMMAND ""
-        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
+        BUILD_COMMAND ""
         BUILD_IN_SOURCE 1
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install
-                                                      --record=record.txt
-                                                      --single-version-externally-managed
-                                                      --install-lib=${_install_lib})
+        INSTALL_COMMAND ${Python_EXECUTABLE} -m pip install <DOWNLOADED_FILE>
+                                                      --target=${_install_lib}
+                                                      --no-deps
+                                                      #-v
+        )
 endif()
