@@ -73,7 +73,7 @@ include(custom_cxxstandard)
 include(custom_static_library)
 
 ################################  Main Project  ################################
-On W, var may come in in native, and w/cmake v4, the psi4-core cache protests, so normalize path
+# On W, var may come in in native, and w/cmake v4, the psi4-core cache protests, so normalize path
 file(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}" _cmake_CMAKE_PREFIX_PATH)
 
 include(ExternalProject)
