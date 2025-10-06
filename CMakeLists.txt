@@ -73,6 +73,9 @@ include(custom_cxxstandard)
 include(custom_static_library)
 
 ################################  Main Project  ################################
+# On W, var may come in in native, and w/cmake v4, the psi4-core cache protests, so normalize path
+file(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}" _cmake_CMAKE_PREFIX_PATH)
+
 include(ExternalProject)
 ExternalProject_Add(pylibefp-core
    DEPENDS #lapack_external
@@ -108,7 +111,7 @@ ExternalProject_Add(pylibefp-core
               -Dlibefp_DIR=${libefp_DIR}
               -Dpybind11_DIR=${pybind11_DIR}
               -DLIBC_INTERJECT=${LIBC_INTERJECT}
-   CMAKE_CACHE_ARGS -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
+   CMAKE_CACHE_ARGS -DCMAKE_PREFIX_PATH:PATH=${_cmake_CMAKE_PREFIX_PATH}
                     -DCMAKE_C_COMPILER_ARG1:STRING=${CMAKE_C_COMPILER_ARG1}
                     -DCMAKE_CXX_COMPILER_ARG1:STRING=${CMAKE_CXX_COMPILER_ARG1}
    BUILD_ALWAYS 1)
